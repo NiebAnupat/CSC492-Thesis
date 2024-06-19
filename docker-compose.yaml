@@ -2,12 +2,50 @@ version: '3'
 
 services:
   frontend:
-    build: ./frontend
+    # commented below line to use the production build
+    command: pnpm dev
+    build:
+      context: ./frontend
+      # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
+      dockerfile: Dockerfile.dev
+      # dockerfile: Dockerfile.prod
+    environment:
+      - PORT=3000
+    expose:
+      - 3000
     ports:
       - "3000:3000"
     depends_on:
       - server
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /usr/src/app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
   server:
-    build: ./server
+    # commented below line to use the production build
+    command: pnpm start:dev
+    build:
+      context: ./server
+      # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
+      dockerfile: Dockerfile.dev
+      # dockerfile: Dockerfile.prod
+    environment:
+      - PORT=4000
+    expose:
+      - 4000
     ports:
       - "4000:4000"
+    develop:
+      watch:
+        - action: sync
+          path: ./server/src
+          target: /usr/src/app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
