@@ -3,12 +3,12 @@ version: '3'
 services:
   frontend:
     # commented below line to use the production build
-    command: pnpm dev
+    # command: pnpm dev
     build:
       context: ./frontend
       # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-      dockerfile: Dockerfile.dev
-      # dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.prod
+      # dockerfile: Dockerfile.dev
     environment:
       - PORT=3000
     expose:
@@ -28,12 +28,12 @@ services:
           path: package.json
   server:
     # commented below line to use the production build
-    command: pnpm start:dev
+    # command: pnpm start:dev
     build:
       context: ./server
       # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-      dockerfile: Dockerfile.dev
-      # dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.prod
+      # dockerfile: Dockerfile.dev
     environment:
       - PORT=4000
     expose:
@@ -49,3 +49,12 @@ services:
             - node_modules/
         - action: rebuild
           path: package.json
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
