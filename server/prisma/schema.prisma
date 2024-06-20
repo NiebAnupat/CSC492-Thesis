@@ -1,0 +1,629 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model appointment {
+  appointment_id         String                  @id @db.VarChar
+  hn                     String?                 @db.VarChar
+  dentist_id             String?                 @db.VarChar
+  appointment_date       DateTime?               @db.Date
+  appointment_time       DateTime?               @db.Time(6)
+  is_nv_refer            Boolean?                @default(false)
+  nv_operation_id        Int?
+  quantity               Int?                    @default(1)
+  is_notify              Boolean?                @default(false)
+  status                 appointment_status?     @default(pending)
+  create_at              DateTime?               @default(now()) @db.Timestamp(6)
+  update_at              DateTime?               @default(now()) @db.Timestamp(6)
+  edit_by                String?                 @db.VarChar
+  branch_id              String                  @db.VarChar
+  branch                 branch                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  dentist                dentist?                @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction)
+  employee               employee?               @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  patient                patient?                @relation(fields: [hn], references: [hn], onDelete: NoAction)
+  treatment_nv_operation treatment_nv_operation? @relation(fields: [nv_operation_id], references: [nv_operation_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model audit_log {
+  audit_log_id Int       @id @default(autoincrement())
+  action       actions?
+  table_name   String?   @db.VarChar
+  row_id       String?   @db.VarChar
+  old_value    Json?     @db.Json
+  new_value    Json?     @db.Json
+  create_at    DateTime? @default(now()) @db.Timestamp(6)
+  edit_by      String?   @db.VarChar
+  branch_id    String?   @db.VarChar
+  branch       branch?   @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee     employee? @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+model branch {
+  branch_id                            String                @id @db.VarChar
+  branch_name                          String?               @db.VarChar
+  address_line_1                       String?
+  address_line_2                       String?
+  provice_id                           Int?
+  telephone                            String?               @db.Char(10)
+  image_url                            String?               @db.VarChar
+  manager_id                           String?               @db.VarChar
+  owner_account                        String?               @db.VarChar
+  appointment                          appointment[]
+  audit_log                            audit_log[]
+  employee_branch_manager_idToemployee employee?             @relation("branch_manager_idToemployee", fields: [manager_id], references: [employee_id], onDelete: NoAction)
+  customer                             customer?             @relation(fields: [owner_account], references: [customer_id], onDelete: NoAction)
+  provice                              provice?              @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction)
+  clinic_stock                         clinic_stock[]
+  dentist                              dentist[]
+  dentist_workday                      dentist_workday[]
+  employee_employee_branch_idTobranch  employee[]            @relation("employee_branch_idTobranch")
+  expert_type                          expert_type[]
+  lab_vender                           lab_vender[]
+  medicine                             medicine[]
+  medicine_type                        medicine_type[]
+  operation_type                       operation_type[]
+  patient                              patient[]
+  position                             position[]
+  product                              product[]
+  receipt                              receipt[]
+  requisition_product                  requisition_product[]
+  tag_list                             tag_list[]
+  treatment                            treatment[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model clinic_stock {
+  clinic_stock_id     String                @id @db.VarChar
+  stock_type          stock_types
+  item_id             Int?
+  quantity            Int                   @default(0)
+  unit_price          Decimal               @default(0) @db.Decimal
+  minimun_quantity    Int                   @default(1)
+  create_at           DateTime?             @default(now()) @db.Timestamp(6)
+  update_at           DateTime?             @default(now()) @db.Timestamp(6)
+  edit_by             String?               @db.VarChar
+  branch_id           String?               @db.VarChar
+  branch              branch?               @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee            employee?             @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  medicine            medicine?             @relation(fields: [item_id], references: [medicine_id], onDelete: NoAction, map: "clinic_stock_item_id_fkey")
+  product             product?              @relation(fields: [item_id], references: [product_id], onDelete: NoAction, map: "clinic_stock_item_id_fkey1")
+  dispensing_medicine dispensing_medicine[]
+  receipt_product     receipt_product[]
+  requisition_product requisition_product[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model customer {
+  customer_id    String    @id @db.VarChar
+  email          String?   @db.VarChar
+  password       String?   @db.VarChar
+  citizen_id     String?   @db.Char(13)
+  fname          String?   @db.VarChar
+  lname          String?   @db.VarChar
+  telephone      String?   @db.Char(10)
+  address_line_1 String?
+  address_line_2 String?
+  package        packages? @default(basic)
+  branch         branch[]
+
+  @@index([password], type: Hash)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dentist {
+  dentist_id                    String                          @id @db.VarChar
+  password                      String?                         @db.VarChar
+  citizen_id                    String?                         @db.Char(13)
+  gender                        genders?
+  prefix                        String?                         @db.VarChar
+  fname                         String?                         @db.VarChar
+  lname                         String?                         @db.VarChar
+  birth_date                    DateTime?                       @db.Date
+  hire_date                     DateTime?                       @db.Date
+  dentist_certificate_number    String?                         @db.VarChar
+  expert_type_id                Int?
+  telephone                     String?                         @db.Char(10)
+  address_line_1                String?
+  address_line_2                String?
+  provice_id                    Int?
+  dentist_fee_rate              Decimal                         @default(0.5) @db.Decimal
+  default_lab_rate              Decimal                         @default(0.5) @db.Decimal
+  is_active                     Boolean                         @default(true)
+  create_at                     DateTime?                       @default(now()) @db.Timestamp(6)
+  update_at                     DateTime?                       @default(now()) @db.Timestamp(6)
+  edit_by                       String?                         @db.VarChar
+  branch_id                     String?                         @db.VarChar
+  appointment                   appointment[]
+  branch                        branch?                         @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee                      employee?                       @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  expert_type                   expert_type?                    @relation(fields: [expert_type_id], references: [expert_type_id], onDelete: NoAction)
+  provice                       provice?                        @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction)
+  dentist_workday               dentist_workday[]
+  treatment                     treatment[]
+  treatment_record_edit_history treatment_record_edit_history[]
+  treatment_record_template     treatment_record_template[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dentist_workday {
+  dentist_workday_id Int       @id @default(autoincrement())
+  dentist_id         String?   @db.VarChar
+  day                days?
+  time_start         DateTime? @db.Time(6)
+  time_end           DateTime? @db.Time(6)
+  create_at          DateTime? @default(now()) @db.Timestamp(6)
+  update_at          DateTime? @default(now()) @db.Timestamp(6)
+  edit_by            String?   @db.VarChar
+  branch_id          String?   @db.VarChar
+  branch             branch?   @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  dentist            dentist?  @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction)
+  employee           employee? @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+model dispensing_medicine {
+  dispensing_id   Int           @id @default(autoincrement())
+  treatment_id    String?       @db.VarChar
+  clinic_stock_id String?       @db.VarChar
+  quantity        Int?
+  clinic_stock    clinic_stock? @relation(fields: [clinic_stock_id], references: [clinic_stock_id], onDelete: NoAction)
+  treatment       treatment?    @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model employee {
+  employee_id                           String                @id @db.VarChar
+  password                              String?               @db.VarChar
+  citizen_id                            String?               @db.Char(13)
+  gender                                genders?
+  prefix                                String?               @db.VarChar
+  fname                                 String?               @db.VarChar
+  lname                                 String?               @db.VarChar
+  position_id                           Int?
+  birth_date                            DateTime?             @db.Date
+  hire_date                             DateTime?             @db.Date
+  telephone                             String?               @db.Char(10)
+  address_line_1                        String?
+  address_line_2                        String?
+  provice_id                            Int?
+  is_active                             Boolean               @default(true)
+  create_at                             DateTime?             @default(now()) @db.Timestamp(6)
+  update_at                             DateTime?             @default(now()) @db.Timestamp(6)
+  edit_by                               String?               @db.VarChar
+  branch_id                             String?               @db.VarChar
+  appointment                           appointment[]
+  audit_log                             audit_log[]
+  branch_branch_manager_idToemployee    branch[]              @relation("branch_manager_idToemployee")
+  clinic_stock                          clinic_stock[]
+  dentist                               dentist[]
+  dentist_workday                       dentist_workday[]
+  branch_employee_branch_idTobranch     branch?               @relation("employee_branch_idTobranch", fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee                              employee?             @relation("employeeToemployee", fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  other_employee                        employee[]            @relation("employeeToemployee")
+  position                              position?             @relation(fields: [position_id], references: [position_id], onDelete: NoAction)
+  provice                               provice?              @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction)
+  expert_type                           expert_type[]
+  lab_request                           lab_request[]
+  lab_vender                            lab_vender[]
+  medicine                              medicine[]
+  medicine_type                         medicine_type[]
+  operation_type                        operation_type[]
+  patient                               patient[]
+  product                               product[]
+  receipt_receipt_edit_byToemployee     receipt[]             @relation("receipt_edit_byToemployee")
+  receipt_receipt_employee_idToemployee receipt[]             @relation("receipt_employee_idToemployee")
+  requisition_product                   requisition_product[]
+  tag_list                              tag_list[]
+  treatment                             treatment[]
+  treatment_document                    treatment_document[]
+  treatment_nv                          treatment_nv[]
+
+  @@index([password], type: Hash)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model expert_type {
+  expert_type_id         Int                      @id @default(autoincrement())
+  expert_type_name       String?                  @db.VarChar
+  create_at              DateTime?                @default(now()) @db.Timestamp(6)
+  update_at              DateTime?                @default(now()) @db.Timestamp(6)
+  edit_by                String?                  @db.VarChar
+  branch_id              String?                  @db.VarChar
+  dentist                dentist[]
+  branch                 branch?                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee               employee?                @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  treatment_nv_operation treatment_nv_operation[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model lab_request {
+  lab_request_id            Int         @id @default(autoincrement())
+  treatment_id              String?     @db.VarChar
+  vender_id                 Int?
+  lab_title                 String?     @db.VarChar
+  lab_description           String?
+  request_date              DateTime?   @db.Date
+  receive_date              DateTime?   @db.Date
+  cost                      Decimal?    @db.Decimal
+  override_dentist_lab_rate Decimal?    @db.Decimal
+  is_receive                Boolean?    @default(false)
+  create_at                 DateTime?   @default(now()) @db.Timestamp(6)
+  update_at                 DateTime?   @default(now()) @db.Timestamp(6)
+  edit_by                   String?     @db.VarChar
+  employee                  employee?   @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  treatment                 treatment?  @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+  lab_vender                lab_vender? @relation(fields: [vender_id], references: [vender_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model lab_vender {
+  vender_id          Int           @id @default(autoincrement())
+  vender_name        String?       @db.VarChar
+  vender_description String?
+  address_line_1     String?
+  address_line_2     String?
+  provice_id         Int?
+  telephone          String?       @db.Char(10)
+  create_at          DateTime?     @default(now()) @db.Timestamp(6)
+  update_at          DateTime?     @default(now()) @db.Timestamp(6)
+  edit_by            String?       @db.VarChar
+  branch_id          String?       @db.VarChar
+  lab_request        lab_request[]
+  branch             branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee           employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  provice            provice?      @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model medicine {
+  medicine_id      Int            @id @default(autoincrement())
+  medicine_name    String?        @db.VarChar
+  medicine_type_id Int?
+  instruction      String?
+  precaution       String?
+  create_at        DateTime?      @default(now()) @db.Timestamp(6)
+  update_at        DateTime?      @default(now()) @db.Timestamp(6)
+  edit_by          String?        @db.VarChar
+  branch_id        String?        @db.VarChar
+  clinic_stock     clinic_stock[]
+  branch           branch?        @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee         employee?      @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  medicine_type    medicine_type? @relation(fields: [medicine_type_id], references: [medicine_type_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model medicine_type {
+  medicine_type_id   Int        @id @default(autoincrement())
+  medicine_type_name String?    @db.VarChar
+  create_at          DateTime?  @default(now()) @db.Timestamp(6)
+  update_at          DateTime?  @default(now()) @db.Timestamp(6)
+  edit_by            String?    @db.VarChar
+  branch_id          String?    @db.VarChar
+  medicine           medicine[]
+  branch             branch?    @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee           employee?  @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model operation_type {
+  operation_type_id      Int                      @id @default(autoincrement())
+  operation_type_name    String?                  @db.VarChar
+  default_time_spend     Decimal?                 @default(15) @db.Decimal
+  default_unit_price     Decimal?                 @default(0) @db.Decimal
+  update_at              DateTime?                @default(now()) @db.Timestamp(6)
+  edit_by                String?                  @db.VarChar
+  branch_id              String?                  @db.VarChar
+  branch                 branch?                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee               employee?                @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  treatment_nv_operation treatment_nv_operation[]
+  treatment_operation    treatment_operation[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patient {
+  hn                       String        @id @db.VarChar
+  nationality              String?       @db.VarChar
+  citizen_id               String?       @db.Char(13)
+  gender                   genders?
+  prefix                   String?       @db.VarChar
+  fname                    String?       @db.VarChar
+  lname                    String?       @db.VarChar
+  brith_date               DateTime?     @db.Date
+  address_line_1           String?
+  address_line_2           String?
+  provice_id               Int?
+  telephone                String?       @db.Char(10)
+  current_medication       String?
+  drug_allergy             String?
+  congenital_disease       String?
+  is_pregnant              Boolean       @default(false)
+  contact_person_name      String?       @db.VarChar
+  contact_person_relation  String?       @db.VarChar
+  contact_person_telephone String?       @db.Char(10)
+  is_active                Boolean       @default(true)
+  create_at                DateTime?     @default(now()) @db.Timestamp(6)
+  update_at                DateTime?     @default(now()) @db.Timestamp(6)
+  edit_by                  String?       @db.VarChar
+  branch_id                String?       @db.VarChar
+  appointment              appointment[]
+  branch                   branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee                 employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  provice                  provice?      @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction)
+  patient_tag              patient_tag[]
+  treatment                treatment[]
+}
+
+model patient_tag {
+  patient_tag_record_id Int       @id @default(autoincrement())
+  tag_id                Int?
+  hn                    String?   @db.VarChar
+  patient               patient?  @relation(fields: [hn], references: [hn], onDelete: NoAction)
+  tag_list              tag_list? @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction)
+}
+
+model position {
+  position_id   Int        @id @default(autoincrement())
+  position_name String?    @db.VarChar
+  branch_id     String?    @db.VarChar
+  employee      employee[]
+  branch        branch?    @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model product {
+  product_id   Int            @id @default(autoincrement())
+  product_name String?        @db.VarChar
+  product_type product_types?
+  create_at    DateTime?      @default(now()) @db.Timestamp(6)
+  update_at    DateTime?      @default(now()) @db.Timestamp(6)
+  edit_by      String?        @db.VarChar
+  branch_id    String?        @db.VarChar
+  clinic_stock clinic_stock[]
+  branch       branch?        @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee     employee?      @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+model provice {
+  provice_id   Int          @id @default(autoincrement())
+  provice_name String?      @db.VarChar
+  branch       branch[]
+  dentist      dentist[]
+  employee     employee[]
+  lab_vender   lab_vender[]
+  patient      patient[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model receipt {
+  receipt_id                             String            @id @db.VarChar
+  treatment_id                           String?           @db.VarChar
+  override_dentist_fee_rate              Decimal?          @db.Decimal
+  total_price                            Decimal?          @default(0) @db.Decimal
+  discount                               Decimal?          @default(0) @db.Decimal
+  arrearage                              Decimal?          @default(0) @db.Decimal
+  is_paid                                Boolean           @default(false)
+  is_cancel                              Boolean           @default(false)
+  employee_id                            String            @db.VarChar
+  create_at                              DateTime?         @default(now()) @db.Timestamp(6)
+  update_at                              DateTime?         @default(now()) @db.Timestamp(6)
+  edit_by                                String?           @db.VarChar
+  branch_id                              String            @db.VarChar
+  branch                                 branch            @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee_receipt_edit_byToemployee     employee?         @relation("receipt_edit_byToemployee", fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  employee_receipt_employee_idToemployee employee          @relation("receipt_employee_idToemployee", fields: [employee_id], references: [employee_id], onDelete: NoAction)
+  treatment                              treatment?        @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+  receipt_payment                        receipt_payment[]
+  receipt_product                        receipt_product[]
+}
+
+model receipt_payment {
+  receipt_payment_id Int            @id @default(autoincrement())
+  receipt_id         String?        @db.VarChar
+  payment_amount     Decimal?       @db.Decimal
+  payment_type       payment_types?
+  receipt            receipt?       @relation(fields: [receipt_id], references: [receipt_id], onDelete: NoAction)
+}
+
+model receipt_product {
+  receipt_product_id  Int           @id @default(autoincrement())
+  receipt_id          String?       @db.VarChar
+  clinic_stock_id     String?       @db.VarChar
+  quantity            Int?
+  override_unit_price Decimal?      @db.Decimal
+  clinic_stock        clinic_stock? @relation(fields: [clinic_stock_id], references: [clinic_stock_id], onDelete: NoAction)
+  receipt             receipt?      @relation(fields: [receipt_id], references: [receipt_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model requisition_product {
+  requisition_id  String        @id @db.VarChar
+  clinic_stock_id String?       @db.VarChar
+  quantity        Int?
+  create_at       DateTime?     @default(now()) @db.Timestamp(6)
+  update_at       DateTime?     @default(now()) @db.Timestamp(6)
+  edit_by         String?       @db.VarChar
+  branch_id       String?       @db.VarChar
+  branch          branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  clinic_stock    clinic_stock? @relation(fields: [clinic_stock_id], references: [clinic_stock_id], onDelete: NoAction)
+  employee        employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tag_list {
+  tag_id      Int           @id @default(autoincrement())
+  tag_name    String?       @db.VarChar
+  tag_color   String?       @db.VarChar
+  create_at   DateTime?     @default(now()) @db.Timestamp(6)
+  update_at   DateTime?     @default(now()) @db.Timestamp(6)
+  edit_by     String?       @db.VarChar
+  branch_id   String?       @db.VarChar
+  patient_tag patient_tag[]
+  branch      branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  employee    employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model treatment {
+  treatment_id                  String                          @id @db.VarChar
+  hn                            String?                         @db.VarChar
+  dentist_id                    String?                         @db.VarChar
+  subject                       String?
+  objective                     String?
+  assessment                    String?
+  plan                          String?
+  recall_date                   DateTime?                       @db.Date
+  is_noitfy_recall              Boolean?                        @default(false)
+  note_to_counter_staff         String?
+  create_at                     DateTime?                       @default(now()) @db.Timestamp(6)
+  update_at                     DateTime?                       @default(now()) @db.Timestamp(6)
+  edit_by                       String?                         @db.VarChar
+  branch_id                     String?                         @db.VarChar
+  dispensing_medicine           dispensing_medicine[]
+  lab_request                   lab_request[]
+  receipt                       receipt[]
+  branch                        branch?                         @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction)
+  dentist                       dentist?                        @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction)
+  employee                      employee?                       @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  patient                       patient?                        @relation(fields: [hn], references: [hn], onDelete: NoAction)
+  treatment_document            treatment_document[]
+  treatment_nv                  treatment_nv[]
+  treatment_operation           treatment_operation[]
+  treatment_record_edit_history treatment_record_edit_history[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model treatment_document {
+  document_id   Int        @id @default(autoincrement())
+  treatment_id  String?    @db.VarChar
+  document_name String?    @db.VarChar
+  document_url  String?    @db.VarChar
+  create_at     DateTime?  @default(now()) @db.Timestamp(6)
+  update_at     DateTime?  @default(now()) @db.Timestamp(6)
+  edit_by       String?    @db.VarChar
+  employee      employee?  @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  treatment     treatment? @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model treatment_nv {
+  treatment_nv_id        Int                      @id @default(autoincrement())
+  treatment_id           String?                  @db.VarChar
+  nv_detail              String?
+  date_notify            DateTime?                @db.Date
+  is_notify              Boolean?
+  create_at              DateTime?                @default(now()) @db.Timestamp(6)
+  update_at              DateTime?                @default(now()) @db.Timestamp(6)
+  edit_by                String?                  @db.VarChar
+  employee               employee?                @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction)
+  treatment              treatment?               @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+  treatment_nv_operation treatment_nv_operation[]
+}
+
+model treatment_nv_operation {
+  nv_operation_id               Int             @id @default(autoincrement())
+  treatment_nv_id               Int?
+  operation_type_id             Int?
+  tooth_position                String?         @db.VarChar
+  refer_denstist_expert_type_id Int?
+  is_appointment                Boolean?        @default(false)
+  appointment                   appointment[]
+  operation_type                operation_type? @relation(fields: [operation_type_id], references: [operation_type_id], onDelete: NoAction)
+  expert_type                   expert_type?    @relation(fields: [refer_denstist_expert_type_id], references: [expert_type_id], onDelete: NoAction)
+  treatment_nv                  treatment_nv?   @relation(fields: [treatment_nv_id], references: [treatment_nv_id], onDelete: NoAction)
+}
+
+model treatment_operation {
+  treatment_operation_id Int             @id @default(autoincrement())
+  treatment_id           String?         @db.VarChar
+  operation_type_id      Int?
+  quantity               Int?            @default(1)
+  tooth_position         String?         @db.VarChar
+  override_unit_price    Decimal?        @db.Decimal
+  operation_type         operation_type? @relation(fields: [operation_type_id], references: [operation_type_id], onDelete: NoAction)
+  treatment              treatment?      @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+}
+
+model treatment_record_edit_history {
+  record_edit_history_id Int                      @id @default(autoincrement())
+  treatment_id           String?                  @db.VarChar
+  edit_at                DateTime?                @db.Timestamp(6)
+  edit_by                String?                  @db.VarChar
+  edit_field             treatment_record_fields?
+  old_value              String?
+  new_value              String?
+  dentist                dentist?                 @relation(fields: [edit_by], references: [dentist_id], onDelete: NoAction)
+  treatment              treatment?               @relation(fields: [treatment_id], references: [treatment_id], onDelete: NoAction)
+}
+
+model treatment_record_template {
+  record_template_id Int                      @id @default(autoincrement())
+  field              treatment_record_fields?
+  value              String?
+  create_at          DateTime?                @db.Timestamp(6)
+  create_by          String?                  @db.VarChar
+  dentist            dentist?                 @relation(fields: [create_by], references: [dentist_id], onDelete: NoAction)
+}
+
+enum actions {
+  create
+  update
+  insert
+  delete
+}
+
+enum appointment_status {
+  pending
+  cancel
+  success
+}
+
+enum days {
+  sunday
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+}
+
+enum genders {
+  male
+  female
+}
+
+enum packages {
+  basic
+  premium
+  vip
+}
+
+enum payment_types {
+  cash
+  credit_card
+  bank_transfer
+  sso
+}
+
+enum product_types {
+  consume
+  sale
+}
+
+enum stock_types {
+  product
+  medicine
+}
+
+enum treatment_record_fields {
+  subject
+  objective
+  assessment
+  plan
+}
