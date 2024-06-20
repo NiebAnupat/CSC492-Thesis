@@ -1,60 +1,63 @@
 version: '3'
 
 services:
-  frontend:
-    # commented below line to use the production build
-    # command: pnpm dev
-    build:
-      context: ./frontend
-      # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-      dockerfile: Dockerfile.prod
-      # dockerfile: Dockerfile.dev
-    environment:
-      - PORT=3000
-    expose:
-      - 3000
-    ports:
-      - "3000:3000"
-    depends_on:
-      - server
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend/src
-          target: /usr/src/app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
-  server:
-    # commented below line to use the production build
-    # command: pnpm start:dev
-    build:
-      context: ./server
-      # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-      dockerfile: Dockerfile.prod
-      # dockerfile: Dockerfile.dev
-    environment:
-      - PORT=4000
-    expose:
-      - 4000
-    ports:
-      - "4000:4000"
-    develop:
-      watch:
-        - action: sync
-          path: ./server/src
-          target: /usr/src/app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
-  postgres:
+  # frontend:
+  #   # commented below line to use the production build
+  #   # command: pnpm dev
+  #   build:
+  #     context: ./frontend
+  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
+  #     dockerfile: Dockerfile.prod
+  #     # dockerfile: Dockerfile.dev
+  #   environment:
+  #     - PORT=3000
+  #   expose:
+  #     - 3000
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - server
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./frontend/src
+  #         target: /usr/src/app/src
+  #         ignore:
+  #           - node_modules/
+  #       - action: rebuild
+  #         path: package.json
+  # server:
+  #   # commented below line to use the production build
+  #   # command: pnpm start:dev
+  #   build:
+  #     context: ./server
+  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
+  #     dockerfile: Dockerfile.prod
+  #     # dockerfile: Dockerfile.dev
+  #   environment:
+  #     - PORT=4000
+  #   expose:
+  #     - 4000
+  #   ports:
+  #     - "4000:4000"
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./server/src
+  #         target: /usr/src/app/src
+  #         ignore:
+  #           - node_modules/
+  #       - action: rebuild
+  #         path: package.json
+  db:
     image: postgres:16
+    container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_USER=AnupatAndSuchanart
+      - POSTGRES_PASSWORD=6K1umZ&4OCw2
+      - POSTGRES_DB=CSC492-Thesis
+    restart: unless-stopped  
     ports:
       - "5432:5432"
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
+      - ./docker-volumes/postgresql:/var/lib/postgresql/data
