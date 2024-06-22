@@ -101,17 +101,19 @@ model clinic_stock {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model customer {
-  customer_id    String    @id @db.VarChar
-  email          String?   @db.VarChar
-  password       String?   @db.VarChar
-  citizen_id     String?   @db.Char(13)
-  fname          String?   @db.VarChar
-  lname          String?   @db.VarChar
-  telephone      String?   @db.Char(10)
-  address_line_1 String?
-  address_line_2 String?
-  package        packages? @default(basic)
-  branch         branch[]
+  customer_id        String    @id @db.VarChar
+  customer_google_id String?   @db.VarChar
+  email              String?   @db.VarChar
+  password           String?   @db.VarChar
+  citizen_id         String?   @db.Char(13)
+  fname              String?   @db.VarChar
+  lname              String?   @db.VarChar
+  telephone          String?   @db.Char(10)
+  address_line_1     String?
+  address_line_2     String?
+  avatar             String?   @db.VarChar
+  package            packages? @default(basic)
+  branch             branch[]
 
   @@index([password], type: Hash)
 }
@@ -135,6 +137,7 @@ model dentist {
   provice_id                    Int?
   dentist_fee_rate              Decimal                         @default(0.5) @db.Decimal
   default_lab_rate              Decimal                         @default(0.5) @db.Decimal
+  avatar                        String?                         @db.VarChar
   is_active                     Boolean                         @default(true)
   create_at                     DateTime?                       @default(now()) @db.Timestamp(6)
   update_at                     DateTime?                       @default(now()) @db.Timestamp(6)
@@ -192,6 +195,7 @@ model employee {
   address_line_1                        String?
   address_line_2                        String?
   provice_id                            Int?
+  avatar                                String?               @db.VarChar
   is_active                             Boolean               @default(true)
   create_at                             DateTime?             @default(now()) @db.Timestamp(6)
   update_at                             DateTime?             @default(now()) @db.Timestamp(6)
@@ -346,6 +350,7 @@ model patient {
   contact_person_name      String?       @db.VarChar
   contact_person_relation  String?       @db.VarChar
   contact_person_telephone String?       @db.Char(10)
+  avatar                   String?       @db.VarChar
   is_active                Boolean       @default(true)
   create_at                DateTime?     @default(now()) @db.Timestamp(6)
   update_at                DateTime?     @default(now()) @db.Timestamp(6)

@@ -18,7 +18,7 @@ const initTables = () => {
   const initTablesSql = readFileSync("./src/migrations/init_tables.sql").toString();
   return pool.query(initTablesSql)
     .then(() => console.log("Tables created successfully"))
-    .catch(error => console.log("Migration failed\n", error));
+    .catch(error => console.log("Tables create failed\n", error));
 };
 
 const customerSeedForTest = () => {

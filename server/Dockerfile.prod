@@ -2,6 +2,7 @@ FROM node:22.3.0-slim as base
 
 # RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
 RUN corepack enable pnpm    
+RUN pnpm add -g @nestjs/cli@10.0.0
 
 WORKDIR /usr/src/app
 COPY . ./

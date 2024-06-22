@@ -62,8 +62,14 @@ CREATE TYPE "actions" AS ENUM (
   'delete'
 );
 
+CREATE TYPE "customer_providers" AS ENUM (
+  'local',
+  'google'
+)
+
 CREATE TABLE "customer" (
   "customer_id" varchar,
+  "customer_provider" customer_providers,
   "email" varchar,
   "password" varchar,
   "citizen_id" char(13),
@@ -72,6 +78,7 @@ CREATE TABLE "customer" (
   "telephone" char(10),
   "address_line_1" text,
   "address_line_2" text,
+  "avatar" VARCHAR,
   "package" packages DEFAULT 'basic',
   PRIMARY KEY ("customer_id")
 );
@@ -110,6 +117,7 @@ CREATE TABLE "employee" (
   "address_line_1" text,
   "address_line_2" text,
   "provice_id" int,
+  "avatar" VARCHAR,
   "is_active" bool NOT NULL DEFAULT true,
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
@@ -143,6 +151,7 @@ CREATE TABLE "dentist" (
   "provice_id" int,
   "dentist_fee_rate" numeric NOT NULL DEFAULT 0.5,
   "default_lab_rate" numeric NOT NULL DEFAULT 0.5,
+  "avatar" VARCHAR,
   "is_active" bool NOT NULL DEFAULT true,
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
@@ -194,6 +203,7 @@ CREATE TABLE "patient" (
   "contact_person_name" varchar,
   "contact_person_relation" varchar,
   "contact_person_telephone" char(10),
+  "avatar" VARCHAR,
   "is_active" bool NOT NULL DEFAULT true,
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
