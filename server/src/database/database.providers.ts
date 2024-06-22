@@ -1,12 +1,18 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigKey } from 'src/config/config.enum';
-import { AppConfig, DatabaseConfig, GoogleAuthConfig } from 'src/config/config.interface';
+import {
+  AppConfig,
+  DatabaseConfig,
+  GoogleAuthConfig,
+} from 'src/config/config.interface';
 
 export const TypeOrmModuleRegisted = TypeOrmModule.forRootAsync({
   // imports: [ConfigModule.forFeature(databaseConfig)],
   useFactory: async (configService: ConfigService) => {
-    const dbConfig = configService.getOrThrow<DatabaseConfig>(ConfigKey.Database);
+    const dbConfig = configService.getOrThrow<DatabaseConfig>(
+      ConfigKey.Database,
+    );
 
     return {
       type: dbConfig.type as any,
@@ -16,6 +22,7 @@ export const TypeOrmModuleRegisted = TypeOrmModule.forRootAsync({
       password: dbConfig.password,
       database: dbConfig.database,
       schema: dbConfig.schema,
+      charset: 'utf8',
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: dbConfig.synchronize,

@@ -6,6 +6,7 @@ import { configSchema } from './config/config.schema';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { configurations } from './config/configuration';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { configurations } from './config/configuration';
     }),
     DatabaseModule,
     AuthModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
