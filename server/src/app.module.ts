@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { configurations } from './config/configuration';
 import { CustomerModule } from './customer/customer.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
@@ -15,11 +16,11 @@ import { CustomerModule } from './customer/customer.module';
       validationSchema: configSchema,
       isGlobal: true,
     }),
-    DatabaseModule,
+    // DatabaseModule,
     AuthModule,
     CustomerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

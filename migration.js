@@ -68,13 +68,12 @@ const findAllCustomer = () => {
 // Execute functions sequentially and close pool
 (async () => {
   try {
-    // await dropSchema();
+    await dropSchema();
     // await initDatatype();
     // await initTables();
     execSync("cd server && pnpm prisma migrate dev --name init", {
       stdio: "inherit",
     });
-    // exec("cd server && pnpm prisma migrate dev --name init");
     await customerSeedForTest();
     await findAllCustomer();
     console.log("Migration completed successfully");

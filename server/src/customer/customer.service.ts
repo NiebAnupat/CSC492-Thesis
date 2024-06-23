@@ -3,45 +3,50 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from './entities/customer.entity';
+// import { Customer } from './entities/customer.entity';
+import { Prisma, customer } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class CustomerService {
-  constructor(
-    @InjectRepository(Customer)
-    private customerRepository: Repository<Customer>,
-    private readonly entityManager: EntityManager,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createCustomerDto: CreateCustomerDto) {
-    const customer = new Customer(createCustomerDto);
-    return this.entityManager.save<Customer>(customer);
+  create(data: Prisma.customerCreateInput): Promise<customer> {
+    return this.prisma.customer.create({ data });
   }
 
-  findAll() {
-    return this.customerRepository.find();
+  findAll(where: Prisma.customerWhereInput): Promise<customer[] | null> {
+    return this.prisma.customer.findMany({ where });
   }
 
-  findOne(id: string) {
-    return this.customerRepository.findOneBy({
-      customer_id: id,
+  findOne(where: Prisma.customerWhereUniqueInput): Promise<customer | null> {
+    return this.prisma.customer.findUnique({ where });
+  }
+
+  update(
+    where: Prisma.customerWhereUniqueInput,
+    data: Prisma.customerUpdateInput,
+  ): Promise<customer> {
+    return this.prisma.customer.update({ where, data });
+  }
+
+  softDelete(where: Prisma.customerWhereUniqueInput): Promise<customer> {
+    return this.prisma.customer.update({
+      where,
+      data: {
+        customer_person_info: {
+          update: {
+            deleted_at: new Date(),
+          },
+        },
+      },
+      include: {
+        customer_person_info: true,
+      },
     });
   }
 
-  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
-    const customer = await this.customerRepository.findOneBy({
-      customer_id: id,
-    });
-    if (!customer) {
-      throw new NotFoundException();
-    }
-    Object.assign(customer, updateCustomerDto);
-    return this.entityManager.save<Customer>(customer);
-  }
-
-  remove(id: string) {
-    return this.customerRepository.softDelete({
-      customer_id: id,
-    });
+  remove(where: Prisma.customerWhereUniqueInput): Promise<customer> {
+    return this.prisma.customer.delete({ where });
   }
 }
