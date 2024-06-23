@@ -1,6 +1,7 @@
 const { Pool } = require("pg");
 const { readFileSync } = require("fs");
 const dotenv = require("dotenv");
+const { exec, execSync } = require("child_process");
 dotenv.config();
 
 const pool = new Pool({
@@ -67,9 +68,13 @@ const findAllCustomer = () => {
 // Execute functions sequentially and close pool
 (async () => {
   try {
-    await dropSchema();
-    await initDatatype();
-    await initTables();
+    // await dropSchema();
+    // await initDatatype();
+    // await initTables();
+    execSync("cd server && pnpm prisma migrate dev --name init", {
+      stdio: "inherit",
+    });
+    // exec("cd server && pnpm prisma migrate dev --name init");
     await customerSeedForTest();
     await findAllCustomer();
     console.log("Migration completed successfully");
