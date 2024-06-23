@@ -17,6 +17,18 @@ const dropSchema = () => {
     .catch((error) => console.log("Migration failed\n", error));
 };
 
+const initDatatype = () => {
+  const initDatatypeSql = readFileSync(
+    "./src/migrations/init_datatype.sql"
+  ).toString();
+  return pool
+    .query(initDatatypeSql)
+    .then(() => console.log("Datatype created successfully"))
+    .catch((error) => {
+      throw error;
+    });
+};
+
 const initTables = () => {
   const initTablesSql = readFileSync(
     "./src/migrations/init_tables.sql"
@@ -56,6 +68,7 @@ const findAllCustomer = () => {
 (async () => {
   try {
     await dropSchema();
+    await initDatatype();
     await initTables();
     await customerSeedForTest();
     await findAllCustomer();

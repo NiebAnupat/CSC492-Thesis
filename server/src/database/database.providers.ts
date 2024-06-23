@@ -1,14 +1,9 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigKey } from 'src/config/config.enum';
-import {
-  AppConfig,
-  DatabaseConfig,
-  GoogleAuthConfig,
-} from 'src/config/config.interface';
+import { DatabaseConfig } from 'src/config/config.interface';
 
 export const TypeOrmModuleRegisted = TypeOrmModule.forRootAsync({
-  // imports: [ConfigModule.forFeature(databaseConfig)],
   useFactory: async (configService: ConfigService) => {
     const dbConfig = configService.getOrThrow<DatabaseConfig>(
       ConfigKey.Database,

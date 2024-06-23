@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Customer } from './entities/customer.entity';
 
 @Injectable()
 export class CustomerService {
+  constructor(
+    @InjectRepository(Customer)
+    private customerRepository: Repository<Customer>,
+    private readonly entityManager: EntityManager,
+  ) {}
+
   create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+    const customer = new Customer(createCustomerDto);
+    return this.entityManager.save<Customer>(customer);
   }
 
   findAll() {
-    return `This action returns all customer`;
+    return this.customerRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  findOne(id: string) {
+    return this.customerRepository.findOneBy({
+      customer_id: id,
+    });
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    const customer = await this.customerRepository.findOneBy({
+      customer_id: id,
+    });
+    if (!customer) {
+      throw new NotFoundException();
+    }
+    Object.assign(customer, updateCustomerDto);
+    return this.entityManager.save<Customer>(customer);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  remove(id: string) {
+    return this.customerRepository.softDelete({
+      customer_id: id,
+    });
   }
 }
