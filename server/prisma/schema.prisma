@@ -107,11 +107,11 @@ model clinic_stock {
 model customer {
   customer_id           String               @id @db.VarChar
   customer_provider     customer_providers?
-  customer_google_id    String?              @db.VarChar
+  // customer_google_id    String?              @unique @db.VarChar
   email                 String?              @db.VarChar
   password              String?              @db.VarChar
   person_information_id Int
-  package               packages             @default(basic)
+  package               packages             @default(free)
   branch                branch[]
   customer_person_info  person_information   @relation("customer_person_information_idToperson_information", fields: [person_information_id], references: [person_information_id], onDelete: NoAction, onUpdate: Cascade)
   person_info_edited    person_information[] @relation("person_information_edit_byTocustomer")
@@ -554,17 +554,17 @@ model treatment_record_template {
 model person_information {
   person_information_id              Int        @id @default(autoincrement())
   nationality                        String?    @db.VarChar
-  citizen_id                         String     @unique(map: "person_information_citizen_id_idx") @db.Char(13)
+  citizen_id                         String?    @unique(map: "person_information_citizen_id_idx") @db.Char(13)
   gender                             genders?
   prefix                             String?    @db.VarChar
   first_name                         String     @db.VarChar
   last_name                          String     @db.VarChar
-  telephone                          String     @unique(map: "person_information_telephone_idx") @db.Char(10)
+  telephone                          String?    @unique(map: "person_information_telephone_idx") @db.Char(10)
   address_line_1                     String?
   address_line_2                     String?
   provice_id                         Int?
   hire_date                          DateTime?  @db.Date
-  birth_date                         DateTime   @db.Date
+  birth_date                         DateTime?  @db.Date
   avatar                             String?    @db.VarChar
   create_at                          DateTime   @default(now()) @db.Timestamp(6)
   update_at                          DateTime   @default(now()) @db.Timestamp(6)
@@ -610,6 +610,7 @@ enum genders {
 }
 
 enum packages {
+  free
   basic
   premium
   vip

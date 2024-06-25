@@ -44,7 +44,7 @@ INSERT INTO
     public.customer (
         customer_id,
         customer_provider,
-        customer_google_id,
+        -- customer_google_id,
         email,
         "password",
         person_information_id,
@@ -53,9 +53,9 @@ INSERT INTO
 VALUES (
         'TestID',
         'local'::customer_providers,
-        '',
+        -- '',
         'test@test.test',
         'testPassword',
         1,
-        'basic'::packages
+        'free'::packages
     );

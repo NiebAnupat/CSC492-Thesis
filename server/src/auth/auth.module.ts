@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from 'src/config/config.enum';
 import { AppConfig } from 'src/config/config.interface';
+import { GoogleOauthController } from './google-oauth.controller';
+import { GoogleOauthStrategy } from './utils/strategy/google-oauth.strategy.ts';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { AppConfig } from 'src/config/config.interface';
     }),
     CustomerModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
+  controllers: [AuthController, GoogleOauthController],
+  providers: [AuthService, GoogleOauthStrategy],
 })
 export class AuthModule {}

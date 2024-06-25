@@ -11,7 +11,7 @@ CREATE TYPE "days" AS ENUM ('sunday', 'monday', 'tuesday', 'wednesday', 'thursda
 CREATE TYPE "genders" AS ENUM ('male', 'female');
 
 -- CreateEnum
-CREATE TYPE "packages" AS ENUM ('basic', 'premium', 'vip');
+CREATE TYPE "packages" AS ENUM ('free', 'basic', 'premium', 'vip');
 
 -- CreateEnum
 CREATE TYPE "payment_types" AS ENUM ('cash', 'credit_card', 'bank_transfer', 'sso');
@@ -42,6 +42,7 @@ CREATE TABLE "appointment" (
     "status" "appointment_status" DEFAULT 'pending',
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR NOT NULL,
 
@@ -74,6 +75,10 @@ CREATE TABLE "branch" (
     "image_url" VARCHAR,
     "manager_id" VARCHAR NOT NULL,
     "owner_account" VARCHAR NOT NULL,
+    "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
+    "edit_by" VARCHAR,
 
     CONSTRAINT "branch_pkey" PRIMARY KEY ("branch_id")
 );
@@ -88,6 +93,7 @@ CREATE TABLE "clinic_stock" (
     "minimun_quantity" INTEGER NOT NULL DEFAULT 1,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -98,11 +104,10 @@ CREATE TABLE "clinic_stock" (
 CREATE TABLE "customer" (
     "customer_id" VARCHAR NOT NULL,
     "customer_provider" "customer_providers",
-    "customer_google_id" VARCHAR,
     "email" VARCHAR,
     "password" VARCHAR,
     "person_information_id" INTEGER NOT NULL,
-    "package" "packages" NOT NULL DEFAULT 'basic',
+    "package" "packages" NOT NULL DEFAULT 'free',
 
     CONSTRAINT "customer_pkey" PRIMARY KEY ("customer_id")
 );
@@ -129,6 +134,7 @@ CREATE TABLE "dentist_workday" (
     "time_end" TIME(6),
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -161,6 +167,7 @@ CREATE TABLE "expert_type" (
     "expert_type_name" VARCHAR,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -181,6 +188,7 @@ CREATE TABLE "lab_request" (
     "is_receive" BOOLEAN DEFAULT false,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
 
     CONSTRAINT "lab_request_pkey" PRIMARY KEY ("lab_request_id")
@@ -197,6 +205,7 @@ CREATE TABLE "lab_vender" (
     "telephone" CHAR(10),
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -212,6 +221,7 @@ CREATE TABLE "medicine" (
     "precaution" TEXT,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -224,6 +234,7 @@ CREATE TABLE "medicine_type" (
     "medicine_type_name" VARCHAR,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -237,6 +248,7 @@ CREATE TABLE "operation_type" (
     "default_time_spend" DECIMAL DEFAULT 15,
     "default_unit_price" DECIMAL DEFAULT 0,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -271,6 +283,9 @@ CREATE TABLE "patient_tag" (
 CREATE TABLE "position" (
     "position_id" SERIAL NOT NULL,
     "position_name" VARCHAR,
+    "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "branch_id" VARCHAR,
 
     CONSTRAINT "position_pkey" PRIMARY KEY ("position_id")
@@ -283,6 +298,7 @@ CREATE TABLE "product" (
     "product_type" "product_types",
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -294,6 +310,9 @@ CREATE TABLE "provice" (
     "provice_id" SERIAL NOT NULL,
     "province_name_th" VARCHAR NOT NULL,
     "province_name_en" VARCHAR NOT NULL,
+    "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
 
     CONSTRAINT "provice_pkey" PRIMARY KEY ("provice_id")
 );
@@ -311,6 +330,7 @@ CREATE TABLE "receipt" (
     "employee_id" VARCHAR NOT NULL,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR NOT NULL,
 
@@ -323,6 +343,10 @@ CREATE TABLE "receipt_payment" (
     "receipt_id" VARCHAR,
     "payment_amount" DECIMAL,
     "payment_type" "payment_types",
+    "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "edit_by" VARCHAR,
+    "deleted_at" TIMESTAMP(6),
 
     CONSTRAINT "receipt_payment_pkey" PRIMARY KEY ("receipt_payment_id")
 );
@@ -334,6 +358,9 @@ CREATE TABLE "receipt_product" (
     "clinic_stock_id" VARCHAR,
     "quantity" INTEGER,
     "override_unit_price" DECIMAL,
+    "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "edit_by" VARCHAR,
 
     CONSTRAINT "receipt_product_pkey" PRIMARY KEY ("receipt_product_id")
 );
@@ -345,6 +372,7 @@ CREATE TABLE "requisition_product" (
     "quantity" INTEGER,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -358,6 +386,7 @@ CREATE TABLE "tag_list" (
     "tag_color" VARCHAR,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -378,6 +407,7 @@ CREATE TABLE "treatment" (
     "note_to_counter_staff" TEXT,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
     "branch_id" VARCHAR,
 
@@ -392,6 +422,7 @@ CREATE TABLE "treatment_document" (
     "document_url" VARCHAR,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
 
     CONSTRAINT "treatment_document_pkey" PRIMARY KEY ("document_id")
@@ -406,6 +437,7 @@ CREATE TABLE "treatment_nv" (
     "is_notify" BOOLEAN,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
 
     CONSTRAINT "treatment_nv_pkey" PRIMARY KEY ("treatment_nv_id")
@@ -463,17 +495,17 @@ CREATE TABLE "treatment_record_template" (
 CREATE TABLE "person_information" (
     "person_information_id" SERIAL NOT NULL,
     "nationality" VARCHAR,
-    "citizen_id" CHAR(13) NOT NULL,
+    "citizen_id" CHAR(13),
     "gender" "genders",
     "prefix" VARCHAR,
     "first_name" VARCHAR NOT NULL,
     "last_name" VARCHAR NOT NULL,
-    "telephone" CHAR(10) NOT NULL,
+    "telephone" CHAR(10),
     "address_line_1" TEXT,
     "address_line_2" TEXT,
     "provice_id" INTEGER,
     "hire_date" DATE,
-    "birth_date" DATE NOT NULL,
+    "birth_date" DATE,
     "avatar" VARCHAR,
     "create_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -644,7 +676,13 @@ ALTER TABLE "receipt" ADD CONSTRAINT "receipt_employee_id_fkey" FOREIGN KEY ("em
 ALTER TABLE "receipt" ADD CONSTRAINT "receipt_treatment_id_fkey" FOREIGN KEY ("treatment_id") REFERENCES "treatment"("treatment_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "receipt_payment" ADD CONSTRAINT "receipt_payment_edit_by_fkey" FOREIGN KEY ("edit_by") REFERENCES "employee"("employee_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "receipt_payment" ADD CONSTRAINT "receipt_payment_receipt_id_fkey" FOREIGN KEY ("receipt_id") REFERENCES "receipt"("receipt_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "receipt_product" ADD CONSTRAINT "receipt_product_edit_by_fkey" FOREIGN KEY ("edit_by") REFERENCES "employee"("employee_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "receipt_product" ADD CONSTRAINT "receipt_product_clinic_stock_id_fkey" FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock"("clinic_stock_id") ON DELETE NO ACTION ON UPDATE CASCADE;

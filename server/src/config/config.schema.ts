@@ -24,7 +24,8 @@ export const DatabaseType = [
 ] as const;
 type DatabaseType = (typeof DatabaseType)[number];
 const databaseTypeSchema = Joi.string()
-  .valid(...DatabaseType).required();
+  .valid(...DatabaseType)
+  .required();
 
 export const configSchema = Joi.object({
   // App Config -----------------------------------
