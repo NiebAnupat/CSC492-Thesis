@@ -1,10 +1,10 @@
-import { registerAs } from '@nestjs/config';
+import { registerAs } from "@nestjs/config";
 import {
   AppConfig,
   DatabaseConfig,
-  GoogleAuthConfig,
-} from './config.interface';
-import { ConfigKey } from './config.enum';
+  GoogleAuthConfig
+} from "./config.interface";
+import { ConfigKey } from "./config.enum";
 
 const APPConfig = registerAs(
   ConfigKey.App,
@@ -13,7 +13,8 @@ const APPConfig = registerAs(
       stage: process.env.STAGE,
       port: process.env.PORT || 4000,
       jwtSecret: process.env.JWT_SECRET,
-    }) as AppConfig,
+      originsURL: process.env.ORIGINS_WHITELIST.split(" ")
+    }) as AppConfig
 );
 
 const DBConfig = registerAs(
@@ -28,8 +29,8 @@ const DBConfig = registerAs(
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       schema: process.env.DB_SCHEMA,
-      synchronize: process.env.DB_SYNCHRONIZE || false,
-    }) as DatabaseConfig,
+      synchronize: process.env.DB_SYNCHRONIZE || false
+    }) as DatabaseConfig
 );
 
 const GOOGLEAuthConfig = registerAs(
@@ -43,23 +44,7 @@ const GOOGLEAuthConfig = registerAs(
       authProviderX509CertURL: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      scope: process.env.GOOGLE_SCOPE.split(' '),
-    }) as GoogleAuthConfig,
+      scope: process.env.GOOGLE_SCOPE.split(" ")
+    }) as GoogleAuthConfig
 );
 export const configurations = [APPConfig, DBConfig, GOOGLEAuthConfig];
-// export type AppConfig = {
-//   app: {
-//     stage: string;
-//     port: number;
-//   },
-//   database: {
-//     type: string;
-//     host: string;
-//     port: number;
-//     username: string;
-//     password: string;
-//     database: string;
-//     schema: string;
-//     synchronize: boolean;
-//   }
-// }

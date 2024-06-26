@@ -37,19 +37,19 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, "google") {
 
     // create a new user or return an existing one
     const user = await this.customerService.findOrCreate({
-      customer_id: id,
+      customer_id: id
     }, {
       customer_id: id,
-      package : Package.FREE,
-      customer_provider: Provider.GOOGLE,
+      package: Package.FREE,
       email: emails[0].value,
+      customer_provider: Provider.GOOGLE,
       customer_person_info: {
         create: {
           first_name: name.givenName,
           last_name: name.familyName,
           avatar: profileUrl,
           create_at: DateTime.now().toISO(),
-          update_at: DateTime.now().toISO(),
+          update_at: DateTime.now().toISO()
         }
       }
     });
