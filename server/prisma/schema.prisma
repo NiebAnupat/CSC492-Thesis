@@ -106,9 +106,8 @@ model clinic_stock {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model customer {
   customer_id           String               @id @db.VarChar
-  customer_provider     customer_providers?
-  // customer_google_id    String?              @unique @db.VarChar
-  email                 String?              @db.VarChar
+  provider              customer_providers?
+  email                 String               @unique @db.VarChar
   password              String?              @db.VarChar
   person_information_id Int
   package               packages             @default(free)

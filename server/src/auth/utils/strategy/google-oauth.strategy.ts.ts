@@ -6,7 +6,7 @@ import { CustomerService } from "src/customer/customer.service";
 import { GoogleAuthConfig } from "src/config/config.interface";
 import { ConfigKey } from "src/config/config.enum";
 import { DateTime } from "luxon";
-import { Package, Provider } from "../../../customer/utils/customer.enum";
+import { $Enums } from "@prisma/client";
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(Strategy, "google") {
@@ -40,9 +40,9 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, "google") {
       customer_id: id
     }, {
       customer_id: id,
-      package: Package.FREE,
+      package: $Enums.packages.free,
       email: emails[0].value,
-      customer_provider: Provider.GOOGLE,
+      provider: $Enums.customer_providers.google,
       customer_person_info: {
         create: {
           first_name: name.givenName,

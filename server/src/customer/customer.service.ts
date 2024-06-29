@@ -1,10 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { Prisma, customer } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
+import { CustomerServiceInterface } from "./utils/interfaces/service.interface";
+import { UniqueIdService } from "../unique-id/unique-id.service";
 
 @Injectable()
-export class CustomerService {
-  constructor(private prisma: PrismaService) {
+export class CustomerService implements CustomerServiceInterface {
+  constructor(
+    private prisma: PrismaService,
+  ) {
   }
 
   create(data: Prisma.customerCreateInput): Promise<customer> {
@@ -15,9 +19,6 @@ export class CustomerService {
     return this.prisma.customer.findMany();
   }
 
-  // findAll(where: Prisma.customerWhereInput): Promise<customer[] | null> {
-  //   return this.prisma.customer.findMany({ where });
-  // }
 
   findOne(where: Prisma.customerWhereUniqueInput): Promise<customer | null> {
     return this.prisma.customer.findUnique({

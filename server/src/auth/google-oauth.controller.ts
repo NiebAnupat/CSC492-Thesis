@@ -22,9 +22,6 @@ export class GoogleOauthController {
   // @UseGuards(JwtAuthGuard)
   @UseGuards(GoogleOauthGuard)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    // For now, we'll just show the user object
-
-    // const { accessToken, customer } = req.user as GooglePassportResponse;
     const customer = req.user as customer;
     const jwtPayload = {
       customer_id: customer.customer_id,
@@ -38,6 +35,6 @@ export class GoogleOauthController {
       sameSite: "none",
       expires: DateTime.now().plus({ days: 30 }).toJSDate()
     });
-    res.send(req.user).end();
+    res.end();
   }
 }

@@ -10,6 +10,7 @@ import { GoogleOauthController } from "./google-oauth.controller";
 import { GoogleOauthStrategy } from "./utils/strategy/google-oauth.strategy.ts";
 import { JwtAuthGuard } from "./utils/guard/jwt-auth.guard";
 import { JwtStrategy } from "./utils/strategy/jwt.strategy";
+import { UniqueIdModule } from "../unique-id/unique-id.module";
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { JwtStrategy } from "./utils/strategy/jwt.strategy";
       }),
       inject: [ConfigService]
     }),
-    CustomerModule
+    CustomerModule,
+    UniqueIdModule
   ],
   controllers: [AuthController, GoogleOauthController],
   providers: [AuthService, GoogleOauthStrategy, JwtStrategy]
