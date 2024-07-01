@@ -1,10 +1,9 @@
-import { $Enums, Prisma } from "@prisma/client";
-import { ValidateResponse } from "../type/auth.type";
-import { HttpException } from "@nestjs/common";
-import { DateTime } from "luxon";
+import { $Enums } from "@prisma/client";
+import { ValidateCustomerResponse } from "../type/auth.type";
+import { CreateCustomerDto } from "../../../customer/dto/create-customer.dto";
 
 export interface AuthServiceInterface {
-  validateUser(email: string, password: string): Promise<ValidateResponse>;
+  validateCustomer(email: string, password: string): Promise<ValidateCustomerResponse>;
 
   customer_login({ customer_id, email, customer_provider }: {
     customer_id: string,
@@ -12,7 +11,7 @@ export interface AuthServiceInterface {
     customer_provider: $Enums.customer_providers
   }): { access_token: string };
 
-  customer_register(customer: Partial<Prisma.customerCreateInput>): Promise<any>;
+  customer_register(customer: CreateCustomerDto): Promise<any>;
 }
 
 // {

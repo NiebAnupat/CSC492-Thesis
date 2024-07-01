@@ -48,6 +48,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, "google") {
           first_name: name.givenName,
           last_name: name.familyName,
           avatar: profileUrl,
+          role: $Enums.roles.owner,
           create_at: DateTime.now().toISO(),
           update_at: DateTime.now().toISO()
         }

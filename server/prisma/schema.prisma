@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model developer {
+  developer_id Int     @id @default(autoincrement())
+  email        String  @unique
+  password     String
+  role         roles   @default(developer)
+  is_active    Boolean @default(true)
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model appointment {
   appointment_id         String                  @id @db.VarChar
@@ -559,12 +567,13 @@ model person_information {
   first_name                         String     @db.VarChar
   last_name                          String     @db.VarChar
   telephone                          String?    @unique(map: "person_information_telephone_idx") @db.Char(10)
-  address_line_1                     String?
-  address_line_2                     String?
+  address_line_1                     String?    @db.Text
+  address_line_2                     String?    @db.Text
   provice_id                         Int?
   hire_date                          DateTime?  @db.Date
   birth_date                         DateTime?  @db.Date
   avatar                             String?    @db.VarChar
+  role                               roles
   create_at                          DateTime   @default(now()) @db.Timestamp(6)
   update_at                          DateTime   @default(now()) @db.Timestamp(6)
   edit_by                            String?    @db.VarChar
@@ -606,6 +615,15 @@ enum days {
 enum genders {
   male
   female
+}
+
+enum roles {
+  admin
+  dentist
+  counter_staff
+  manager
+  owner
+  developer
 }
 
 enum packages {

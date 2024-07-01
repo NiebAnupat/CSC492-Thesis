@@ -1,8 +1,7 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Prisma, customer } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
 import { CustomerServiceInterface } from "./utils/interfaces/service.interface";
-import { UniqueIdService } from "../unique-id/unique-id.service";
 
 @Injectable()
 export class CustomerService implements CustomerServiceInterface {
@@ -16,7 +15,11 @@ export class CustomerService implements CustomerServiceInterface {
   }
 
   findAll(): Promise<customer[] | null> {
-    return this.prisma.customer.findMany();
+    return this.prisma.customer.findMany({
+      include: {
+        customer_person_info: true
+      }
+    });
   }
 
 

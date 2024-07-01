@@ -13,6 +13,7 @@ INSERT INTO
         hire_date,
         birth_date,
         avatar,
+        role,
         create_at,
         update_at,
         edit_by,
@@ -33,6 +34,7 @@ VALUES (
         NULL,
         '2003-06-08',
         NULL,
+        'owner'::roles,
         now(),
         now(),
         NULL,
@@ -43,7 +45,7 @@ VALUES (
 INSERT INTO
     public.customer (
         customer_id,
-        customer_provider,
+        provider,
         -- customer_google_id,
         email,
         "password",

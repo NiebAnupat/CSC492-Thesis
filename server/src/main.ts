@@ -6,12 +6,14 @@ import { ValidationPipe } from "@nestjs/common";
 import cookieParser from "cookie-parser";
 import { ConfigKey } from "./config/config.enum";
 import { AppConfig } from "./config/config.interface";
+import { useRequestLogging } from "./middleware/request-logging";
 
 async function bootstrap() {
   // Create the app
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix("api");
   app.useGlobalPipes(new ValidationPipe());
+  useRequestLogging(app);
 
   // Swagger
   const config = new DocumentBuilder()

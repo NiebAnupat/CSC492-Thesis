@@ -8,9 +8,10 @@ import { ConfigKey } from "src/config/config.enum";
 import { AppConfig } from "src/config/config.interface";
 import { GoogleOauthController } from "./google-oauth.controller";
 import { GoogleOauthStrategy } from "./utils/strategy/google-oauth.strategy.ts";
-import { JwtAuthGuard } from "./utils/guard/jwt-auth.guard";
 import { JwtStrategy } from "./utils/strategy/jwt.strategy";
 import { UniqueIdModule } from "../unique-id/unique-id.module";
+import { LocalStrategy } from "./utils/strategy/local.strategy";
+import { PrismaService } from "nestjs-prisma";
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { UniqueIdModule } from "../unique-id/unique-id.module";
     UniqueIdModule
   ],
   controllers: [AuthController, GoogleOauthController],
-  providers: [AuthService, GoogleOauthStrategy, JwtStrategy]
+  providers: [PrismaService, AuthService, GoogleOauthStrategy, JwtStrategy, LocalStrategy]
 })
 export class AuthModule {
 }

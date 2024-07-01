@@ -4,7 +4,6 @@ import { GoogleOauthGuard } from "./utils/guard/google-oauth.guard";
 import { customer } from "@prisma/client";
 import { DateTime } from "luxon";
 import { JwtService } from "@nestjs/jwt";
-import { JwtAuthGuard } from "./utils/guard/jwt-auth.guard";
 
 @Controller("auth/google")
 export class GoogleOauthController {
@@ -26,7 +25,7 @@ export class GoogleOauthController {
     const jwtPayload = {
       customer_id: customer.customer_id,
       email: customer.email,
-      provider: customer.customer_provider
+      provider: customer.provider
     };
     const accessToken = this.jwtService.sign(jwtPayload);
     res.cookie("access_token", accessToken, {

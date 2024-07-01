@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { configurations } from './config/configuration';
 import { CustomerModule } from './customer/customer.module';
 import { UniqueIdModule } from './unique-id/unique-id.module';
+import { DeveloperModule } from './developer/developer.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UniqueIdModule } from './unique-id/unique-id.module';
     AuthModule,
     CustomerModule,
     UniqueIdModule,
+    DeveloperModule,
   ],
   controllers: [AppController],
   providers: [AppService],
