@@ -26,7 +26,8 @@ import { PrismaService } from "nestjs-prisma";
     UniqueIdModule
   ],
   controllers: [AuthController, GoogleOauthController],
-  providers: [PrismaService, AuthService, GoogleOauthStrategy, JwtStrategy, LocalStrategy]
+  providers: [PrismaService, AuthService, GoogleOauthStrategy, JwtStrategy, LocalStrategy],
+  exports: [JwtStrategy]
 })
 export class AuthModule {
 }

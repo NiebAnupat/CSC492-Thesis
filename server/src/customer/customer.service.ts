@@ -25,7 +25,10 @@ export class CustomerService implements CustomerServiceInterface {
 
   findOne(where: Prisma.customerWhereUniqueInput): Promise<customer | null> {
     return this.prisma.customer.findUnique({
-      where
+      where,
+      include : {
+        customer_person_info: true
+      }
     });
   }
 

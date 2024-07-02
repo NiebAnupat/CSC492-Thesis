@@ -29,7 +29,6 @@ const DBConfig = registerAs(
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       schema: process.env.DB_SCHEMA,
-      synchronize: process.env.DB_SYNCHRONIZE || false
     }) as DatabaseConfig
 );
 

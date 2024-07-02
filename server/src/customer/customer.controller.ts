@@ -1,14 +1,14 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete
+  Delete, UseGuards
 } from "@nestjs/common";
 import { CustomerService } from "./customer.service";
-import { UpdateCustomerDto } from "./dto/update-customer.dto";
+import { JwtAuthGuard } from "../auth/utils/guard/jwt-auth.guard";
+import { Role } from "../auth/utils/decorator/role.decorator";
+import { $Enums } from "@prisma/client";
+import { RoleGuard } from "../auth/utils/guard/role.guard";
 
 @Controller("customer")
 export class CustomerController {
@@ -20,6 +20,8 @@ export class CustomerController {
   //   return this.customerService.create(createCustomerDto);
   // }
 
+  @Role($Enums.roles.developer)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
   findAll() {
     return this.customerService.findAll();

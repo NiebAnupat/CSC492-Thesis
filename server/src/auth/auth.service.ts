@@ -36,7 +36,7 @@ export class AuthService implements AuthServiceInterface {
       access_token: this.jwtService.sign({
         customer_id,
         email,
-        provider: customer_provider
+        provider: customer_provider,
       })
     };
   }
