@@ -52,6 +52,17 @@ const customerSeedForTest = () => {
     });
 };
 
+const developerSeed = () => { 
+  const seedSql = readFileSync("./src/migrations/dev_seed.sql").toString();
+  return pool
+    .query(seedSql)
+    .then(() => console.log("Seed developer for test completed successfully"))
+    .catch((error) => {
+      throw error;
+    });
+
+}
+
 const findAllCustomer = () => {
   const findAllSql = "SELECT * FROM customer";
   return pool
@@ -75,6 +86,7 @@ const findAllCustomer = () => {
       stdio: "inherit",
     });
     await customerSeedForTest();
+    await developerSeed();
     await findAllCustomer();
     console.log("Migration completed successfully");
   } catch (error) {
