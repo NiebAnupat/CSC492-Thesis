@@ -12,6 +12,7 @@ import { JwtStrategy } from "./utils/strategy/jwt.strategy";
 import { UniqueIdModule } from "../unique-id/unique-id.module";
 import { LocalStrategy } from "./utils/strategy/local.strategy";
 import { PrismaService } from "nestjs-prisma";
+import { DeveloperModule } from "../developer/developer.module";
 
 @Module({
   imports: [
@@ -23,11 +24,12 @@ import { PrismaService } from "nestjs-prisma";
       inject: [ConfigService]
     }),
     CustomerModule,
-    UniqueIdModule
+    DeveloperModule,
+    UniqueIdModule,
   ],
   controllers: [AuthController, GoogleOauthController],
   providers: [PrismaService, AuthService, GoogleOauthStrategy, JwtStrategy, LocalStrategy],
-  exports: [JwtStrategy]
+  exports: []
 })
 export class AuthModule {
 }

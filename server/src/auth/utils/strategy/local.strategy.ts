@@ -11,15 +11,27 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, password: string): Promise<any> {
-    const user = await this.authService.validateCustomer(email, password);
+    let user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    return this.authService.customer_login({
-      customer_id: user.customer_id,
-      email: user.email,
-      customer_provider: $Enums.customer_providers.local
-    });
+    const { owner, developer } = $Enums.roles;
+    switch (user.role) {
+      case owner:
+        return this.authService.customer_login({
+          customer_id: user.user_id,
+          email: user.email,
+          customer_provider: $Enums.customer_providers.local,
+        });
+      case developer:
+        return this.authService.developer_login({
+          dev_id: user.user_id,
+          email: user.email
+        });
+      default:
+        throw new UnauthorizedException();
+    }
+
   }
 }

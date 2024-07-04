@@ -19,6 +19,8 @@ export class PackageGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
+    if (user.role === $Enums.roles.developer) return true;
+
     return this.matchPackage(packages, user);
 
   }

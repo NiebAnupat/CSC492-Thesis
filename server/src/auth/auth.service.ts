@@ -5,24 +5,25 @@ import {
   NotFoundException
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { AuthServiceInterface } from "./utils/interfaces/service.interface";
-import { $Enums } from "@prisma/client";
+import { $Enums, customer, developer } from "@prisma/client";
 import { CustomerService } from "../customer/customer.service";
 import { compare, hash } from "bcrypt";
 import { UniqueIdService } from "../unique-id/unique-id.service";
 import { CreateCustomerDto } from "../customer/dto/create-customer.dto";
 import { DateTime } from "luxon";
 import { PrismaService } from "nestjs-prisma";
-import { ValidateCustomerResponse } from "./utils/type/auth.type";
+import { UserWithRole, ValidateUserResponse } from "./utils/type/auth.type";
+import { DeveloperService } from "../developer/developer.service";
 
 
 @Injectable()
-export class AuthService implements AuthServiceInterface {
+export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly customerService: CustomerService,
     private readonly jwtService: JwtService,
-    private readonly uniqueIdService: UniqueIdService
+    private readonly uniqueIdService: UniqueIdService,
+    private readonly developerService: DeveloperService
   ) {
   }
 
@@ -34,9 +35,10 @@ export class AuthService implements AuthServiceInterface {
   }): { access_token: string; } {
     return {
       access_token: this.jwtService.sign({
-        customer_id,
+        user_id: customer_id,
         email,
         provider: customer_provider,
+        role: $Enums.roles.owner
       })
     };
   }
@@ -91,22 +93,79 @@ export class AuthService implements AuthServiceInterface {
 
   }
 
+  async developer_register({ email, password }: { email: string, password: string }): Promise<{
+    access_token: string
+  }> {
+    // check for developer already exists
+    const isEmailExits = await this.developerService.findOne(email);
+    if (isEmailExits) throw new BadRequestException("Developer already exists");
 
-  async validateCustomer(email: string, password: string): Promise<ValidateCustomerResponse> {
-    const user = await this.customerService.findOne({ email });
-    if (!user) throw new NotFoundException;
+    return this.developerService.create({
+      email,
+      password: await this.hashPassword(password)
+    }).then((user) => {
+      return this.developer_login({
+        dev_id: user.developer_id.toString(),
+        email: user.email
+      });
+    }).catch((error) => {
+      throw new InternalServerErrorException(error);
+    });
+  }
+
+  developer_login({ dev_id, email }: { dev_id: string, email: string }) {
+    return {
+      access_token: this.jwtService.sign({
+        user_id: dev_id,
+        email,
+        role: $Enums.roles.developer
+      })
+    };
+  }
 
 
-    if ((user.provider === $Enums.customer_providers.google) || (await compare(password, user.password))) {
-      return {
-        customer_id: user.customer_id,
-        email: user.email,
-        package: user.package
-      };
+  async validateUser(email: string, password: string): Promise<ValidateUserResponse> {
+    const { owner, developer } = $Enums.roles;
+    let { user, role } = await this.getUserWithRole(email);
 
-    } else throw new BadRequestException("Invalid password");
+    switch (role) {
+      case owner:
+        // customer section
+        user = user as customer;
+        if ((user.provider === $Enums.customer_providers.google) || (await compare(password, user.password))) {
+          return {
+            user_id: user.customer_id,
+            email: user.email,
+            role: owner,
+            package: user.package
+          };
+
+        } else throw new BadRequestException("Invalid password");
+      case developer:
+        // developer section
+        user = user as developer;
+        if (await compare(password, user.password)) {
+          return {
+            user_id: user.developer_id.toString(),
+            email: user.email,
+            role: developer
+          };
+        }
+        break;
+      default:
+        throw new NotFoundException;
+    }
 
 
+  }
+
+  private async getUserWithRole(email: string): Promise<UserWithRole> {
+    let user: customer | developer;
+    user = await this.customerService.findOne({ email });
+    if (user) return { user, role: $Enums.roles.owner };
+    user = await this.developerService.findOne(email);
+    if (user) return { user, role: $Enums.roles.developer };
+    throw new NotFoundException;
   }
 
   private hashPassword(password: string): Promise<string> {

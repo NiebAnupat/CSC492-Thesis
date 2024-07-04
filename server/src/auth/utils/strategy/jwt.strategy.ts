@@ -5,13 +5,15 @@ import { ConfigService } from "@nestjs/config";
 import { ConfigKey } from "../../../config/config.enum";
 import { AppConfig } from "../../../config/config.interface";
 import { CustomerService } from "../../../customer/customer.service";
-import { customer } from "@prisma/client";
+import { $Enums, customer, developer } from "@prisma/client";
+import { DeveloperService } from "../../../developer/developer.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    private readonly customerService: CustomerService
+    private readonly customerService: CustomerService,
+    private readonly developerService: DeveloperService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -27,14 +29,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     // This payload will be the decrypted token payload you provided when signing the token
-    const c: customer = await this.customerService.findOne({ email: payload.email });
-    if (!c) return NotFoundException;
+
+
+    const { email, role, user_id } = payload;
+
+    let user: customer | developer;
+    const { owner, developer } = $Enums.roles;
+
+    switch (role) {
+      case owner:
+        user = await this.customerService.findOne({ email: email });
+        break;
+      case developer:
+        user = await this.developerService.findOne(email);
+        break;
+      default:
+        return NotFoundException;
+    }
 
     return {
-      customer_id: payload.customer_id,
-      email: payload.email,
-      provider: payload.provider,
-      role: c["customer_person_info"].role
+      user_id,
+      email,
+      role,
+      ...(role === $Enums.roles.owner && { package: user["package"] })
     };
   }
 }

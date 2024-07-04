@@ -1,7 +1,13 @@
-import { $Enums } from "@prisma/client";
+import { $Enums, customer, developer } from "@prisma/client";
 
-export type ValidateCustomerResponse = {
-  customer_id : string;
+export type ValidateUserResponse = {
+  user_id : string;
   email: string;
-  package: $Enums.packages;
+  role: $Enums.roles;
+  package?: $Enums.packages;
+}
+
+export type UserWithRole = {
+  user : customer | developer;
+  role: $Enums.roles;
 }
