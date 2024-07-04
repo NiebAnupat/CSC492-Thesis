@@ -1,14 +1,13 @@
-import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
-import { Request, Response } from "express";
-import { GoogleOauthGuard } from "./utils/guard/google-oauth.guard";
-import { $Enums, customer } from "@prisma/client";
-import { DateTime } from "luxon";
-import { JwtService } from "@nestjs/jwt";
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { GoogleOauthGuard } from './utils/guard/google-oauth.guard';
+import { $Enums, customer } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { JwtService } from '@nestjs/jwt';
 
-@Controller("auth/google")
+@Controller('auth/google')
 export class GoogleOauthController {
-  constructor(private jwtService: JwtService) {
-  }
+  constructor(private jwtService: JwtService) {}
 
   @Get()
   // @UseGuards(JwtAuthGuard)
@@ -17,7 +16,7 @@ export class GoogleOauthController {
     // Guard redirects
   }
 
-  @Get("callback")
+  @Get('callback')
   // @UseGuards(JwtAuthGuard)
   @UseGuards(GoogleOauthGuard)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
@@ -26,14 +25,14 @@ export class GoogleOauthController {
       customer_id: customer.customer_id,
       email: customer.email,
       provider: customer.provider,
-      role: $Enums.roles.owner
+      role: $Enums.roles.owner,
     };
     const accessToken = this.jwtService.sign(jwtPayload);
-    res.cookie("access_token", accessToken, {
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
-      expires: DateTime.now().plus({ days: 30 }).toJSDate()
+      sameSite: 'none',
+      expires: DateTime.now().plus({ days: 30 }).toJSDate(),
     });
     res.end();
   }

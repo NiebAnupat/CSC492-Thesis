@@ -1,4 +1,4 @@
-import { customer, Prisma } from "@prisma/client";
+import { customer, Prisma } from '@prisma/client';
 
 export interface CustomerServiceInterface {
   create(data: Prisma.customerCreateInput): Promise<customer>;
@@ -9,12 +9,12 @@ export interface CustomerServiceInterface {
 
   findOrCreate(
     where: Prisma.customerWhereUniqueInput,
-    create: Prisma.customerCreateInput
+    create: Prisma.customerCreateInput,
   ): Promise<customer>;
 
   update(
     where: Prisma.customerWhereUniqueInput,
-    data: Prisma.customerUpdateInput
+    data: Prisma.customerUpdateInput,
   ): Promise<customer>;
 
   softDelete(where: Prisma.customerWhereUniqueInput): Promise<customer>;

@@ -1,26 +1,29 @@
 // export class CreateCustomerDto {}
 
-import { $Enums } from "@prisma/client";
+import { $Enums } from '@prisma/client';
 import {
-  IsEmail, IsEnum,
-  IsNotEmpty, IsObject,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
-  IsStrongPassword, Matches, ValidateNested
-} from "class-validator";
-import { Type } from "class-transformer";
+  IsStrongPassword,
+  Matches,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 // export type CreateCustomerDto = Partial<Prisma.customerCreateInput>;
 
 // interface person_info {}
 
 class PersonInfo {
-
   @IsOptional()
   nationality: string;
 
   @IsString()
-  @Matches(/^[0-9]{13}$/, { message: "Citizen ID must be 13 digits" })
+  @Matches(/^[0-9]{13}$/, { message: 'Citizen ID must be 13 digits' })
   citizen_id: string;
 
   @IsEnum($Enums.genders)
@@ -47,7 +50,7 @@ class PersonInfo {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9]{10}$/, { message: "Telephone must be 10 digits" })
+  @Matches(/^[0-9]{10}$/, { message: 'Telephone must be 10 digits' })
   telephone: string;
 
   @IsOptional()
@@ -61,12 +64,9 @@ class PersonInfo {
   @IsOptional()
   @IsString()
   edit_by: string;
-
-
 }
 
 export class CreateCustomerDto {
-
   @IsNotEmpty()
   @IsEmail()
   email: string;
@@ -80,5 +80,4 @@ export class CreateCustomerDto {
   @ValidateNested()
   @Type(() => PersonInfo)
   person_info: PersonInfo;
-
 }

@@ -1,28 +1,28 @@
-import * as Joi from "joi";
+import * as Joi from 'joi';
 
 // type DatabaseType = "mysql" | "postgres" | "cockroachdb" | "sap" | "mariadb" | "sqlite" | "cordova" | "react-native" | "nativescript" | "sqljs" | "oracle" | "mssql" | "mongodb" | "aurora-mysql" | "aurora-postgres" | "expo" | "better-sqlite3" | "capacitor" | "spanner";
 export const DatabaseType = [
-  "mysql",
-  "postgres",
-  "cockroachdb",
-  "sap",
-  "mariadb",
-  "sqlite",
-  "cordova",
-  "react-native",
-  "nativescript",
-  "sqljs",
-  "oracle",
-  "mssql",
-  "mongodb",
-  "aurora-mysql",
-  "aurora-postgres",
-  "expo",
-  "better-sqlite3",
-  "capacitor",
-  "spanner"
+  'mysql',
+  'postgres',
+  'cockroachdb',
+  'sap',
+  'mariadb',
+  'sqlite',
+  'cordova',
+  'react-native',
+  'nativescript',
+  'sqljs',
+  'oracle',
+  'mssql',
+  'mongodb',
+  'aurora-mysql',
+  'aurora-postgres',
+  'expo',
+  'better-sqlite3',
+  'capacitor',
+  'spanner',
 ] as const;
-type DatabaseType = (typeof DatabaseType)[number];
+// type DatabaseType = (typeof DatabaseType)[number];
 const databaseTypeSchema = Joi.string()
   .valid(...DatabaseType)
   .required();
@@ -30,11 +30,11 @@ const databaseTypeSchema = Joi.string()
 export const configSchema = Joi.object({
   // App Config -----------------------------------
   STAGE: Joi.string()
-    .valid("development", "production", "test")
+    .valid('development', 'production', 'test')
     .error(
       new Error(
-        "NODE_ENV must be one of \"development\", \"production\" or \"test\""
-      )
+        'NODE_ENV must be one of "development", "production" or "test"',
+      ),
     ),
   PORT: Joi.number().positive().max(65535).default(4000),
   JWT_SECRET: Joi.string().required(),
@@ -57,5 +57,5 @@ export const configSchema = Joi.object({
   GOOGLE_AUTH_PROVIDER_X509_CERT_URL: Joi.string().uri().required(),
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
   GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
-  GOOGLE_SCOPE: Joi.string().required()
+  GOOGLE_SCOPE: Joi.string().required(),
 }).required();

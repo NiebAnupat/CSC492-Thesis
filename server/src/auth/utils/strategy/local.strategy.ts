@@ -1,17 +1,17 @@
-import { Strategy } from "passport-local";
-import { PassportStrategy } from "@nestjs/passport";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { AuthService } from "../../auth.service";
-import { $Enums } from "@prisma/client";
+import { Strategy } from 'passport-local';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '../../auth.service';
+import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    super({ usernameField: "email" });
+    super({ usernameField: 'email' });
   }
 
   async validate(email: string, password: string): Promise<any> {
-    let user = await this.authService.validateUser(email, password);
+    const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -27,11 +27,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       case developer:
         return this.authService.developer_login({
           dev_id: user.user_id,
-          email: user.email
+          email: user.email,
         });
       default:
         throw new UnauthorizedException();
     }
-
   }
 }
