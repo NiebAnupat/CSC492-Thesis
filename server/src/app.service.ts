@@ -5,4 +5,8 @@ export class AppService {
   getHello(): string {
     return 'Hello Anupat Kaewmee!!!!';
   }
+
+  getHealth() {
+    return "I'm healthy!";
+  }
 }

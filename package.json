@@ -7,7 +7,7 @@
   "scripts": {
     "setup:project": "pnpm install && concurrently \"(cd frontend && pnpm install)\" \"(cd server && pnpm install)\"",
     "dev": "concurrently \"(cd frontend && pnpm dev)\" \"(cd server && pnpm start:dev)\"",
-    "db:migration" : "node migration.js"
+    "postgres:migration" : "node migration.js"
   },
   "keywords": [],
   "author": "",

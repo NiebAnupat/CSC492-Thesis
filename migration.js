@@ -1,6 +1,7 @@
-const { Pool } = require('pg');
-const { readFileSync } = require('fs');
-const dotenv = require('dotenv');
+const { Pool } = require("pg");
+const { readFileSync } = require("fs");
+const dotenv = require("dotenv");
+const { exec, execSync } = require("child_process");
 dotenv.config();
 
 const pool = new Pool({
@@ -8,44 +9,88 @@ const pool = new Pool({
 });
 
 const dropSchema = () => {
-  const dropSchemaSql = readFileSync("./src/migrations/drop_schema.sql").toString();
-  return pool.query(dropSchemaSql)
+  const dropSchemaSql = readFileSync(
+    "./src/migrations/drop_schema.sql"
+  ).toString();
+  return pool
+    .query(dropSchemaSql)
     .then(() => console.log("Schema dropped successfully"))
-    .catch(error => console.log("Migration failed\n", error));
+    .catch((error) => console.log("Migration failed\n", error));
+};
+
+const initDatatype = () => {
+  const initDatatypeSql = readFileSync(
+    "./src/migrations/init_datatype.sql"
+  ).toString();
+  return pool
+    .query(initDatatypeSql)
+    .then(() => console.log("Datatype created successfully"))
+    .catch((error) => {
+      throw error;
+    });
 };
 
 const initTables = () => {
-  const initTablesSql = readFileSync("./src/migrations/init_tables.sql").toString();
-  return pool.query(initTablesSql)
+  const initTablesSql = readFileSync(
+    "./src/migrations/init_tables.sql"
+  ).toString();
+  return pool
+    .query(initTablesSql)
     .then(() => console.log("Tables created successfully"))
-    .catch(error => console.log("Migration failed\n", error));
+    .catch((error) => {
+      throw error;
+    });
 };
 
 const customerSeedForTest = () => {
   const seedSql = readFileSync("./src/migrations/customer_seed.sql").toString();
-  return pool.query(seedSql)
+  return pool
+    .query(seedSql)
     .then(() => console.log("Seed customer for test completed successfully"))
-    .catch(error => console.log("Seed customer for test failed\n", error));
+    .catch((error) => {
+      throw error;
+    });
 };
 
+const developerSeed = () => { 
+  const seedSql = readFileSync("./src/migrations/dev_seed.sql").toString();
+  return pool
+    .query(seedSql)
+    .then(() => console.log("Seed developer for test completed successfully"))
+    .catch((error) => {
+      throw error;
+    });
+
+}
+
 const findAllCustomer = () => {
-  const findAllSql = 'SELECT * FROM customer';
-  return pool.query(findAllSql)
-    .then(result => {
+  const findAllSql = "SELECT * FROM customer";
+  return pool
+    .query(findAllSql)
+    .then((result) => {
       console.log("Test find all customer completed successfully");
       console.log(result.rows);
     })
-    .catch(error => console.log("Test find all customer failed\n", error));
+    .catch((error) => {
+      throw error;
+    });
 };
 
 // Execute functions sequentially and close pool
 (async () => {
   try {
     await dropSchema();
-    await initTables();
+    // await initDatatype();
+    // await initTables();
+    execSync("cd server && pnpm prisma migrate dev --name init", {
+      stdio: "inherit",
+    });
     await customerSeedForTest();
-    await findAllCustomer();  
+    await developerSeed();
+    await findAllCustomer();
     console.log("Migration completed successfully");
+  } catch (error) {
+    console.log("Migration failed\n", error);
   } finally {
     pool.end();
   }
