@@ -13,7 +13,7 @@ export default function Home() {
       <div className='container p-10 max-w-[28rem] rounded-xl shadow-xl bg-secondary'>
 
         <form action="" className="flex flex-col items-center gap-y-4 mb-10">
-          <h1 className="h4 mb-10">เข้าสู่ระบบ</h1>
+          <h1 className="h4 mb-10">เข้าสู่ระบบ Nied Autism</h1>
 
           {/* Username */}
           <div className='relative flex items-center w-full'>
