@@ -1,125 +1,67 @@
--- CREATE DATABASE CSC492_Thesis WITH ENCODING 'UTF8';
-SET client_encoding = 'UTF8';
--- UPDATE pg_database SET encoding = pg_char_to_encoding('UTF8') WHERE datname='your_database_name';
-UPDATE pg_database SET encoding = pg_char_to_encoding('UTF8') WHERE datname='CSC492-Thesis';
-UPDATE pg_database SET datcollate='en_US.UTF-8' WHERE datname='CSC492-Thesis';
-
-CREATE TYPE "packages" AS ENUM (
-  'basic',
-  'premium',
-  'vip'
-);
-
-CREATE TYPE "genders" AS ENUM (
-  'male',
-  'female'
-);
-
-CREATE TYPE "days" AS ENUM (
-  'sunday',
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday'
-);
-
-CREATE TYPE "product_types" AS ENUM (
-  'consume',
-  'sale'
-);
-
-CREATE TYPE "stock_types" AS ENUM (
-  'product',
-  'medicine'
-);
-
-CREATE TYPE "treatment_record_fields" AS ENUM (
-  'subject',
-  'objective',
-  'assessment',
-  'plan'
-);
-
-CREATE TYPE "payment_types" AS ENUM (
-  'cash',
-  'credit_card',
-  'bank_transfer',
-  'sso'
-);
-
-CREATE TYPE "appointment_status" AS ENUM (
-  'pending',
-  'cancel',
-  'success'
-);
-
-CREATE TYPE "actions" AS ENUM (
-  'create',
-  'update',
-  'insert',
-  'delete'
+CREATE TABLE "person_information" (
+  "person_information_id" serial,
+  "nationality" varchar ,
+  "citizen_id" char(13) NOT NULL UNIQUE,
+  "gender" genders,
+  "prefix" varchar,
+  "first_name" varchar NOT NULL,
+  "last_name" varchar NOT NULL,
+  "telephone" char(10) NOT NULL UNIQUE,
+  "address_line_1" text,
+  "address_line_2" text,
+  "provice_id" integer,
+  "hire_date" date,
+  "birth_date" date NOT NULL,
+  "avatar" varchar,
+  "create_at" timestamp DEFAULT (now()) NOT NULL,
+  "update_at" timestamp DEFAULT (now()) NOT NULL,
+  "edit_by" varchar,
+  "deleted_at" timestamp,
+  "branch_id" varchar,
+  PRIMARY KEY ("person_information_id")
 );
 
 CREATE TABLE "customer" (
   "customer_id" varchar,
+  "customer_provider" customer_providers,
+  "customer_google_id" varchar,
   "email" varchar,
   "password" varchar,
-  "citizen_id" char(13),
-  "fname" varchar,
-  "lname" varchar,
-  "telephone" char(10),
-  "address_line_1" text,
-  "address_line_2" text,
-  "package" packages DEFAULT 'basic',
+  "person_information_id" integer NOT NULL,
+  "package" packages DEFAULT 'basic' NOT NULL,
   PRIMARY KEY ("customer_id")
 );
 
 CREATE TABLE "provice" (
-  "provice_id" serial ,
-  "provice_name" varchar,
+  "provice_id" serial,
+  "province_name_th" varchar NOT NULL,
+  "province_name_en" varchar NOT NULL,
   PRIMARY KEY ("provice_id")
 );
 
 CREATE TABLE "branch" (
   "branch_id" varchar,
-  "branch_name" varchar,
+  "branch_name" varchar NOT NULL,
   "address_line_1" text,
   "address_line_2" text,
-  "provice_id" int,
-  "telephone" char(10),
+  "provice_id" integer,
+  "telephone" char(10) NOT NULL,
   "image_url" varchar,
-  "manager_id" varchar,
-  "owner_account" varchar,
+  "manager_id" varchar NOT NULL,
+  "owner_account" varchar NOT NULL,
   PRIMARY KEY ("branch_id")
 );
 
 CREATE TABLE "employee" (
   "employee_id" varchar,
-  "password" varchar,
-  "citizen_id" char(13),
-  "gender" genders,
-  "prefix" varchar,
-  "fname" varchar,
-  "lname" varchar,
-  "position_id" int,
-  "birth_date" date,
-  "hire_date" date,
-  "telephone" char(10),
-  "address_line_1" text,
-  "address_line_2" text,
-  "provice_id" int,
-  "is_active" bool NOT NULL DEFAULT true,
-  "create_at" timestamp DEFAULT (now()),
-  "update_at" timestamp DEFAULT (now()),
-  "edit_by" varchar,
-  "branch_id" varchar,
+  "password" varchar NOT NULL,
+  "position_id" integer,
+  "person_information_id" integer NOT NULL,
   PRIMARY KEY ("employee_id")
 );
 
 CREATE TABLE "position" (
-  "position_id" serial ,
+  "position_id" serial,
   "position_name" varchar,
   "branch_id" varchar,
   PRIMARY KEY ("position_id")
@@ -128,26 +70,11 @@ CREATE TABLE "position" (
 CREATE TABLE "dentist" (
   "dentist_id" varchar,
   "password" varchar,
-  "citizen_id" char(13),
-  "gender" genders,
-  "prefix" varchar,
-  "fname" varchar,
-  "lname" varchar,
-  "birth_date" date,
-  "hire_date" date,
   "dentist_certificate_number" varchar,
-  "expert_type_id" int,
-  "telephone" char(10),
-  "address_line_1" text,
-  "address_line_2" text,
-  "provice_id" int,
+  "expert_type_id" integer,
   "dentist_fee_rate" numeric NOT NULL DEFAULT 0.5,
   "default_lab_rate" numeric NOT NULL DEFAULT 0.5,
-  "is_active" bool NOT NULL DEFAULT true,
-  "create_at" timestamp DEFAULT (now()),
-  "update_at" timestamp DEFAULT (now()),
-  "edit_by" varchar,
-  "branch_id" varchar,
+  "person_information_id" integer,
   PRIMARY KEY ("dentist_id")
 );
 
@@ -176,17 +103,7 @@ CREATE TABLE "dentist_workday" (
 
 CREATE TABLE "patient" (
   "hn" varchar,
-  "nationality" varchar,
-  "citizen_id" char(13),
-  "gender" genders,
-  "prefix" varchar,
-  "fname" varchar,
-  "lname" varchar,
-  "brith_date" date,
-  "address_line_1" text,
-  "address_line_2" text,
-  "provice_id" int,
-  "telephone" char(10),
+  "person_information_id" integer,
   "current_medication" text,
   "drug_allergy" text,
   "congenital_disease" text,
@@ -194,11 +111,6 @@ CREATE TABLE "patient" (
   "contact_person_name" varchar,
   "contact_person_relation" varchar,
   "contact_person_telephone" char(10),
-  "is_active" bool NOT NULL DEFAULT true,
-  "create_at" timestamp DEFAULT (now()),
-  "update_at" timestamp DEFAULT (now()),
-  "edit_by" varchar,
-  "branch_id" varchar,
   PRIMARY KEY ("hn")
 );
 
@@ -215,7 +127,7 @@ CREATE TABLE "tag_list" (
 
 CREATE TABLE "patient_tag" (
   "patient_tag_record_id" serial,
-  "tag_id" int,
+  "tag_id" integer,
   "hn" varchar,
   PRIMARY KEY ("patient_tag_record_id")
 );
@@ -234,7 +146,7 @@ CREATE TABLE "product" (
 CREATE TABLE "requisition_product" (
   "requisition_id" varchar,
   "clinic_stock_id" varchar,
-  "quantity" int,
+  "quantity" integer,
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
   "edit_by" varchar,
@@ -245,7 +157,7 @@ CREATE TABLE "requisition_product" (
 CREATE TABLE "medicine" (
   "medicine_id" serial,
   "medicine_name" varchar,
-  "medicine_type_id" int,
+  "medicine_type_id" integer,
   "instruction" text,
   "precaution" text,
   "create_at" timestamp DEFAULT (now()),
@@ -268,10 +180,10 @@ CREATE TABLE "medicine_type" (
 CREATE TABLE "clinic_stock" (
   "clinic_stock_id" varchar,
   "stock_type" stock_types NOT NULL,
-  "item_id" int,
-  "quantity" int NOT NULL DEFAULT 0,
+  "item_id" integer,
+  "quantity" integer NOT NULL DEFAULT 0,
   "unit_price" numeric NOT NULL DEFAULT 0,
-  "minimun_quantity" int NOT NULL DEFAULT 1,
+  "minimun_quantity" integer NOT NULL DEFAULT 1,
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
   "edit_by" varchar,
@@ -322,10 +234,10 @@ CREATE TABLE "treatment_nv" (
 
 CREATE TABLE "treatment_nv_operation" (
   "nv_operation_id" serial,
-  "treatment_nv_id" int,
-  "operation_type_id" int,
+  "treatment_nv_id" integer,
+  "operation_type_id" integer,
   "tooth_position" varchar,
-  "refer_denstist_expert_type_id" int,
+  "refer_denstist_expert_type_id" integer,
   "is_appointment" bool DEFAULT false,
   PRIMARY KEY ("nv_operation_id")
 );
@@ -364,8 +276,8 @@ CREATE TABLE "treatment_document" (
 CREATE TABLE "treatment_operation" (
   "treatment_operation_id" serial,
   "treatment_id" varchar,
-  "operation_type_id" int,
-  "quantity" int DEFAULT 1,
+  "operation_type_id" integer,
+  "quantity" integer DEFAULT 1,
   "tooth_position" varchar DEFAULT null,
   "override_unit_price" numeric DEFAULT null,
   PRIMARY KEY ("treatment_operation_id")
@@ -375,7 +287,7 @@ CREATE TABLE "dispensing_medicine" (
   "dispensing_id" serial,
   "treatment_id" varchar,
   "clinic_stock_id" varchar,
-  "quantity" int,
+  "quantity" integer,
   PRIMARY KEY ("dispensing_id")
 );
 
@@ -385,7 +297,7 @@ CREATE TABLE "lab_vender" (
   "vender_description" text,
   "address_line_1" text,
   "address_line_2" text,
-  "provice_id" int,
+  "provice_id" integer,
   "telephone" char(10),
   "create_at" timestamp DEFAULT (now()),
   "update_at" timestamp DEFAULT (now()),
@@ -397,7 +309,7 @@ CREATE TABLE "lab_vender" (
 CREATE TABLE "lab_request" (
   "lab_request_id" serial,
   "treatment_id" varchar,
-  "vender_id" int,
+  "vender_id" integer,
   "lab_title" varchar,
   "lab_description" text,
   "request_date" date,
@@ -440,7 +352,7 @@ CREATE TABLE "receipt_product" (
   "receipt_product_id" serial,
   "receipt_id" varchar,
   "clinic_stock_id" varchar,
-  "quantity" int,
+  "quantity" integer,
   "override_unit_price" numeric,
   PRIMARY KEY ("receipt_product_id")
 );
@@ -452,8 +364,8 @@ CREATE TABLE "appointment" (
   "appointment_date" date,
   "appointment_time" time,
   "is_nv_refer" bool DEFAULT false,
-  "nv_operation_id" int DEFAULT null,
-  "quantity" int DEFAULT 1,
+  "nv_operation_id" integer DEFAULT null,
+  "quantity" integer DEFAULT 1,
   "is_notify" bool DEFAULT false,
   "status" appointment_status DEFAULT 'pending',
   "create_at" timestamp DEFAULT (now()),
@@ -476,19 +388,19 @@ CREATE TABLE "audit_log" (
   PRIMARY KEY ("audit_log_id")
 );
 
+CREATE UNIQUE INDEX ON "person_information" ("telephone");
+
+CREATE UNIQUE INDEX ON "person_information" ("citizen_id");
+
 CREATE INDEX ON "customer" USING HASH ("password");
 
 CREATE INDEX ON "employee" USING HASH ("password");
 
+COMMENT ON COLUMN "person_information"."create_at" IS 'Create date';
+
+COMMENT ON COLUMN "person_information"."update_at" IS 'Update date';
+
 COMMENT ON COLUMN "customer"."package" IS 'higher package can access more feature';
-
-COMMENT ON COLUMN "employee"."create_at" IS 'Create date';
-
-COMMENT ON COLUMN "employee"."update_at" IS 'Update date';
-
-COMMENT ON COLUMN "dentist"."create_at" IS 'Create date';
-
-COMMENT ON COLUMN "dentist"."update_at" IS 'Update date';
 
 COMMENT ON COLUMN "expert_type"."create_at" IS 'Create date';
 
@@ -497,10 +409,6 @@ COMMENT ON COLUMN "expert_type"."update_at" IS 'Update date';
 COMMENT ON COLUMN "dentist_workday"."create_at" IS 'Create date';
 
 COMMENT ON COLUMN "dentist_workday"."update_at" IS 'Update date';
-
-COMMENT ON COLUMN "patient"."create_at" IS 'Create date';
-
-COMMENT ON COLUMN "patient"."update_at" IS 'Update date';
 
 COMMENT ON COLUMN "tag_list"."create_at" IS 'Create date';
 
@@ -578,158 +486,156 @@ COMMENT ON COLUMN "appointment"."update_at" IS 'Update date';
 
 COMMENT ON COLUMN "audit_log"."create_at" IS 'Create date';
 
-ALTER TABLE "branch" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id") ON UPDATE CASCADE;
+ALTER TABLE "person_information" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id");
 
-ALTER TABLE "branch" ADD FOREIGN KEY ("manager_id") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "person_information" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "branch" ADD FOREIGN KEY ("owner_account") REFERENCES "customer" ("customer_id") ON UPDATE CASCADE;
+ALTER TABLE "person_information" ADD FOREIGN KEY ("edit_by") REFERENCES "customer" ("customer_id");
 
-ALTER TABLE "employee" ADD FOREIGN KEY ("position_id") REFERENCES "position" ("position_id") ON UPDATE CASCADE;
+ALTER TABLE "person_information" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "employee" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id") ON UPDATE CASCADE;
+ALTER TABLE "customer" ADD FOREIGN KEY ("person_information_id") REFERENCES "person_information" ("person_information_id");
 
-ALTER TABLE "employee" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "branch" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id");
 
-ALTER TABLE "employee" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "branch" ADD FOREIGN KEY ("manager_id") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "position" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "branch" ADD FOREIGN KEY ("owner_account") REFERENCES "customer" ("customer_id");
 
-ALTER TABLE "dentist" ADD FOREIGN KEY ("expert_type_id") REFERENCES "expert_type" ("expert_type_id") ON UPDATE CASCADE;
+ALTER TABLE "employee" ADD FOREIGN KEY ("position_id") REFERENCES "position" ("position_id");
 
-ALTER TABLE "dentist" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id") ON UPDATE CASCADE;
+ALTER TABLE "employee" ADD FOREIGN KEY ("person_information_id") REFERENCES "person_information" ("person_information_id");
 
-ALTER TABLE "dentist" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "position" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "dentist" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "dentist" ADD FOREIGN KEY ("expert_type_id") REFERENCES "expert_type" ("expert_type_id");
 
-ALTER TABLE "expert_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "dentist" ADD FOREIGN KEY ("person_information_id") REFERENCES "person_information" ("person_information_id");
 
-ALTER TABLE "expert_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "expert_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id") ON UPDATE CASCADE;
+ALTER TABLE "expert_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id");
 
-ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "patient" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id") ON UPDATE CASCADE;
+ALTER TABLE "dentist_workday" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "patient" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "patient" ADD FOREIGN KEY ("person_information_id") REFERENCES "person_information" ("person_information_id");
 
-ALTER TABLE "patient" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "tag_list" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "tag_list" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "tag_list" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "tag_list" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "patient_tag" ADD FOREIGN KEY ("tag_id") REFERENCES "tag_list" ("tag_id");
 
-ALTER TABLE "patient_tag" ADD FOREIGN KEY ("tag_id") REFERENCES "tag_list" ("tag_id") ON UPDATE CASCADE;
+ALTER TABLE "patient_tag" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn");
 
-ALTER TABLE "patient_tag" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn") ON UPDATE CASCADE;
+ALTER TABLE "product" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "product" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "product" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "requisition_product" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id");
 
-ALTER TABLE "requisition_product" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id") ON UPDATE CASCADE;
+ALTER TABLE "requisition_product" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "requisition_product" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "requisition_product" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "requisition_product" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "medicine" ADD FOREIGN KEY ("medicine_type_id") REFERENCES "medicine_type" ("medicine_type_id");
 
-ALTER TABLE "medicine" ADD FOREIGN KEY ("medicine_type_id") REFERENCES "medicine_type" ("medicine_type_id") ON UPDATE CASCADE;
+ALTER TABLE "medicine" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "medicine" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "medicine" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "medicine" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "medicine_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "medicine_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "medicine_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "medicine_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("item_id") REFERENCES "medicine" ("medicine_id");
 
-ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("item_id") REFERENCES "medicine" ("medicine_id") ON UPDATE CASCADE;
+ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("item_id") REFERENCES "product" ("product_id");
 
-ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("item_id") REFERENCES "product" ("product_id") ON UPDATE CASCADE;
+ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "clinic_stock" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "operation_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "operation_type" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "operation_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "operation_type" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn");
 
-ALTER TABLE "treatment" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn") ON UPDATE CASCADE;
+ALTER TABLE "treatment" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id");
 
-ALTER TABLE "treatment" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "treatment" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "treatment" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_nv" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "treatment_nv" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_nv" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "treatment_nv" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("treatment_nv_id") REFERENCES "treatment_nv" ("treatment_nv_id");
 
-ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("treatment_nv_id") REFERENCES "treatment_nv" ("treatment_nv_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("operation_type_id") REFERENCES "operation_type" ("operation_type_id");
 
-ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("operation_type_id") REFERENCES "operation_type" ("operation_type_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("refer_denstist_expert_type_id") REFERENCES "expert_type" ("expert_type_id");
 
-ALTER TABLE "treatment_nv_operation" ADD FOREIGN KEY ("refer_denstist_expert_type_id") REFERENCES "expert_type" ("expert_type_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_record_template" ADD FOREIGN KEY ("create_by") REFERENCES "dentist" ("dentist_id");
 
-ALTER TABLE "treatment_record_template" ADD FOREIGN KEY ("create_by") REFERENCES "dentist" ("dentist_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_record_edit_history" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "treatment_record_edit_history" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_record_edit_history" ADD FOREIGN KEY ("edit_by") REFERENCES "dentist" ("dentist_id");
 
-ALTER TABLE "treatment_record_edit_history" ADD FOREIGN KEY ("edit_by") REFERENCES "dentist" ("dentist_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_document" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "treatment_document" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_document" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "treatment_document" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_operation" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "treatment_operation" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "treatment_operation" ADD FOREIGN KEY ("operation_type_id") REFERENCES "operation_type" ("operation_type_id");
 
-ALTER TABLE "treatment_operation" ADD FOREIGN KEY ("operation_type_id") REFERENCES "operation_type" ("operation_type_id") ON UPDATE CASCADE;
+ALTER TABLE "dispensing_medicine" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "dispensing_medicine" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "dispensing_medicine" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id");
 
-ALTER TABLE "dispensing_medicine" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_vender" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id");
 
-ALTER TABLE "lab_vender" ADD FOREIGN KEY ("provice_id") REFERENCES "provice" ("provice_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_vender" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "lab_vender" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_vender" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "lab_vender" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_request" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "lab_request" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_request" ADD FOREIGN KEY ("vender_id") REFERENCES "lab_vender" ("vender_id");
 
-ALTER TABLE "lab_request" ADD FOREIGN KEY ("vender_id") REFERENCES "lab_vender" ("vender_id") ON UPDATE CASCADE;
+ALTER TABLE "lab_request" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "lab_request" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id");
 
-ALTER TABLE "receipt" ADD FOREIGN KEY ("treatment_id") REFERENCES "treatment" ("treatment_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt" ADD FOREIGN KEY ("employee_id") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "receipt" ADD FOREIGN KEY ("employee_id") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "receipt" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "receipt" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt_payment" ADD FOREIGN KEY ("receipt_id") REFERENCES "receipt" ("receipt_id");
 
-ALTER TABLE "receipt_payment" ADD FOREIGN KEY ("receipt_id") REFERENCES "receipt" ("receipt_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt_product" ADD FOREIGN KEY ("receipt_id") REFERENCES "receipt" ("receipt_id");
 
-ALTER TABLE "receipt_product" ADD FOREIGN KEY ("receipt_id") REFERENCES "receipt" ("receipt_id") ON UPDATE CASCADE;
+ALTER TABLE "receipt_product" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id");
 
-ALTER TABLE "receipt_product" ADD FOREIGN KEY ("clinic_stock_id") REFERENCES "clinic_stock" ("clinic_stock_id") ON UPDATE CASCADE;
+ALTER TABLE "appointment" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn");
 
-ALTER TABLE "appointment" ADD FOREIGN KEY ("hn") REFERENCES "patient" ("hn") ON UPDATE CASCADE;
+ALTER TABLE "appointment" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id");
 
-ALTER TABLE "appointment" ADD FOREIGN KEY ("dentist_id") REFERENCES "dentist" ("dentist_id") ON UPDATE CASCADE;
+ALTER TABLE "appointment" ADD FOREIGN KEY ("nv_operation_id") REFERENCES "treatment_nv_operation" ("nv_operation_id");
 
-ALTER TABLE "appointment" ADD FOREIGN KEY ("nv_operation_id") REFERENCES "treatment_nv_operation" ("nv_operation_id") ON UPDATE CASCADE;
+ALTER TABLE "appointment" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "appointment" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
+ALTER TABLE "appointment" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
 
-ALTER TABLE "appointment" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "audit_log" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id");
 
-ALTER TABLE "audit_log" ADD FOREIGN KEY ("edit_by") REFERENCES "employee" ("employee_id") ON UPDATE CASCADE;
-
-ALTER TABLE "audit_log" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id") ON UPDATE CASCADE;
+ALTER TABLE "audit_log" ADD FOREIGN KEY ("branch_id") REFERENCES "branch" ("branch_id");
