@@ -8,6 +8,7 @@ import { configurations } from './config/configuration';
 import { CustomerModule } from './customer/customer.module';
 import { UniqueIdModule } from './unique-id/unique-id.module';
 import { DeveloperModule } from './developer/developer.module';
+import { ClinicModule } from './clinic/clinic.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DeveloperModule } from './developer/developer.module';
     CustomerModule,
     UniqueIdModule,
     DeveloperModule,
+    ClinicModule,
   ],
   controllers: [AppController],
   providers: [AppService],

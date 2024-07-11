@@ -7,6 +7,7 @@ import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
 import { $Enums, customer, developer } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
+import { JwtUser } from '../type/auth.type';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -27,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: any): Promise<NotFoundException | JwtUser> {
     // This payload will be the decrypted token payload you provided when signing the token
 
     const { email, role, user_id } = payload;
@@ -43,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         user = await this.developerService.findOne(email);
         break;
       default:
-        return NotFoundException;
+        return new NotFoundException();
     }
 
     return {
