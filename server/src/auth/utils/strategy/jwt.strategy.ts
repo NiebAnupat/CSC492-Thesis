@@ -48,9 +48,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     return {
-      user_id,
+      id: user_id,
       email,
-      role,
+      roles: [role],
       ...(role === $Enums.roles.owner && { package: user['package'] }),
     };
   }

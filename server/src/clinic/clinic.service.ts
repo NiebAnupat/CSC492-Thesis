@@ -4,9 +4,9 @@ import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
 export class ClinicService {
-  constructor(private readonly prisma: PrismaService) { }
-  
-  findAll() { 
+  constructor(private readonly prisma: PrismaService) {}
+
+  findAll() {
     return this.prisma.clinic.findMany();
   }
 
@@ -20,7 +20,7 @@ export class ClinicService {
             customer_id: true,
           },
         },
-      }
+      },
     });
   }
 

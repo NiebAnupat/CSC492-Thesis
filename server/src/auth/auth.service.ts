@@ -14,6 +14,7 @@ import { DateTime } from 'luxon';
 import { PrismaService } from 'nestjs-prisma';
 import { UserWithRole, ValidateUserResponse } from './utils/type/auth.type';
 import { DeveloperService } from '../developer/developer.service';
+import { Roles } from 'src/utils/roles/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -134,10 +135,10 @@ export class AuthService {
     password: string,
   ): Promise<ValidateUserResponse> {
     const { owner, developer } = $Enums.roles;
-    const { _user, role } = await this.getUserWithRole(email);
+    const { _user, roles } = await this.getUserWithRole(email);
 
     let user: customer | developer;
-    switch (role) {
+    switch (roles[0]) {
       case owner:
         // customer section
         user = _user as customer;
@@ -148,7 +149,7 @@ export class AuthService {
           return {
             user_id: user.customer_id,
             email: user.email,
-            role: owner,
+            roles: [owner],
             package: user.package,
           };
         } else throw new BadRequestException('Invalid password');
@@ -159,7 +160,7 @@ export class AuthService {
           return {
             user_id: user.developer_id.toString(),
             email: user.email,
-            role: developer,
+            roles: [developer],
           };
         }
         break;
@@ -171,9 +172,9 @@ export class AuthService {
   private async getUserWithRole(email: string): Promise<UserWithRole> {
     let user: customer | developer;
     user = await this.customerService.findOne({ email });
-    if (user) return { _user: user, role: $Enums.roles.owner };
+    if (user) return { _user: user, roles: [Roles.owner] };
     user = await this.developerService.findOne(email);
-    if (user) return { _user: user, role: $Enums.roles.developer };
+    if (user) return { _user: user, roles: [Roles.developer] };
     throw new NotFoundException();
   }
 

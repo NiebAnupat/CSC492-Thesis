@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     }
 
     const { owner, developer } = $Enums.roles;
-    switch (user.role) {
+    switch (user.roles[0]) {
       case owner:
         return this.authService.customer_login({
           customer_id: user.user_id,

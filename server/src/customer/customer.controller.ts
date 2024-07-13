@@ -2,9 +2,9 @@ import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
 import { Role } from '../auth/utils/decorator/role.decorator';
-import { $Enums } from '@prisma/client';
 import { RoleGuard } from '../auth/utils/guard/role.guard';
 import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
+import { Roles } from 'src/utils/roles/roles.enum';
 
 @Controller('customer')
 export class CustomerController {
@@ -15,13 +15,15 @@ export class CustomerController {
   //   return this.customerService.create(createCustomerDto);
   // }
 
-  @Role($Enums.roles.developer)
+  @Role(Roles.developer)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
   async findAll() {
     return excludeFromList(await this.customerService.findAll(), ['password']);
   }
 
+  @Role(Roles.developer, Roles.owner)
+  // TODO : Implement CASL Guard
   @Get(':customer_id')
   async findOne(@Param('customer_id') customer_id: string) {
     return excludeFromObject(

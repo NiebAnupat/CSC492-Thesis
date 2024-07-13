@@ -8,43 +8,49 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ClinicService } from './clinic.service';
-import { $Enums } from '@prisma/client';
 import { Role } from '../auth/utils/decorator/role.decorator';
 import { RoleGuard } from '../auth/utils/guard/role.guard';
 import { CreateClinicDto } from './dto/create-clinic-dto';
 import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
 import { JwtUser } from '../auth/utils/type/auth.type';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
-import { ClinicGuard } from './utils/guard/clinic.guard';
+import { Roles } from 'src/utils/roles/roles.enum';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { ClinicHook } from './utils/permissions/clinic.hook';
+import { toAny } from 'src/utils/toAny';
 
 @Controller('clinic')
 export class ClinicController {
   constructor(private readonly clinicService: ClinicService) {}
 
-  @Role($Enums.roles.developer)
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Role(Roles.developer)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  @UseGuards(JwtAuthGuard, AccessGuard)
+  @UseAbility(Actions.read, toAny('clinic'))
   @Get()
   async findAll() {
     return this.clinicService.findAll();
   }
 
-  @Role($Enums.roles.developer, $Enums.roles.owner)
-  @UseGuards(JwtAuthGuard, RoleGuard, ClinicGuard)
+  // @Role(Roles.developer, Roles.owner)
+  // @UseGuards(JwtAuthGuard, RoleGuard, ClinicGuard)
+  @UseGuards(JwtAuthGuard, AccessGuard)
+  @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get(':clinic_id')
-  async findOne(@Param('clinic_id') clinic_id: number, @Req() req: any) {
+  async findOne(@Param('clinic_id') clinic_id: number) {
     // const user: JwtUser = req.user;
     return this.clinicService.findOne(clinic_id);
   }
 
-  @Role($Enums.roles.developer, $Enums.roles.owner)
+  @Role(Roles.developer, Roles.owner)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post()
   async create(@Body() data: CreateClinicDto, @Req() req: any) {
     const user: JwtUser = req.user;
     let customer_id = '';
-    if (user.role === $Enums.roles.developer) customer_id = 'TestID';
-    if (user.role === $Enums.roles.owner) customer_id = user.user_id;
+    if (user.roles[0] === Roles.developer) customer_id = 'TestID';
+    if (user.roles[0] === Roles.owner) customer_id = user.id;
 
     // TODO: Implement file upload logic
 

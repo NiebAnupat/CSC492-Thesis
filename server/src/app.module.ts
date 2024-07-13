@@ -11,6 +11,9 @@ import { DeveloperModule } from './developer/developer.module';
 import { ClinicModule } from './clinic/clinic.module';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
+import { CaslModule } from 'nest-casl';
+import { Role } from './utils/roles/roles';
+import { Roles } from './utils/roles/roles.enum';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { PrismaModule, PrismaService } from 'nestjs-prisma';
       isGlobal: true,
     }),
     PrismaModule.forRoot(),
+    CaslModule.forRoot<Role>({
+      superuserRole: Roles.developer,
+    }),
     NestjsFormDataModule.config({ storage: MemoryStoredFile, isGlobal: true }),
     AuthModule,
     CustomerModule,
