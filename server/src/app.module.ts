@@ -12,8 +12,8 @@ import { ClinicModule } from './clinic/clinic.module';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { CaslModule } from 'nest-casl';
-import { Role } from './utils/roles/roles';
-import { Roles } from './utils/roles/roles.enum';
+import { Role } from './auth/utils/type/roles';
+import { Roles } from './auth/utils/enum/role.enum';
 
 @Module({
   imports: [

@@ -8,13 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ClinicService } from './clinic.service';
-import { Role } from '../auth/utils/decorator/role.decorator';
-import { RoleGuard } from '../auth/utils/guard/role.guard';
 import { CreateClinicDto } from './dto/create-clinic-dto';
 import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
-import { JwtUser } from '../auth/utils/type/auth.type';
+import { JwtUser } from '../auth/utils/type/auth';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
-import { Roles } from 'src/utils/roles/roles.enum';
+import { Roles } from '../auth/utils/enum/role.enum';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { ClinicHook } from './utils/permissions/clinic.hook';
 import { toAny } from 'src/utils/toAny';
@@ -23,8 +21,6 @@ import { toAny } from 'src/utils/toAny';
 export class ClinicController {
   constructor(private readonly clinicService: ClinicService) {}
 
-  // @Role(Roles.developer)
-  // @UseGuards(JwtAuthGuard, RoleGuard)
   @UseGuards(JwtAuthGuard, AccessGuard)
   @UseAbility(Actions.read, toAny('clinic'))
   @Get()
@@ -32,8 +28,6 @@ export class ClinicController {
     return this.clinicService.findAll();
   }
 
-  // @Role(Roles.developer, Roles.owner)
-  // @UseGuards(JwtAuthGuard, RoleGuard, ClinicGuard)
   @UseGuards(JwtAuthGuard, AccessGuard)
   @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get(':clinic_id')
@@ -42,8 +36,8 @@ export class ClinicController {
     return this.clinicService.findOne(clinic_id);
   }
 
-  @Role(Roles.developer, Roles.owner)
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  @UseGuards(JwtAuthGuard, AccessGuard)
+  @UseAbility(Actions.create, toAny('clinic'))
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post()
   async create(@Body() data: CreateClinicDto, @Req() req: any) {

@@ -12,9 +12,9 @@ import { UniqueIdService } from '../unique-id/unique-id.service';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
 import { DateTime } from 'luxon';
 import { PrismaService } from 'nestjs-prisma';
-import { UserWithRole, ValidateUserResponse } from './utils/type/auth.type';
+import { UserWithRole, ValidateUserResponse } from './utils/type/auth';
 import { DeveloperService } from '../developer/developer.service';
-import { Roles } from 'src/utils/roles/roles.enum';
+import { Roles } from './utils/enum/role.enum';
 
 @Injectable()
 export class AuthService {

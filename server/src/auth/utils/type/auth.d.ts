@@ -1,5 +1,5 @@
 import { $Enums, customer, developer } from '@prisma/client';
-import { Role } from 'src/utils/roles/roles';
+import { Role } from 'src/auth/utils/type/roles';
 
 export type ValidateUserResponse = {
   user_id: string;

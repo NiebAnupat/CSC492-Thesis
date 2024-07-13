@@ -7,7 +7,7 @@ import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
 import { $Enums, customer, developer } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
-import { JwtUser } from '../type/auth.type';
+import { JwtUser } from '../type/auth';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

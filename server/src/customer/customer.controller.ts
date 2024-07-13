@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
-import { Role } from '../auth/utils/decorator/role.decorator';
-import { RoleGuard } from '../auth/utils/guard/role.guard';
 import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
-import { Roles } from 'src/utils/roles/roles.enum';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { toAny } from 'src/utils/toAny';
+import { CustomerHook } from './utils/permissions/customer.hook';
 
 @Controller('customer')
 export class CustomerController {
@@ -15,15 +15,15 @@ export class CustomerController {
   //   return this.customerService.create(createCustomerDto);
   // }
 
-  @Role(Roles.developer)
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  @UseGuards(JwtAuthGuard, AccessGuard)
+  @UseAbility(Actions.manage, toAny('customer'))
   @Get()
   async findAll() {
     return excludeFromList(await this.customerService.findAll(), ['password']);
   }
 
-  @Role(Roles.developer, Roles.owner)
-  // TODO : Implement CASL Guard
+  @UseAbility(Actions.read, toAny('customer'), CustomerHook)
+  @UseGuards(JwtAuthGuard, AccessGuard)
   @Get(':customer_id')
   async findOne(@Param('customer_id') customer_id: string) {
     return excludeFromObject(
