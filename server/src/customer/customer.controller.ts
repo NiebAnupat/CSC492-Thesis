@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
 import { Role } from '../auth/utils/decorator/role.decorator';
 import { $Enums } from '@prisma/client';
 import { RoleGuard } from '../auth/utils/guard/role.guard';
+import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
 
 @Controller('customer')
 export class CustomerController {
@@ -17,13 +18,16 @@ export class CustomerController {
   @Role($Enums.roles.developer)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
-  findAll() {
-    return this.customerService.findAll();
+  async findAll() {
+    return excludeFromList(await this.customerService.findAll(), ['password']);
   }
 
   @Get(':customer_id')
-  findOne(@Param('customer_id') customer_id: string) {
-    return this.customerService.findOne({ customer_id });
+  async findOne(@Param('customer_id') customer_id: string) {
+    return excludeFromObject(
+      await this.customerService.findOne({ customer_id }),
+      ['password'],
+    );
   }
 
   // @Patch(':id')

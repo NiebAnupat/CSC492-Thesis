@@ -27,6 +27,7 @@ export class RoleGuard implements CanActivate {
     if (!hasPermission) {
       throw new UnauthorizedException();
     }
+    
     return true;
   }
 }

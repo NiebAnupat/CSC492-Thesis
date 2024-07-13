@@ -9,6 +9,8 @@ import { CustomerModule } from './customer/customer.module';
 import { UniqueIdModule } from './unique-id/unique-id.module';
 import { DeveloperModule } from './developer/developer.module';
 import { ClinicModule } from './clinic/clinic.module';
+import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
+import { PrismaModule, PrismaService } from 'nestjs-prisma';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { ClinicModule } from './clinic/clinic.module';
       validationSchema: configSchema,
       isGlobal: true,
     }),
+    PrismaModule.forRoot(),
+    NestjsFormDataModule.config({ storage: MemoryStoredFile, isGlobal: true }),
     AuthModule,
     CustomerModule,
     UniqueIdModule,
@@ -24,6 +28,17 @@ import { ClinicModule } from './clinic/clinic.module';
     ClinicModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly prisma: PrismaService) {}
+  async onModuleInit() {
+    try {
+      await this.prisma.$connect();
+      console.log('Connected to the database');
+    } catch (error) {
+      console.error(error.message);
+      process.exit(1);
+    }
+  }
+}

@@ -52,14 +52,7 @@ export class AuthService {
       email: customer.email,
     });
 
-    const isCitizenIdExits = await this.prisma.person_information.findFirst({
-      where: {
-        citizen_id: customer.person_info.citizen_id,
-      },
-    });
-
-    if (isEmailExits || isCitizenIdExits)
-      throw new BadRequestException('Customer already exists');
+    if (isEmailExits) throw new BadRequestException('Customer already exists');
 
     const new_customer_id = await this.uniqueIdService.generateCustomerId();
 
