@@ -22,6 +22,7 @@ class PersonInfo {
   @IsOptional()
   nationality: string;
 
+  @IsOptional()
   @IsString()
   @Matches(/^[0-9]{13}$/, { message: 'Citizen ID must be 13 digits' })
   citizen_id: string;

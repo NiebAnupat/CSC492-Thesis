@@ -11,6 +11,9 @@ CREATE TYPE "days" AS ENUM ('sunday', 'monday', 'tuesday', 'wednesday', 'thursda
 CREATE TYPE "genders" AS ENUM ('male', 'female');
 
 -- CreateEnum
+CREATE TYPE "roles" AS ENUM ('admin', 'dentist', 'counter_staff', 'manager', 'owner', 'developer');
+
+-- CreateEnum
 CREATE TYPE "packages" AS ENUM ('free', 'basic', 'premium', 'vip');
 
 -- CreateEnum
@@ -27,6 +30,17 @@ CREATE TYPE "treatment_record_fields" AS ENUM ('subject', 'objective', 'assessme
 
 -- CreateEnum
 CREATE TYPE "customer_providers" AS ENUM ('local', 'google');
+
+-- CreateTable
+CREATE TABLE "developer" (
+    "developer_id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "roles" NOT NULL DEFAULT 'developer',
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "developer_pkey" PRIMARY KEY ("developer_id")
+);
 
 -- CreateTable
 CREATE TABLE "appointment" (
@@ -65,6 +79,29 @@ CREATE TABLE "audit_log" (
 );
 
 -- CreateTable
+CREATE TABLE "customer" (
+    "customer_id" VARCHAR NOT NULL,
+    "provider" "customer_providers",
+    "email" VARCHAR NOT NULL,
+    "password" VARCHAR,
+    "person_information_id" INTEGER NOT NULL,
+    "package" "packages" NOT NULL DEFAULT 'free',
+
+    CONSTRAINT "customer_pkey" PRIMARY KEY ("customer_id")
+);
+
+-- CreateTable
+CREATE TABLE "clinic" (
+    "clinic_id" SERIAL NOT NULL,
+    "clinic_name" VARCHAR NOT NULL,
+    "clinic_description" TEXT,
+    "logo_url" VARCHAR NOT NULL,
+    "owner_id" VARCHAR NOT NULL,
+
+    CONSTRAINT "clinic_pkey" PRIMARY KEY ("clinic_id")
+);
+
+-- CreateTable
 CREATE TABLE "branch" (
     "branch_id" VARCHAR NOT NULL,
     "branch_name" VARCHAR NOT NULL,
@@ -74,11 +111,11 @@ CREATE TABLE "branch" (
     "telephone" CHAR(10) NOT NULL,
     "image_url" VARCHAR,
     "manager_id" VARCHAR NOT NULL,
-    "owner_account" VARCHAR NOT NULL,
     "create_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(6),
     "edit_by" VARCHAR,
+    "clinic_id" INTEGER,
 
     CONSTRAINT "branch_pkey" PRIMARY KEY ("branch_id")
 );
@@ -98,18 +135,6 @@ CREATE TABLE "clinic_stock" (
     "branch_id" VARCHAR,
 
     CONSTRAINT "clinic_stock_pkey" PRIMARY KEY ("clinic_stock_id")
-);
-
--- CreateTable
-CREATE TABLE "customer" (
-    "customer_id" VARCHAR NOT NULL,
-    "customer_provider" "customer_providers",
-    "email" VARCHAR,
-    "password" VARCHAR,
-    "person_information_id" INTEGER NOT NULL,
-    "package" "packages" NOT NULL DEFAULT 'free',
-
-    CONSTRAINT "customer_pkey" PRIMARY KEY ("customer_id")
 );
 
 -- CreateTable
@@ -507,6 +532,7 @@ CREATE TABLE "person_information" (
     "hire_date" DATE,
     "birth_date" DATE,
     "avatar" VARCHAR,
+    "role" "roles" NOT NULL,
     "create_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "update_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "edit_by" VARCHAR,
@@ -517,7 +543,16 @@ CREATE TABLE "person_information" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "developer_email_key" ON "developer"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customer_email_key" ON "customer"("email");
+
+-- CreateIndex
 CREATE INDEX "customer_password_idx" ON "customer" USING HASH ("password");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "clinic_owner_id_key" ON "clinic"("owner_id");
 
 -- CreateIndex
 CREATE INDEX "employee_password_idx" ON "employee" USING HASH ("password");
@@ -550,10 +585,16 @@ ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_branch_id_fkey" FOREIGN KEY ("
 ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_edit_by_fkey" FOREIGN KEY ("edit_by") REFERENCES "employee"("employee_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "branch" ADD CONSTRAINT "branch_manager_id_fkey" FOREIGN KEY ("manager_id") REFERENCES "employee"("employee_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "customer" ADD CONSTRAINT "customer_person_information_id_fkey" FOREIGN KEY ("person_information_id") REFERENCES "person_information"("person_information_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "branch" ADD CONSTRAINT "branch_owner_account_fkey" FOREIGN KEY ("owner_account") REFERENCES "customer"("customer_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "clinic" ADD CONSTRAINT "clinic_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "customer"("customer_id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "branch" ADD CONSTRAINT "branch_clinic_id_fkey" FOREIGN KEY ("clinic_id") REFERENCES "clinic"("clinic_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "branch" ADD CONSTRAINT "branch_manager_id_fkey" FOREIGN KEY ("manager_id") REFERENCES "employee"("employee_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "branch" ADD CONSTRAINT "branch_provice_id_fkey" FOREIGN KEY ("provice_id") REFERENCES "provice"("provice_id") ON DELETE NO ACTION ON UPDATE CASCADE;
@@ -569,9 +610,6 @@ ALTER TABLE "clinic_stock" ADD CONSTRAINT "clinic_stock_item_id_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "clinic_stock" ADD CONSTRAINT "clinic_stock_item_id_fkey1" FOREIGN KEY ("item_id") REFERENCES "product"("product_id") ON DELETE NO ACTION ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "customer" ADD CONSTRAINT "customer_person_information_id_fkey" FOREIGN KEY ("person_information_id") REFERENCES "person_information"("person_information_id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "dentist" ADD CONSTRAINT "dentist_expert_type_id_fkey" FOREIGN KEY ("expert_type_id") REFERENCES "expert_type"("expert_type_id") ON DELETE NO ACTION ON UPDATE CASCADE;

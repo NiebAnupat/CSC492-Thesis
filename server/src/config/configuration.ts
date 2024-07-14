@@ -14,6 +14,7 @@ const APPConfig = registerAs(
       port: process.env.PORT || 4000,
       jwtSecret: process.env.JWT_SECRET,
       originsURL: process.env.ORIGINS_WHITELIST.split(' '),
+      domainName: process.env.DOMAIN_NAME,
     }) as AppConfig,
 );
 

@@ -9,7 +9,6 @@ import { AppConfig } from 'src/config/config.interface';
 import { GoogleOauthController } from './google-oauth.controller';
 import { GoogleOauthStrategy } from './utils/strategy/google-oauth.strategy.ts';
 import { JwtStrategy } from './utils/strategy/jwt.strategy';
-import { UniqueIdModule } from '../unique-id/unique-id.module';
 import { LocalStrategy } from './utils/strategy/local.strategy';
 import { PrismaService } from 'nestjs-prisma';
 import { DeveloperModule } from '../developer/developer.module';
@@ -25,7 +24,6 @@ import { DeveloperModule } from '../developer/developer.module';
     }),
     CustomerModule,
     DeveloperModule,
-    UniqueIdModule,
   ],
   controllers: [AuthController, GoogleOauthController],
   providers: [

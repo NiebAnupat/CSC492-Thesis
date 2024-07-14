@@ -39,6 +39,7 @@ export const configSchema = Joi.object({
   PORT: Joi.number().positive().max(65535).default(4000),
   JWT_SECRET: Joi.string().required(),
   ORIGINS_WHITELIST: Joi.string().required(),
+  DOMAIN_NAME: Joi.string().required(),
   // Database Config ------------------------------
   DATABASE_URL: Joi.string().uri().optional(),
   DB_TYPE: databaseTypeSchema,

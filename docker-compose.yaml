@@ -1,14 +1,8 @@
-version: '3'
-
+name: csc492
 services:
   # frontend:
-  #   # commented below line to use the production build
-  #   # command: pnpm dev
   #   build:
   #     context: ./frontend
-  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-  #     dockerfile: Dockerfile.prod
-  #     # dockerfile: Dockerfile.dev
   #   environment:
   #     - PORT=3000
   #   expose:
@@ -17,38 +11,15 @@ services:
   #     - "3000:3000"
   #   depends_on:
   #     - server
-  #   develop:
-  #     watch:
-  #       - action: sync
-  #         path: ./frontend/src
-  #         target: /usr/src/app/src
-  #         ignore:
-  #           - node_modules/
-  #       - action: rebuild
-  #         path: package.json
   # server:
-  #   # commented below line to use the production build
-  #   # command: pnpm start:dev
   #   build:
   #     context: ./server
-  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-  #     dockerfile: Dockerfile.prod
-  #     # dockerfile: Dockerfile.dev
   #   environment:
   #     - PORT=4000
   #   expose:
   #     - 4000
   #   ports:
   #     - "4000:4000"
-  #   develop:
-  #     watch:
-  #       - action: sync
-  #         path: ./server/src
-  #         target: /usr/src/app/src
-  #         ignore:
-  #           - node_modules/
-  #       - action: rebuild
-  #         path: package.json
   db:
     image: postgres:16
     container_name: postgres

@@ -15,6 +15,7 @@ export class CustomerService implements CustomerServiceInterface {
     return this.prisma.customer.findMany({
       include: {
         customer_person_info: true,
+        clinic: true,
       },
     });
   }
@@ -24,6 +25,7 @@ export class CustomerService implements CustomerServiceInterface {
       where,
       include: {
         customer_person_info: true,
+        clinic: true,
       },
     });
   }
