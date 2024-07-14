@@ -3,6 +3,7 @@ export interface AppConfig {
   port: number;
   jwtSecret: string;
   originsURL: string[];
+  domainName: string;
 }
 
 export interface DatabaseConfig {

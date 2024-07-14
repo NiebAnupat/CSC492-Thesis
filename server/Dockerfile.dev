@@ -1,9 +1,0 @@
-FROM node:22.3.0
-
-# RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
-RUN corepack enable pnpm    
-
-WORKDIR /usr/src/app
-COPY . ./
-
-RUN pnpm install
