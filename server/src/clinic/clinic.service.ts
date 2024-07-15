@@ -10,9 +10,9 @@ export class ClinicService {
     return this.prisma.clinic.findMany();
   }
 
-  findOne(id: number) {
+  findOne(where: Prisma.clinicWhereUniqueInput) {
     return this.prisma.clinic.findUnique({
-      where: { clinic_id: id },
+      where,
       include: {
         branchs: true,
         customer: {

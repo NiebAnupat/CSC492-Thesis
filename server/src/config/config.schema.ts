@@ -59,4 +59,9 @@ export const configSchema = Joi.object({
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
   GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
   GOOGLE_SCOPE: Joi.string().required(),
+  // AWS ---------------------------
+  AWS_ACCESS_KEY_ID: Joi.string().required(),
+  AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+  AWS_DEFAULT_REGION: Joi.string().required(),
+  AWS_BUCKET_NAME: Joi.string().required(),
 }).required();

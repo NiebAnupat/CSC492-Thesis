@@ -14,6 +14,7 @@ import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { CaslModule } from 'nest-casl';
 import { Role } from './auth/utils/type/roles';
 import { Roles } from './auth/utils/enum/role.enum';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Roles } from './auth/utils/enum/role.enum';
     UniqueIdModule,
     DeveloperModule,
     ClinicModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

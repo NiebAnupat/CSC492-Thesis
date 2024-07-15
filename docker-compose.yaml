@@ -27,8 +27,21 @@ services:
       - POSTGRES_USER=AnupatAndSuchanart
       - POSTGRES_PASSWORD=6K1umZ&4OCw2
       - POSTGRES_DB=CSC492-Thesis
-    restart: unless-stopped  
+    restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
       - ./docker-volumes/postgresql:/var/lib/postgresql/data
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Main LocalStack API
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_BUCKET_NAME=image-bucket
+      - SERVICES=s3
+    volumes:
+      - ./docker-volumes/aws:/etc/localstack/init/ready.d    

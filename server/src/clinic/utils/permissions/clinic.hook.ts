@@ -14,6 +14,6 @@ export class ClinicHook implements SubjectBeforeFilterHook {
     request: AuthorizableRequest<AuthorizableUser<string, string>, AnyObject>,
   ) {
     const { params } = request;
-    return this.clinicService.findOne(+params.clinic_id);
+    return this.clinicService.findOne({ clinic_id: +params.clinic_id });
   }
 }

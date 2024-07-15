@@ -12,5 +12,7 @@ export const permissions: Permissions<Role, Subject, Actions> = {
     can(Actions.read, 'clinic', { owner_id: user.id }).because(
       'User is the owner of the clinic',
     );
+
+    can(Actions.create, 'clinic').because('User is the owner of the clinic');
   },
 };

@@ -28,3 +28,10 @@ export interface GoogleAuthConfig {
   callbackURL: string;
   scope: string[];
 }
+
+export interface AWSConfig { 
+  accessKeyId: string;
+  secretAccessKey: string;
+  region: string;
+  bucketName: string;
+}
