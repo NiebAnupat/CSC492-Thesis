@@ -9,10 +9,13 @@ export type Subject = Subjects<{
 
 export const permissions: Permissions<Role, Subject, Actions> = {
   owner({ user, can }) {
+    can(Actions.create, 'clinic').because('User is the owner of the clinic');
     can(Actions.read, 'clinic', { owner_id: user.id }).because(
       'User is the owner of the clinic',
     );
-
-    can(Actions.create, 'clinic').because('User is the owner of the clinic');
+    can(Actions.update, 'clinic', { owner_id: user.id }).because(
+      'User is the owner of the clinic',
+    );
+    can(Actions.delete, 'clinic').because('User is the owner of the clinic');
   },
 };

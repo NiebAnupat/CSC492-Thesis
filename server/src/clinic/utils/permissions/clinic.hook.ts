@@ -1,5 +1,5 @@
 import { AnyObject } from '@casl/ability/dist/types/types';
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import {
   AuthorizableRequest,
   AuthorizableUser,
@@ -13,7 +13,18 @@ export class ClinicHook implements SubjectBeforeFilterHook {
   async run(
     request: AuthorizableRequest<AuthorizableUser<string, string>, AnyObject>,
   ) {
-    const { params } = request;
-    return this.clinicService.findOne({ clinic_id: +params.clinic_id });
+    const method = request.method;
+
+    switch (method) {
+      case 'get': {
+        const { clinic_id } = request.params;
+        if (!clinic_id) {
+          throw new ForbiddenException('Clinic ID is required');
+        }
+        return this.clinicService.findOne({ clinic_id: +clinic_id });
+      }
+      default:
+        break;
+    }
   }
 }

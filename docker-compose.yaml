@@ -42,6 +42,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
       - AWS_BUCKET_NAME=csc492-bucket
+      - AWS_ENDPOINT_URL=http://localstack:4566
       - SERVICES=s3
     volumes:
       - ./docker-volumes/aws:/etc/localstack/init/ready.d    

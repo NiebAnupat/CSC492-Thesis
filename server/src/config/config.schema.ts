@@ -64,5 +64,5 @@ export const configSchema = Joi.object({
   AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   AWS_DEFAULT_REGION: Joi.string().required(),
   AWS_BUCKET_NAME: Joi.string().required(),
-  AWS_ENDPOINT: Joi.string().required(),
+  AWS_ENDPOINT_URL: Joi.string().required(),
 }).required();

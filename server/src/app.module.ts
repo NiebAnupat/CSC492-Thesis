@@ -27,12 +27,13 @@ import { ConfigKey } from './config/config.enum';
     }),
     PrismaModule.forRoot(),
     S3Module.forRootAsync({
-      useFactory: (configService: ConfigService) => (
-        {
+      useFactory: (configService: ConfigService) => ({
         config: {
           credentials: {
-            accessKeyId: configService.get<AWSConfig>(ConfigKey.AWS).accessKeyId,
-            secretAccessKey: configService.get<AWSConfig>(ConfigKey.AWS).secretAccessKey,
+            accessKeyId: configService.get<AWSConfig>(ConfigKey.AWS)
+              .accessKeyId,
+            secretAccessKey: configService.get<AWSConfig>(ConfigKey.AWS)
+              .secretAccessKey,
           },
           region: configService.get<AWSConfig>(ConfigKey.AWS).region,
           endpoint: configService.get<AWSConfig>(ConfigKey.AWS).endpoint,

@@ -15,7 +15,6 @@ export interface DatabaseConfig {
   password: string;
   database: string;
   schema: string;
-  synchronize: boolean;
 }
 
 export interface GoogleAuthConfig {
@@ -29,7 +28,7 @@ export interface GoogleAuthConfig {
   scope: string[];
 }
 
-export interface AWSConfig { 
+export interface AWSConfig {
   accessKeyId: string;
   secretAccessKey: string;
   region: string;

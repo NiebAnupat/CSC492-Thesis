@@ -29,4 +29,10 @@ export class ClinicService {
       data,
     });
   }
+
+  async delete(where: Prisma.clinicWhereUniqueInput) {
+    return this.prisma.clinic.delete({
+      where,
+    });
+  }
 }

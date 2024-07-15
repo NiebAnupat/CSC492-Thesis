@@ -46,6 +46,7 @@
     "luxon": "^3.4.4",
     "morgan": "^1.10.0",
     "multer": "1.4.5-lts.1",
+    "nanoid": "^5.0.7",
     "nest-casl": "^1.9.7",
     "nestjs-form-data": "^1.9.91",
     "nestjs-prisma": "^0.23.0",
@@ -57,7 +58,8 @@
     "prisma": "^5.16.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "type-fest": "^4.20.1"
+    "type-fest": "^4.20.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
