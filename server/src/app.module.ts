@@ -18,6 +18,7 @@ import { S3Module } from 'nestjs-s3';
 import { AWSConfig } from './config/config.interface';
 import { ConfigKey } from './config/config.enum';
 import { FileStorageModule } from './file-storage/file-storage.module';
+import { BranchModule } from './branch/branch.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { FileStorageModule } from './file-storage/file-storage.module';
     DeveloperModule,
     ClinicModule,
     FileStorageModule,
+    BranchModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
