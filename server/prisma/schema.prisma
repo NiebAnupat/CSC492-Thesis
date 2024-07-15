@@ -73,7 +73,7 @@ model clinic {
   clinic_id          Int      @id @default(autoincrement())
   clinic_name        String   @db.VarChar
   clinic_description String?  @db.Text
-  logo_url           String   @db.VarChar
+  logo_filename      String   @db.VarChar
   owner_id           String   @unique @db.VarChar
   branchs            branch[]
   customer           customer @relation(fields: [owner_id], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)

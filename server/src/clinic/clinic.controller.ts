@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   HttpStatus,
-  InternalServerErrorException,
   Param,
   Post,
   Req,
@@ -19,41 +18,108 @@ import { JwtUser } from '../auth/utils/type/auth';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
 import { Roles } from '../auth/utils/enum/role.enum';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
-import { ClinicHook } from './utils/permissions/clinic.hook';
 import { toAny } from 'src/utils/toAny';
 import { Response } from 'express';
 import { InjectS3, S3 } from 'nestjs-s3';
-import { ConfigService } from '@nestjs/config';
-import { AWSConfig } from 'src/config/config.interface';
-import { ConfigKey } from 'src/config/config.enum';
 import { UploadLogoDto } from './dto/upload-logo-dto';
-import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
-import { log } from 'console';
+import { FileStorageService } from '../file-storage/file-storage.service';
+import { clinic } from '@prisma/client';
+import { GetClinicHook } from './utils/permissions/hooks/clinic.get.hook';
+import { PostClinicHook } from './utils/permissions/hooks/clinic.post.hook';
+import { DeleteClinicHook } from './utils/permissions/hooks/clinic.delete.hook';
 
+@UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('clinic')
 export class ClinicController {
   constructor(
     @InjectS3() private readonly s3: S3,
-    private readonly configService: ConfigService,
     private readonly clinicService: ClinicService,
+    private readonly fileStorageService: FileStorageService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard, AccessGuard)
-  // @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
+
+  
+  @UseAbility(Actions.update, toAny('clinic'), PostClinicHook)
+  @FormDataRequest({ storage: MemoryStoredFile })
+  @Post('logo')
+  async uploadLogo(
+    @Body() data: UploadLogoDto,
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    const user: JwtUser = req.user;
+    const user_clinic = await this.clinicService.findOne({
+      owner_id: user.id,
+    });
+    if (!user_clinic) {
+      return new ConflictException('Clinic is not exist');
+    }
+    const file = data.logo_file;
+    const newFileNeame = `${user.id}_clinic_logo_${file.originalName}`;
+    try {
+      await this.fileStorageService.uploadFile(file, newFileNeame);
+      await this.clinicService.update({
+        where: { clinic_id: user_clinic.clinic_id },
+        data: { logo_filename: newFileNeame },
+      });
+      res
+        .status(HttpStatus.CREATED)
+        .json({ logo_filename: newFileNeame })
+        .end();
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    }
+  }
+
+  
+  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
+  @Get('logo')
+  async getLogo(@Req() req: any, @Res() res: Response) {
+    try {
+      const user: JwtUser = req.user as JwtUser;
+      let clinic: clinic;
+      switch (user.roles[0]) {
+        case Roles.owner:
+          clinic = await this.clinicService.findOne({ owner_id: user.id });
+          break;
+        case Roles.developer:
+          clinic = await this.clinicService.findOne({ owner_id: 'TestID' });
+          break;
+        default:
+          break;
+      }
+
+      const { Body, Metadata } = await this.fileStorageService.getFile(
+        clinic.logo_filename,
+      );
+      res
+        .writeHead(HttpStatus.OK, {
+          'Content-Type': Metadata.ContentType,
+          'Content-Length': Metadata.ContentLength,
+          'Content-Disposition': 'inline',
+          // 'Content-Disposition': 'attachment; filename=' + logo_filename,
+        })
+        .end(Body);
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+    }
+  }
+
+  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
   @Get()
   async findAll() {
     return this.clinicService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard, AccessGuard)
-  @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
+
+  
+  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
   @Get(':clinic_id')
   async findOne(@Param('clinic_id') clinic_id: number) {
-    // const user: JwtUser = req.user;
     return this.clinicService.findOne({ clinic_id });
   }
 
-  @UseGuards(JwtAuthGuard, AccessGuard)
+  
   @UseAbility(Actions.create, toAny('clinic'))
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post()
@@ -82,7 +148,7 @@ export class ClinicController {
     const created_clinic = await this.clinicService.create({
       clinic_name: data.clinic_name,
       clinic_description: data.clinic_description,
-      logo_url: 'default_logo.png',
+      logo_filename: 'default_logo.png',
       customer: {
         connect: {
           customer_id,
@@ -92,82 +158,8 @@ export class ClinicController {
 
     return res.status(HttpStatus.CREATED).json(created_clinic).end();
   }
-
-  @UseGuards(JwtAuthGuard, AccessGuard)
-  @UseAbility(Actions.update, toAny('clinic'), ClinicHook)
-  @FormDataRequest({ storage: MemoryStoredFile })
-  @Post('logo')
-  async uploadLogo(
-    @Body() data: UploadLogoDto,
-    @Req() req: any,
-    @Res() res: Response,
-  ) {
-    const user: JwtUser = req.user;
-    const user_clinic = await this.clinicService.findOne({
-      owner_id: user.id,
-    });
-    if (!user_clinic) {
-      return new ConflictException('Clinic is not exist');
-    }
-    const awsConfig: AWSConfig = this.configService.get<AWSConfig>(
-      ConfigKey.AWS,
-    );
-    const file = data.logo_file;
-    const newFileNeame = `${user.id}_clinic_logo_${file.originalName}`;
-    try {
-      await this.s3.putObject({
-        Bucket: awsConfig.bucketName,
-        Key: newFileNeame,
-        Body: file.buffer,
-        Metadata: {
-          'Content-Type': file.mimeType,
-          length: file.size.toString(),
-        },
-      });
-      res
-        .status(HttpStatus.CREATED)
-        .json({ logo_filename: newFileNeame })
-        .end();
-    } catch (error) {
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send(new InternalServerErrorException('Upload file failed'))
-        .end();
-    }
-  }
-
-  // get logo file
-  @Get('logo/:logo_filename')
-  async getLogo(
-    @Param('logo_filename') logo_filename: string,
-    @Res() res: Response,
-  ) {
-    const awsConfig: AWSConfig = this.configService.get<AWSConfig>(
-      ConfigKey.AWS,
-    );
-    try {
-      const result: GetObjectCommandOutput = await this.s3.getObject({
-        Bucket: awsConfig.bucketName,
-        Key: logo_filename,
-      });
-
-      const { Body, Metadata } = result;
-      res
-        .writeHead(HttpStatus.OK, {
-          'Content-Type': Metadata['content-type'],
-          'Content-Length': Metadata.length,
-          'Content-Disposition': 'inline',
-          // 'Content-Disposition': 'attachment; filename=' + logo_filename,
-        })
-        .end(await Body.transformToByteArray());
-    } catch (error) {
-      log(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @UseGuards(JwtAuthGuard, AccessGuard)
-  @UseAbility(Actions.delete, toAny('clinic'), ClinicHook)
+  
+  @UseAbility(Actions.delete, toAny('clinic'), DeleteClinicHook)
   @Delete()
   async remove(@Req() req: any) {
     const user: JwtUser = req.user;

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any): Promise<NotFoundException | JwtUser> {
+  async validate(payload: any): Promise<UnauthorizedException | JwtUser> {
     // This payload will be the decrypted token payload you provided when signing the token
 
     const { email, role, user_id } = payload;
@@ -44,7 +44,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         user = await this.developerService.findOne(email);
         break;
       default:
-        return new NotFoundException();
+        return new UnauthorizedException();
+    }
+
+    if (!user) {
+      throw new UnauthorizedException();
     }
 
     return {

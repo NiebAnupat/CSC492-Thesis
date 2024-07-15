@@ -95,7 +95,7 @@ CREATE TABLE "clinic" (
     "clinic_id" SERIAL NOT NULL,
     "clinic_name" VARCHAR NOT NULL,
     "clinic_description" TEXT,
-    "logo_url" VARCHAR NOT NULL,
+    "logo_filename" VARCHAR NOT NULL,
     "owner_id" VARCHAR NOT NULL,
 
     CONSTRAINT "clinic_pkey" PRIMARY KEY ("clinic_id")

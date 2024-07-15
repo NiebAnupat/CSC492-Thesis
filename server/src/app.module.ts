@@ -17,6 +17,7 @@ import { Roles } from './auth/utils/enum/role.enum';
 import { S3Module } from 'nestjs-s3';
 import { AWSConfig } from './config/config.interface';
 import { ConfigKey } from './config/config.enum';
+import { FileStorageModule } from './file-storage/file-storage.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ConfigKey } from './config/config.enum';
     UniqueIdModule,
     DeveloperModule,
     ClinicModule,
+    FileStorageModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
