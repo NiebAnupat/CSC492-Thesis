@@ -34,4 +34,5 @@ export interface AWSConfig {
   secretAccessKey: string;
   region: string;
   bucketName: string;
+  endpoint: string;
 }

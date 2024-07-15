@@ -57,6 +57,7 @@ const AWSConfig = registerAs(
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_DEFAULT_REGION,
       bucketName: process.env.AWS_BUCKET_NAME,
+      endpoint: process.env.AWS_ENDPOINT,
     }) as AWSConfig,
 );
 export const configurations = [

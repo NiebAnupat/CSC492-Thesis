@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configSchema } from './config/config.schema';
@@ -14,7 +14,9 @@ import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { CaslModule } from 'nest-casl';
 import { Role } from './auth/utils/type/roles';
 import { Roles } from './auth/utils/enum/role.enum';
-import { S3Module } from './s3/s3.module';
+import { S3Module } from 'nestjs-s3';
+import { AWSConfig } from './config/config.interface';
+import { ConfigKey } from './config/config.enum';
 
 @Module({
   imports: [
@@ -24,6 +26,22 @@ import { S3Module } from './s3/s3.module';
       isGlobal: true,
     }),
     PrismaModule.forRoot(),
+    S3Module.forRootAsync({
+      useFactory: (configService: ConfigService) => (
+        {
+        config: {
+          credentials: {
+            accessKeyId: configService.get<AWSConfig>(ConfigKey.AWS).accessKeyId,
+            secretAccessKey: configService.get<AWSConfig>(ConfigKey.AWS).secretAccessKey,
+          },
+          region: configService.get<AWSConfig>(ConfigKey.AWS).region,
+          endpoint: configService.get<AWSConfig>(ConfigKey.AWS).endpoint,
+          forcePathStyle: true,
+          signatureVersion: 'v4',
+        },
+      }),
+      inject: [ConfigService],
+    }),
     CaslModule.forRoot<Role>({
       superuserRole: Roles.developer,
     }),
@@ -33,7 +51,6 @@ import { S3Module } from './s3/s3.module';
     UniqueIdModule,
     DeveloperModule,
     ClinicModule,
-    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
