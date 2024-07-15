@@ -41,7 +41,7 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
-      - AWS_BUCKET_NAME=image-bucket
+      - AWS_BUCKET_NAME=csc492-bucket
       - SERVICES=s3
     volumes:
       - ./docker-volumes/aws:/etc/localstack/init/ready.d    
