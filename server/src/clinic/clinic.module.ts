@@ -10,6 +10,6 @@ import { FileStorageModule } from 'src/file-storage/file-storage.module';
   imports: [CaslModule.forFeature({ permissions }), FileStorageModule],
   providers: [ClinicService, PrismaService],
   controllers: [ClinicController],
-  exports : [ClinicService]
+  exports: [ClinicService],
 })
 export class ClinicModule {}

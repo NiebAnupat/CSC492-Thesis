@@ -1,6 +1,6 @@
 import { AnyObject } from '@casl/ability/dist/types/types';
 import {
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -26,8 +26,10 @@ export class GetClinicHook implements SubjectBeforeFilterHook {
     }
 
     const { clinic_id } = request.params;
+    // console.log({ clinic_id });
+
     if (Number.isNaN(parseInt(clinic_id))) {
-      throw new ForbiddenException('Clinic ID is required');
+      throw new BadRequestException('Clinic ID is required');
     }
     return await this.getClinic({ clinic_id: parseInt(clinic_id) });
   }

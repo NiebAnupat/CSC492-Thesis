@@ -2,10 +2,12 @@ import {
   Body,
   ConflictException,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Req,
   Res,
@@ -20,7 +22,6 @@ import { Roles } from '../auth/utils/enum/role.enum';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { toAny } from 'src/utils/toAny';
 import { Response } from 'express';
-import { InjectS3, S3 } from 'nestjs-s3';
 import { UploadLogoDto } from './dto/upload-logo-dto';
 import { FileStorageService } from '../file-storage/file-storage.service';
 import { clinic } from '@prisma/client';
@@ -32,13 +33,10 @@ import { DeleteClinicHook } from './utils/permissions/hooks/clinic.delete.hook';
 @Controller('clinic')
 export class ClinicController {
   constructor(
-    @InjectS3() private readonly s3: S3,
     private readonly clinicService: ClinicService,
     private readonly fileStorageService: FileStorageService,
   ) {}
 
-
-  
   @UseAbility(Actions.update, toAny('clinic'), PostClinicHook)
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post('logo')
@@ -71,7 +69,6 @@ export class ClinicController {
     }
   }
 
-  
   @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
   @Get('logo')
   async getLogo(@Req() req: any, @Res() res: Response) {
@@ -111,17 +108,21 @@ export class ClinicController {
     return this.clinicService.findAll();
   }
 
+  // @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
+  // @Get('branchs')
 
-  
   @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
   @Get(':clinic_id')
-  async findOne(@Param('clinic_id') clinic_id: number) {
-    return this.clinicService.findOne({ clinic_id });
+  async findOne(
+    @Param('clinic_id', new DefaultValuePipe(0), ParseIntPipe)
+    clinic_id: number,
+  ) {
+    const clinic = await this.clinicService.findOne({ clinic_id });
+    if (!clinic) return new ConflictException('Clinic is not exist');
+    return clinic;
   }
 
-  
   @UseAbility(Actions.create, toAny('clinic'))
-  @FormDataRequest({ storage: MemoryStoredFile })
   @Post()
   async create(
     @Body() data: CreateClinicDto,
@@ -147,6 +148,7 @@ export class ClinicController {
 
     const created_clinic = await this.clinicService.create({
       clinic_name: data.clinic_name,
+      clinic_initial: data.clinic_initial,
       clinic_description: data.clinic_description,
       logo_filename: 'default_logo.png',
       customer: {
@@ -158,18 +160,20 @@ export class ClinicController {
 
     return res.status(HttpStatus.CREATED).json(created_clinic).end();
   }
-  
+
   @UseAbility(Actions.delete, toAny('clinic'), DeleteClinicHook)
   @Delete()
   async remove(@Req() req: any) {
     const user: JwtUser = req.user;
-    const user_clinic = await this.clinicService.findOne({
-      owner_id: user.id,
-    });
-    if (!user_clinic) {
-      return new ConflictException('Clinic is not exist');
-    }
-    const { clinic_id } = user_clinic;
+    const { clinic_id } = await this.getClinicID(user.id);
     return this.clinicService.delete({ clinic_id });
+  }
+
+  private async getClinicID(owner_id: string): Promise<{ clinic_id: number }> {
+    const clinic = await this.clinicService.findOne({ owner_id });
+    if (!clinic) {
+      throw new ConflictException('Clinic is not exist');
+    }
+    return { clinic_id: clinic.clinic_id };
   }
 }

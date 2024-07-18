@@ -5,6 +5,10 @@ export class CreateClinicDto {
   @IsString()
   clinic_name: string;
 
+  @IsNotEmpty()
+  @IsString()
+  clinic_initial: string;
+
   @IsOptional()
   @IsString()
   clinic_description: string;
