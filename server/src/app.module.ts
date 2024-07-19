@@ -19,6 +19,7 @@ import { AWSConfig } from './config/config.interface';
 import { ConfigKey } from './config/config.enum';
 import { FileStorageModule } from './file-storage/file-storage.module';
 import { BranchModule } from './branch/branch.module';
+import { EmployeeModule } from './employee/employee.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { BranchModule } from './branch/branch.module';
     FileStorageModule,
     ClinicModule,
     BranchModule,
+    EmployeeModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
