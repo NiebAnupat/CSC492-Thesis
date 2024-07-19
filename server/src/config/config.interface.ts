@@ -3,6 +3,7 @@ export interface AppConfig {
   port: number;
   jwtSecret: string;
   originsURL: string[];
+  domainName: string;
 }
 
 export interface DatabaseConfig {
@@ -14,7 +15,6 @@ export interface DatabaseConfig {
   password: string;
   database: string;
   schema: string;
-  synchronize: boolean;
 }
 
 export interface GoogleAuthConfig {
@@ -26,4 +26,12 @@ export interface GoogleAuthConfig {
   clientSecret: string;
   callbackURL: string;
   scope: string[];
+}
+
+export interface AWSConfig {
+  accessKeyId: string;
+  secretAccessKey: string;
+  region: string;
+  bucketName: string;
+  endpoint: string;
 }

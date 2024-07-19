@@ -3,6 +3,7 @@ import {
   AppConfig,
   DatabaseConfig,
   GoogleAuthConfig,
+  AWSConfig,
 } from './config.interface';
 import { ConfigKey } from './config.enum';
 
@@ -14,6 +15,7 @@ const APPConfig = registerAs(
       port: process.env.PORT || 4000,
       jwtSecret: process.env.JWT_SECRET,
       originsURL: process.env.ORIGINS_WHITELIST.split(' '),
+      domainName: process.env.DOMAIN_NAME,
     }) as AppConfig,
 );
 
@@ -46,4 +48,21 @@ const GOOGLEAuthConfig = registerAs(
       scope: process.env.GOOGLE_SCOPE.split(' '),
     }) as GoogleAuthConfig,
 );
-export const configurations = [APPConfig, DBConfig, GOOGLEAuthConfig];
+
+const AWSConfig = registerAs(
+  ConfigKey.AWS,
+  () =>
+    ({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_DEFAULT_REGION,
+      bucketName: process.env.AWS_BUCKET_NAME,
+      endpoint: process.env.AWS_ENDPOINT_URL,
+    }) as AWSConfig,
+);
+export const configurations = [
+  APPConfig,
+  DBConfig,
+  GOOGLEAuthConfig,
+  AWSConfig,
+];

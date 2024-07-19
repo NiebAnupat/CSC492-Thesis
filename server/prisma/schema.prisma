@@ -31,7 +31,7 @@ model appointment {
   update_at              DateTime?               @default(now()) @db.Timestamp(6)
   deleted_at             DateTime?               @db.Timestamp(6)
   edit_by                String?                 @db.VarChar
-  branch_id              String                  @db.VarChar
+  branch_id              Int
   branch                 branch                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   dentist                dentist?                @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction, onUpdate: Cascade)
   employee               employee?               @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -49,30 +49,57 @@ model audit_log {
   new_value    Json?     @db.Json
   create_at    DateTime? @default(now()) @db.Timestamp(6)
   edit_by      String?   @db.VarChar
-  branch_id    String?   @db.VarChar
+  branch_id    Int
   branch       branch?   @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee     employee? @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model customer {
+  customer_id           String               @id @db.VarChar
+  provider              customer_providers?
+  email                 String               @unique @db.VarChar
+  password              String?              @db.VarChar
+  person_information_id Int
+  package               packages             @default(free)
+  clinic                clinic?
+  customer_person_info  person_information   @relation("customer_person_information_idToperson_information", fields: [person_information_id], references: [person_information_id], onDelete: NoAction, onUpdate: Cascade)
+  person_info_edited    person_information[] @relation("person_information_edit_byTocustomer")
+
+  @@index([password], type: Hash)
+}
+
+model clinic {
+  clinic_id          Int      @id @default(autoincrement())
+  clinic_name        String   @db.VarChar
+  clinic_initial     String   @db.VarChar
+  clinic_description String?  @db.Text
+  logo_filename      String   @db.VarChar
+  owner_id           String   @unique @db.VarChar
+  branchs            branch[]
+  customer           customer @relation(fields: [owner_id], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)
+}
+
 model branch {
-  branch_id           String                @id @db.VarChar
+  branch_id           Int                   @id @default(autoincrement())
+  branch_display_id   String                @db.VarChar
   branch_name         String                @db.VarChar
   address_line_1      String?
   address_line_2      String?
   provice_id          Int?
   telephone           String                @db.Char(10)
-  image_url           String?               @db.VarChar
-  manager_id          String                @db.VarChar
-  owner_account       String                @db.VarChar
+  logo_filename       String?               @db.VarChar
+  manager_id          String?                @db.VarChar
   create_at           DateTime?             @default(now()) @db.Timestamp(6)
   update_at           DateTime?             @default(now()) @db.Timestamp(6)
   deleted_at          DateTime?             @db.Timestamp(6)
   edit_by             String?               @db.VarChar
   appointment         appointment[]
   audit_log           audit_log[]
-  branch_manager      employee              @relation("branch_manager_idToemployee", fields: [manager_id], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
-  customer            customer              @relation(fields: [owner_account], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)
+  clinic              clinic?               @relation(fields: [clinic_id], references: [clinic_id])
+  branch_manager      employee?              @relation("branch_manager_idToemployee", fields: [manager_id], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
   provice             provice?              @relation(fields: [provice_id], references: [provice_id], onDelete: NoAction, onUpdate: Cascade)
+  clinic_id           Int?
   clinic_stock        clinic_stock[]
   dentist_workday     dentist_workday[]
   expert_type         expert_type[]
@@ -101,7 +128,7 @@ model clinic_stock {
   update_at           DateTime?             @default(now()) @db.Timestamp(6)
   deleted_at          DateTime?             @db.Timestamp(6)
   edit_by             String?               @db.VarChar
-  branch_id           String?               @db.VarChar
+  branch_id           Int
   branch              branch?               @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee            employee?             @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
   medicine            medicine?             @relation(fields: [item_id], references: [medicine_id], onDelete: NoAction, onUpdate: Cascade, map: "clinic_stock_item_id_fkey")
@@ -109,21 +136,6 @@ model clinic_stock {
   dispensing_medicine dispensing_medicine[]
   receipt_product     receipt_product[]
   requisition_product requisition_product[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model customer {
-  customer_id           String               @id @db.VarChar
-  provider              customer_providers?
-  email                 String               @unique @db.VarChar
-  password              String?              @db.VarChar
-  person_information_id Int
-  package               packages             @default(free)
-  branch                branch[]
-  customer_person_info  person_information   @relation("customer_person_information_idToperson_information", fields: [person_information_id], references: [person_information_id], onDelete: NoAction, onUpdate: Cascade)
-  person_info_edited    person_information[] @relation("person_information_edit_byTocustomer")
-
-  @@index([password], type: Hash)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -155,7 +167,7 @@ model dentist_workday {
   update_at          DateTime? @default(now()) @db.Timestamp(6)
   deleted_at         DateTime? @db.Timestamp(6)
   edit_by            String?   @db.VarChar
-  branch_id          String?   @db.VarChar
+  branch_id          Int
   branch             branch?   @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   dentist            dentist?  @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction, onUpdate: Cascade)
   employee           employee? @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -212,7 +224,7 @@ model expert_type {
   update_at              DateTime?                @default(now()) @db.Timestamp(6)
   deleted_at             DateTime?                @db.Timestamp(6)
   edit_by                String?                  @db.VarChar
-  branch_id              String?                  @db.VarChar
+  branch_id              Int
   dentist                dentist[]
   branch                 branch?                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee               employee?                @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -253,7 +265,7 @@ model lab_vender {
   update_at          DateTime?     @default(now()) @db.Timestamp(6)
   deleted_at         DateTime?     @db.Timestamp(6)
   edit_by            String?       @db.VarChar
-  branch_id          String?       @db.VarChar
+  branch_id          Int
   lab_request        lab_request[]
   branch             branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee           employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -271,7 +283,7 @@ model medicine {
   update_at        DateTime?      @default(now()) @db.Timestamp(6)
   deleted_at       DateTime?      @db.Timestamp(6)
   edit_by          String?        @db.VarChar
-  branch_id        String?        @db.VarChar
+  branch_id        Int
   clinic_stock     clinic_stock[]
   branch           branch?        @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee         employee?      @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -286,7 +298,7 @@ model medicine_type {
   update_at          DateTime?  @default(now()) @db.Timestamp(6)
   deleted_at         DateTime?  @db.Timestamp(6)
   edit_by            String?    @db.VarChar
-  branch_id          String?    @db.VarChar
+  branch_id          Int
   medicine           medicine[]
   branch             branch?    @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee           employee?  @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -301,7 +313,7 @@ model operation_type {
   update_at              DateTime?                @default(now()) @db.Timestamp(6)
   deleted_at             DateTime?                @db.Timestamp(6)
   edit_by                String?                  @db.VarChar
-  branch_id              String?                  @db.VarChar
+  branch_id              Int
   branch                 branch?                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee               employee?                @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
   treatment_nv_operation treatment_nv_operation[]
@@ -339,7 +351,7 @@ model position {
   create_at     DateTime?  @default(now()) @db.Timestamp(6)
   update_at     DateTime?  @default(now()) @db.Timestamp(6)
   deleted_at    DateTime?  @db.Timestamp(6)
-  branch_id     String?    @db.VarChar
+  branch_id     Int
   branch        branch?    @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee      employee[]
 }
@@ -353,7 +365,7 @@ model product {
   update_at    DateTime?      @default(now()) @db.Timestamp(6)
   deleted_at   DateTime?      @db.Timestamp(6)
   edit_by      String?        @db.VarChar
-  branch_id    String?        @db.VarChar
+  branch_id    Int
   clinic_stock clinic_stock[]
   branch       branch?        @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee     employee?      @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -386,7 +398,7 @@ model receipt {
   update_at                 DateTime?         @default(now()) @db.Timestamp(6)
   deleted_at                DateTime?         @db.Timestamp(6)
   edit_by                   String?           @db.VarChar
-  branch_id                 String            @db.VarChar
+  branch_id                 Int
   branch                    branch            @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee_edited           employee?         @relation("receipt_edit_byToemployee", fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
   create_by                 employee          @relation("receipt_employee_idToemployee", fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -431,7 +443,7 @@ model requisition_product {
   update_at       DateTime?     @default(now()) @db.Timestamp(6)
   deleted_at      DateTime?     @db.Timestamp(6)
   edit_by         String?       @db.VarChar
-  branch_id       String?       @db.VarChar
+  branch_id       Int
   branch          branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   clinic_stock    clinic_stock? @relation(fields: [clinic_stock_id], references: [clinic_stock_id], onDelete: NoAction, onUpdate: Cascade)
   employee_edited employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -446,7 +458,7 @@ model tag_list {
   update_at       DateTime?     @default(now()) @db.Timestamp(6)
   deleted_at      DateTime?     @db.Timestamp(6)
   edit_by         String?       @db.VarChar
-  branch_id       String?       @db.VarChar
+  branch_id       Int
   patient_tag     patient_tag[]
   branch          branch?       @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   employee_edited employee?     @relation(fields: [edit_by], references: [employee_id], onDelete: NoAction, onUpdate: Cascade)
@@ -468,7 +480,7 @@ model treatment {
   update_at                     DateTime?                       @default(now()) @db.Timestamp(6)
   deleted_at                    DateTime?                       @db.Timestamp(6)
   edit_by                       String?                         @db.VarChar
-  branch_id                     String?                         @db.VarChar
+  branch_id                     Int
   dispensing_medicine           dispensing_medicine[]
   lab_request                   lab_request[]
   receipt                       receipt[]
@@ -578,7 +590,7 @@ model person_information {
   update_at                          DateTime   @default(now()) @db.Timestamp(6)
   edit_by                            String?    @db.VarChar
   deleted_at                         DateTime?  @db.Timestamp(6)
-  branch_id                          String?    @db.VarChar
+  branch_id                          Int?
   customer                           customer[] @relation("customer_person_information_idToperson_information")
   dentist                            dentist[]
   employee                           employee[] @relation("employee_person_information_idToperson_information")

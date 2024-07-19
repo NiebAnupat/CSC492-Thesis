@@ -1,14 +1,8 @@
-version: '3'
-
+name: csc492
 services:
   # frontend:
-  #   # commented below line to use the production build
-  #   # command: pnpm dev
   #   build:
   #     context: ./frontend
-  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-  #     dockerfile: Dockerfile.prod
-  #     # dockerfile: Dockerfile.dev
   #   environment:
   #     - PORT=3000
   #   expose:
@@ -17,38 +11,15 @@ services:
   #     - "3000:3000"
   #   depends_on:
   #     - server
-  #   develop:
-  #     watch:
-  #       - action: sync
-  #         path: ./frontend/src
-  #         target: /usr/src/app/src
-  #         ignore:
-  #           - node_modules/
-  #       - action: rebuild
-  #         path: package.json
   # server:
-  #   # commented below line to use the production build
-  #   # command: pnpm start:dev
   #   build:
   #     context: ./server
-  #     # Dockerfile have 2 files, Dockerfile.prod and Dockerfile.dev
-  #     dockerfile: Dockerfile.prod
-  #     # dockerfile: Dockerfile.dev
   #   environment:
   #     - PORT=4000
   #   expose:
   #     - 4000
   #   ports:
   #     - "4000:4000"
-  #   develop:
-  #     watch:
-  #       - action: sync
-  #         path: ./server/src
-  #         target: /usr/src/app/src
-  #         ignore:
-  #           - node_modules/
-  #       - action: rebuild
-  #         path: package.json
   db:
     image: postgres:16
     container_name: postgres
@@ -56,8 +27,22 @@ services:
       - POSTGRES_USER=AnupatAndSuchanart
       - POSTGRES_PASSWORD=6K1umZ&4OCw2
       - POSTGRES_DB=CSC492-Thesis
-    restart: unless-stopped  
+    restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
       - ./docker-volumes/postgresql:/var/lib/postgresql/data
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Main LocalStack API
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_BUCKET_NAME=csc492-bucket
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - SERVICES=s3
+    volumes:
+      - ./docker-volumes/aws:/etc/localstack/init/ready.d    
