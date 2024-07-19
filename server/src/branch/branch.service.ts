@@ -45,6 +45,7 @@ export class BranchService {
     return this.prisma.branch.findMany({
       where: { clinic_id },
       include: { clinic: { select: { owner_id: true } } },
+      orderBy: { branch_id: 'asc' },
     });
   }
 
@@ -62,7 +63,11 @@ export class BranchService {
   }
 
   update(id: number, updateBranchDto: UpdateBranchDto) {
-    return `This action updates a #${id} branch ${updateBranchDto}`;
+    // return `This action updates a #${id} branch ${updateBranchDto}`;
+    return this.prisma.branch.update({
+      where: { branch_id: id },
+      data: updateBranchDto,
+    });
   }
 
   remove(where: Prisma.branchWhereUniqueInput) {

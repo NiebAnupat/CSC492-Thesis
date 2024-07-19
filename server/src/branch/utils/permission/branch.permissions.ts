@@ -11,7 +11,7 @@ export const permissions: Permissions<Role, Subject, Actions> = {
   owner({ user, can }) {
     can(Actions.create, 'branch');
     can(Actions.read, 'branch', { owner_id: user.id });
-    can(Actions.update, 'clinic', { owner_id: user.id });
+    can(Actions.update, 'branch', { owner_id: user.id });
     can(Actions.delete, 'branch', { owner_id: user.id });
   },
 };
