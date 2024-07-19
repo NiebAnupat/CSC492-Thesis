@@ -92,7 +92,6 @@ export class BranchController {
     @Body() updateBranchDto: UpdateBranchDto,
   ) {
     return this.branchService.update(branch_id, updateBranchDto);
-    // throw new Error(`Method not implemented ${branch_id} ${updateBranchDto}`);
   }
 
   @UseAbility(Actions.delete, toAny('branch'), DeleteBranchHook)

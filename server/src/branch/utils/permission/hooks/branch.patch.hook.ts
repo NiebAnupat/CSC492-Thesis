@@ -11,7 +11,6 @@ import {
 } from 'nest-casl';
 import { BranchService } from 'src/branch/branch.service';
 import { Prisma } from '@prisma/client';
-import { log } from 'console';
 
 @Injectable()
 export class PatchBranchHook implements SubjectBeforeFilterHook {
@@ -24,7 +23,6 @@ export class PatchBranchHook implements SubjectBeforeFilterHook {
       throw new BadRequestException('Branch ID is required');
     }
     const branch = await this.getBranch({ branch_id: parseInt(branch_id) });
-   log({branch})
     return { owner_id: branch.clinic.owner_id };
   }
 

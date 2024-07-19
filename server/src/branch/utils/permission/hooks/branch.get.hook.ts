@@ -53,7 +53,8 @@ export class GetBranchHook implements SubjectBeforeFilterHook {
     }
 
     return {
-      owner_id: (await this.getBranch({ branch_id: parseInt(branch_id) })).clinic.owner_id,
+      owner_id: (await this.getBranch({ branch_id: parseInt(branch_id) }))
+        .clinic.owner_id,
     };
   }
 
