@@ -47,11 +47,14 @@ export class GetBranchHook implements SubjectBeforeFilterHook {
     }
 
     const { branch_id } = request.params;
+
     if (Number.isNaN(parseInt(branch_id))) {
       throw new BadRequestException('Branch ID is required');
     }
 
-    return await this.getBranch({ branch_id: parseInt(branch_id) });
+    return {
+      owner_id: (await this.getBranch({ branch_id: parseInt(branch_id) })).clinic.owner_id,
+    };
   }
 
   private async getBranch(where: Prisma.branchWhereUniqueInput) {
