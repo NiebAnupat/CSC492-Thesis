@@ -2,10 +2,14 @@ import React from 'react'
 
 export default function page() {
     return (
-        <main className='min-h-screen'>
-            <h2 className='h2 text-center mt-12'>
-                Owner Main Page
-            </h2>
-        </main>
+        <>
+            <span className="font-bold text-4xl">หน้าหลัก</span>
+            <div className="border-dashed border border-zinc-500 w-full h-12 rounded-lg"></div>
+            <div className="border-dashed border border-zinc-500 w-full h-64 rounded-lg"></div>
+            <div className="border-dashed border border-zinc-500 w-full h-64 rounded-lg"></div>
+            <div className="border-dashed border border-zinc-500 w-full h-64 rounded-lg"></div>
+            <div className="border-dashed border border-zinc-500 w-full h-64 rounded-lg"></div>
+            <div className="border-dashed border border-zinc-500 w-full h-64 rounded-lg"></div>
+        </>
     )
 }
