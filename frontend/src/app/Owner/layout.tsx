@@ -3,6 +3,11 @@ import { Noto_Serif_Thai } from "next/font/google";
 
 import "@/styles/globals.css";
 
+import SideNav from "@/components/SideNav/side-nav";
+import MarginWidthWrapper from "@/components/SideNav/margin-width-wrapper";
+import HeaderMobile from "@/components/SideNav/header-mobile";
+import PageWrapper from "@/components/SideNav/page-wrapper";
+
 const notoSerifThai = Noto_Serif_Thai({ subsets: ["thai"] });
 
 export const metadata: Metadata = {
@@ -18,7 +23,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={notoSerifThai.className}>
-        {children}
+        <div className="flex">
+          <SideNav />
+          <main className="flex-1">
+            <MarginWidthWrapper>
+              {/* <Header /> */}
+              <HeaderMobile />
+              <PageWrapper>{children}</PageWrapper>
+            </MarginWidthWrapper>
+          </main>
+        </div>
       </body>
     </html>
   );
