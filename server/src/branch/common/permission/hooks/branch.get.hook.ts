@@ -11,7 +11,7 @@ import {
   AuthorizableUser,
   SubjectBeforeFilterHook,
 } from 'nest-casl';
-import { JwtUser } from 'src/auth/utils/type/auth';
+import { JwtUser } from 'src/auth/common/type/auth';
 import { BranchService } from 'src/branch/branch.service';
 import { ClinicService } from 'src/clinic/clinic.service';
 
@@ -33,16 +33,16 @@ export class GetBranchHook implements SubjectBeforeFilterHook {
 
     // Role owner
     if (url === '/clinic') {
-      log;
-      const { clinic_id } = await this.clinicService.findOne({
-        owner_id: user.id,
-      });
+      const clinic = await this.clinicService.findOne({ owner_id: user.id });
+      if (!clinic) {
+        throw new NotFoundException('Clinic not found');
+      }
+      const { clinic_id } = clinic;
       const branchs = await this.branchService.findBranchesByClinic(clinic_id);
+      // branchs.length === 0 && new NotFoundException('Branch not found');
       if (branchs.length === 0) {
         throw new NotFoundException('Branch not found');
       }
-      console.log(branchs);
-
       return { owner_id: branchs[0].clinic.owner_id };
     }
 

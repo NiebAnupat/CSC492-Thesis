@@ -10,7 +10,7 @@ import {
   AuthorizableUser,
   SubjectBeforeFilterHook,
 } from 'nest-casl';
-import { JwtUser } from 'src/auth/utils/type/auth';
+import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
 
 @Injectable()

@@ -20,16 +20,18 @@ export class BranchService {
   }) {
     const branchDisplayId =
       await this.uniqueIdService.generateBranchDisplayId(clinic_id);
-    // data.branch_display_id = branchDisplayId;
-    // data.clinic.connect = { clinic_id };
-    // const newData = data as Prisma.branchCreateInput;
+    // TODO: Create 1st employee for the Owner
+
     return this.prisma.branch.create({
       data: {
         branch_display_id: branchDisplayId,
-        branch_name: data.branch_name,
+        branch_name_th: data.branch_name_th,
+        branch_name_en: data.branch_name_en,
         address_line_1: data.address_line_1,
         address_line_2: data.address_line_2,
         telephone: data.telephone,
+        // TODO: Use ClinicService to get the clinic logo by default
+        logo_filename: 'default_clinic_logo.png',
         clinic: {
           connect: { clinic_id },
         },
@@ -43,8 +45,28 @@ export class BranchService {
 
   findBranchesByClinic(clinic_id: number) {
     return this.prisma.branch.findMany({
+      select: {
+        branch_id: true,
+        branch_display_id: true,
+        branch_name_th: true,
+        branch_name_en: true,
+        clinic: { select: { owner_id: true } },
+        person_information: {
+          select: {
+            person_information_id: true,
+            role: true,
+            first_name: true,
+            last_name: true,
+            employee: {
+              select: {
+                employee_id: true,
+                employee_uid: true,
+              },
+            },
+          },
+        },
+      },
       where: { clinic_id },
-      include: { clinic: { select: { owner_id: true } } },
       orderBy: { branch_id: 'asc' },
     });
   }
@@ -56,6 +78,20 @@ export class BranchService {
         clinic: {
           select: {
             owner_id: true,
+          },
+        },
+        person_information: {
+          select: {
+            person_information_id: true,
+            role: true,
+            first_name: true,
+            last_name: true,
+            employee: {
+              select: {
+                employee_id: true,
+                employee_uid: true,
+              },
+            },
           },
         },
       },

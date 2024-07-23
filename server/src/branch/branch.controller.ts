@@ -17,14 +17,15 @@ import { BranchService } from './branch.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
-import { JwtAuthGuard } from 'src/auth/utils/guard/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { toAny } from 'src/utils/toAny';
-import { GetBranchHook } from './utils/permission/hooks/branch.get.hook';
-import { DeleteBranchHook } from './utils/permission/hooks/branch.delete.hook';
+import { GetBranchHook } from './common/permission/hooks/branch.get.hook';
+import { DeleteBranchHook } from './common/permission/hooks/branch.delete.hook';
 import { ClinicService } from 'src/clinic/clinic.service';
-import { JwtUser } from 'src/auth/utils/type/auth';
-import { Roles } from 'src/auth/utils/enum/role.enum';
-import { PatchBranchHook } from './utils/permission/hooks/branch.patch.hook';
+import { JwtUser } from 'src/auth/common/type/auth';
+import { Roles } from 'src/auth/common/enum/role.enum';
+import { PatchBranchHook } from './common/permission/hooks/branch.patch.hook';
+import { log } from 'console';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
@@ -37,7 +38,6 @@ export class BranchController {
   @UseAbility(Actions.create, toAny('branch'))
   @Post()
   async create(@Body() createBranchDto: CreateBranchDto, @Req() req: any) {
-    // TODO: Test this
     const user: JwtUser = req.user as JwtUser;
     let owner_id;
     switch (user.roles[0]) {
@@ -50,7 +50,11 @@ export class BranchController {
       default:
         return new ConflictException('User not found');
     }
-    const { clinic_id } = await this.clinicService.findOne({ owner_id });
+   const clinic = await this.clinicService.findOne({ owner_id: user.id });
+      if (!clinic) {
+        throw new NotFoundException('Clinic not found');
+      }
+      const { clinic_id } = clinic;({ owner_id });
     if (!clinic_id) return new ConflictException('Clinic not found');
     return this.branchService.create({ clinic_id, data: createBranchDto });
   }

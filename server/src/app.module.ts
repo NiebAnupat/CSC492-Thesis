@@ -12,13 +12,14 @@ import { ClinicModule } from './clinic/clinic.module';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { CaslModule } from 'nest-casl';
-import { Role } from './auth/utils/type/roles';
-import { Roles } from './auth/utils/enum/role.enum';
+import { Role } from './auth/common/type/roles';
+import { Roles } from './auth/common/enum/role.enum';
 import { S3Module } from 'nestjs-s3';
 import { AWSConfig } from './config/config.interface';
 import { ConfigKey } from './config/config.enum';
 import { FileStorageModule } from './file-storage/file-storage.module';
 import { BranchModule } from './branch/branch.module';
+import { EmployeeModule } from './employee/employee.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { BranchModule } from './branch/branch.module';
     FileStorageModule,
     ClinicModule,
     BranchModule,
+    EmployeeModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

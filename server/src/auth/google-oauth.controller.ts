@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { GoogleOauthGuard } from './utils/guard/google-oauth.guard';
+import { GoogleOauthGuard } from './common/guard/google-oauth.guard';
 import { $Enums, customer } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { JwtService } from '@nestjs/jwt';

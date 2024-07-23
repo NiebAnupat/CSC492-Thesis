@@ -3,7 +3,7 @@ import { ClinicService } from './clinic.service';
 import { PrismaService } from 'nestjs-prisma';
 import { ClinicController } from './clinic.controller';
 import { CaslModule } from 'nest-casl';
-import { permissions } from './utils/permissions/clinic.permissions';
+import { permissions } from './common/permissions/clinic.permissions';
 import { FileStorageModule } from 'src/file-storage/file-storage.module';
 
 @Module({

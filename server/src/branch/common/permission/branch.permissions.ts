@@ -1,6 +1,6 @@
 import { branch } from '@prisma/client';
 import { Actions, Permissions } from 'nest-casl';
-import { Role } from 'src/auth/utils/type/roles';
+import { Role } from 'src/auth/common/type/roles';
 import { Subjects } from '@casl/prisma';
 
 export type Subject = Subjects<{

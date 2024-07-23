@@ -1,23 +1,22 @@
-// export class CreateCustomerDto {}
-
+import { Type } from 'class-transformer';
 import {
-  IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsObject,
+  IsOptional,
   IsStrongPassword,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
-export class CreateCustomerDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
+export class CreateEmployeeDto {
   @IsNotEmpty()
   @IsStrongPassword()
   password: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  branch_id : number;
 
   @IsNotEmpty()
   @IsObject()

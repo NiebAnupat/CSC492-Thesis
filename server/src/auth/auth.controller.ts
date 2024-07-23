@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
 import { DateTime } from 'luxon';
 import { Response } from 'express';
-import { LocalAuthGuard } from './utils/guard/local-auth.guard';
+import { LocalAuthGuard } from './common/guard/local-auth.guard';
 import { CreateDeveloperDto } from '../developer/dto/create-developer.dto';
 
 @Controller('auth')
