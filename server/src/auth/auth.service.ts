@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { $Enums, customer, developer } from '@prisma/client';
 import { CustomerService } from '../customer/customer.service';
-import { compare, hash } from 'bcrypt';
+import { compare } from 'bcrypt';
 import { UniqueIdService } from '../unique-id/unique-id.service';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
 import { DateTime } from 'luxon';
@@ -15,6 +15,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { UserWithRole, ValidateUserResponse } from './common/type/auth';
 import { DeveloperService } from '../developer/developer.service';
 import { Roles } from './common/enum/role.enum';
+import { hashPassword } from '../utils/hashPassword';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +64,7 @@ export class AuthService {
         email: customer.email,
         package: $Enums.packages.free,
         provider: $Enums.customer_providers.local,
-        password: await this.hashPassword(customer.password),
+        password: await hashPassword(customer.password),
         customer_person_info: {
           create: {
             ...customer.person_info,
@@ -102,7 +103,7 @@ export class AuthService {
     return this.developerService
       .create({
         email,
-        password: await this.hashPassword(password),
+        password: await hashPassword(password),
       })
       .then((user) => {
         return this.developer_login({
@@ -172,9 +173,5 @@ export class AuthService {
     if (user) return { _user: user, roles: [Roles.developer] };
     throw new NotFoundException();
   }
-
-  hashPassword(password: string): Promise<string> {
-    const saltRounds = 13;
-    return hash(password, saltRounds);
-  }
+ 
 }

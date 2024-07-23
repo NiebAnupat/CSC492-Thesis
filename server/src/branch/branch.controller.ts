@@ -19,13 +19,10 @@ import { UpdateBranchDto } from './dto/update-branch.dto';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { toAny } from 'src/utils/toAny';
-import { GetBranchHook } from './common/permission/hooks/branch.get.hook';
-import { DeleteBranchHook } from './common/permission/hooks/branch.delete.hook';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { Roles } from 'src/auth/common/enum/role.enum';
-import { PatchBranchHook } from './common/permission/hooks/branch.patch.hook';
-import { log } from 'console';
+import { BranchHook } from './common/permission/branch.hook';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
@@ -59,13 +56,13 @@ export class BranchController {
     return this.branchService.create({ clinic_id, data: createBranchDto });
   }
 
-  @UseAbility(Actions.read, toAny('branch'), GetBranchHook)
+  @UseAbility(Actions.read, toAny('branch'), BranchHook)
   @Get()
   findAll() {
     return this.branchService.findAll();
   }
 
-  @UseAbility(Actions.read, toAny('branch'), GetBranchHook)
+  @UseAbility(Actions.read, toAny('branch'), BranchHook)
   @Get('/clinic')
   async findBranchesByClinic(@Req() req: any) {
     const user: JwtUser = req.user as JwtUser;
@@ -77,7 +74,7 @@ export class BranchController {
     return branchs;
   }
 
-  @UseAbility(Actions.read, toAny('branch'), GetBranchHook)
+  @UseAbility(Actions.read, toAny('branch'), BranchHook)
   @Get(':branch_id')
   async findOne(
     @Param('branch_id', new DefaultValuePipe(0), ParseIntPipe)
@@ -88,7 +85,7 @@ export class BranchController {
     return branch;
   }
 
-  @UseAbility(Actions.update, toAny('branch'), PatchBranchHook)
+  @UseAbility(Actions.update, toAny('branch'), BranchHook)
   @Patch(':branch_id')
   update(
     @Param('branch_id', new DefaultValuePipe(0), ParseIntPipe)
@@ -98,13 +95,13 @@ export class BranchController {
     return this.branchService.update(branch_id, updateBranchDto);
   }
 
-  @UseAbility(Actions.delete, toAny('branch'), DeleteBranchHook)
+  @UseAbility(Actions.delete, toAny('branch'), BranchHook)
   @Delete(':branch_id')
   async remove(@Param('branch_id', new ParseIntPipe()) branch_id: number) {
     const clinic = await this.branchService.findOne({ branch_id });
     if (!clinic) return new ConflictException('Branch not found');
     const branch_deleted = await this.branchService.remove({ branch_id });
     if (!branch_deleted) return new ConflictException('Branch not deleted');
-    return { message: `Branch ID ${branch_id} is deleted` };
+    return { message: `Branch ID ${branch_id} is deleted (soft)` };
   }
 }

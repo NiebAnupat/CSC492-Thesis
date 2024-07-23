@@ -5,17 +5,18 @@ import { EmployeeController } from './employee.controller';
 import { CaslModule } from 'nest-casl';
 import { PrismaService } from 'nestjs-prisma';
 import { UniqueIdModule } from 'src/unique-id/unique-id.module';
-import { AuthModule } from 'src/auth/auth.module';
+// import { AuthModule } from 'src/auth/auth.module';
 import { ClinicModule } from 'src/clinic/clinic.module';
 
 @Module({
   imports: [
     CaslModule.forFeature({ permissions }),
     UniqueIdModule,
-    AuthModule,
+    // AuthModule,
     ClinicModule,
   ],
   controllers: [EmployeeController],
-  providers: [PrismaService, EmployeeService],
+  providers: [PrismaService, EmployeeService,],
+  exports: [EmployeeService],
 })
 export class EmployeeModule {}

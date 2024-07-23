@@ -20,11 +20,11 @@ import { AccessGuard, UseAbility } from 'nest-casl';
 import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { toAny } from 'src/utils/toAny';
 import { Response } from 'express';
-import { AuthService } from 'src/auth/auth.service';
 import { Roles } from 'src/auth/common/enum/role.enum';
 import { DateTime } from 'luxon';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { hashPassword } from 'src/utils/hashPassword';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('employee')
@@ -32,7 +32,6 @@ export class EmployeeController {
   constructor(
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
-    private readonly authService: AuthService,
   ) {}
 
   @UseAbility('create', toAny('employee'))
@@ -58,11 +57,11 @@ export class EmployeeController {
     const { branch_id } = createEmployeeDto;
     const now = DateTime.now().toUTC().toString();
     return this.employeeService.create({
-      user_id : owner_id,
+      // user_id : owner_id,
       clinic_id,
       branch_id,
       data: {
-        password: await this.authService.hashPassword(
+        password: await hashPassword(
           createEmployeeDto.password,
         ),
         person_information: {
@@ -91,7 +90,7 @@ export class EmployeeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.employeeService.findOne(+id);
+    // return this.employeeService.findOne(+id);
   }
 
   @Patch(':id')
@@ -99,11 +98,11 @@ export class EmployeeController {
     @Param('id') id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ) {
-    return this.employeeService.update(+id, updateEmployeeDto);
+    // return this.employeeService.update(+id, updateEmployeeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.employeeService.remove(+id);
+    // return this.employeeService.remove(+id);
   }
 }

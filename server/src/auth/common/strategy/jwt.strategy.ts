@@ -5,15 +5,18 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from '../../../config/config.enum';
 import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
-import { $Enums, customer, developer } from '@prisma/client';
+import { $Enums, customer, developer, employee } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
 import { JwtUser } from '../type/auth';
+import { Roles } from '../enum/role.enum';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
     private readonly customerService: CustomerService,
+    private readonly employeeService: EmployeeService,
     private readonly developerService: DeveloperService,
   ) {
     super({
@@ -31,14 +34,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any): Promise<UnauthorizedException | JwtUser> {
     // This payload will be the decrypted token payload you provided when signing the token
 
-    const { email, role, user_id } = payload;
+    const { email, role, user_id, uid } = payload;
 
-    let user: customer | developer;
-    const { owner, developer } = $Enums.roles;
+    let user: customer | employee | developer;
+    const { owner, employee, developer } = Roles;
 
     switch (role) {
       case owner:
         user = await this.customerService.findOne({ email: email });
+        break;
+      case employee:
+        user = await this.employeeService.findOne({ employee_uid: uid });
         break;
       case developer:
         user = await this.developerService.findOne(email);
@@ -55,7 +61,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       id: user_id,
       email,
       roles: [role],
-      ...(role === $Enums.roles.owner && { package: user['package'] }),
+      ...(role === owner && { package: user['package'] }),
+      ...(role === employee && { uid: user['employee_uid'] }),
     };
   }
 }

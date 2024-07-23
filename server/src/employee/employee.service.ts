@@ -16,12 +16,12 @@ export class EmployeeService {
   ) {}
 
   async create({
-    user_id,
+    // user_id,
     clinic_id,
     branch_id,
     data,
   }: {
-    user_id: string;
+    // user_id: string;
     clinic_id: number;
     branch_id: number;
     data: Except<Prisma.employeeCreateInput, 'employee_id' | 'employee_uid'>;
@@ -72,15 +72,33 @@ export class EmployeeService {
     return this.prisma.employee.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} employee`;
+  findOne(where: Prisma.employeeWhereUniqueInput) {
+    return this.prisma.employee.findUnique({
+      where: {
+        ...where,
+        AND: {
+          person_information: {
+            deleted_at: null,
+          },
+        },
+      },
+    });
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
     return `This action updates a #${id} employee`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} employee`;
+  remove(where: Prisma.employeeWhereUniqueInput) {
+    return this.prisma.employee.update({
+      where,
+      data: {
+        person_information: {
+          update: {
+            deleted_at: new Date(),
+          },
+        },
+      },
+    });
   }
 }

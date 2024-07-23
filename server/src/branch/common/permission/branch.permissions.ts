@@ -14,4 +14,7 @@ export const permissions: Permissions<Role, Subject, Actions> = {
     can(Actions.update, 'branch', { owner_id: user.id });
     can(Actions.delete, 'branch', { owner_id: user.id });
   },
+  employee({ user, can }) { 
+    can(Actions.read, 'branch');
+  },
 };

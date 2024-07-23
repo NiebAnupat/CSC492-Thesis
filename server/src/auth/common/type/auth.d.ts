@@ -1,21 +1,23 @@
-import { $Enums, customer, developer } from '@prisma/client';
+import { $Enums, customer, developer, employee } from '@prisma/client';
 import { Role } from 'src/auth/common/type/roles';
 
 export type ValidateUserResponse = {
+  uid?: string;
   user_id: string;
-  email: string;
+  email?: string;
   roles: Role[];
   package?: $Enums.packages;
 };
 
 export type UserWithRole = {
-  _user: customer | developer;
+  _user: customer | employee | developer;
   roles: Role[];
 };
 
 export type JwtUser = {
   id: string;
-  email: string;
+  uid?: string;
+  email?: string;
   roles: Role[];
   package?: $Enums.packages;
 };
