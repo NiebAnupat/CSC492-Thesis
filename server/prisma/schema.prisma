@@ -95,6 +95,7 @@ model branch {
   update_at           DateTime?             @default(now()) @db.Timestamp(6)
   deleted_at          DateTime?             @db.Timestamp(6)
   edit_by             String?               @db.VarChar
+  is_deleted           Boolean               @default(false)
   appointment         appointment[]
   audit_log           audit_log[]
   clinic              clinic?               @relation(fields: [clinic_id], references: [clinic_id])

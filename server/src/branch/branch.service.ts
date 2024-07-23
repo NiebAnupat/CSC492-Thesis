@@ -66,14 +66,17 @@ export class BranchService {
           },
         },
       },
-      where: { clinic_id },
+      where: { clinic_id , is_deleted: false },
       orderBy: { branch_id: 'asc' },
     });
   }
 
   findOne(where: Prisma.branchWhereUniqueInput) {
     return this.prisma.branch.findUnique({
-      where,
+      where: {
+        ...where,
+        is_deleted: false,
+      },
       include: {
         clinic: {
           select: {
@@ -107,6 +110,6 @@ export class BranchService {
   }
 
   remove(where: Prisma.branchWhereUniqueInput) {
-    return this.prisma.branch.delete({ where });
+    return this.prisma.branch.update({ where, data: { is_deleted: true } });
   }
 }

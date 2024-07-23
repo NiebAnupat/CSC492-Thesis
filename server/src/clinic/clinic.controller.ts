@@ -108,9 +108,8 @@ export class ClinicController {
     return this.clinicService.findAll();
   }
 
-  // @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
-  // @Get('branchs')
 
+  // TODO: Make get clinic from user_id for each role
   @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
   @Get(':clinic_id')
   async findOne(
