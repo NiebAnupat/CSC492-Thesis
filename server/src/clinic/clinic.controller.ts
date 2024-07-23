@@ -15,19 +15,19 @@ import {
 } from '@nestjs/common';
 import { ClinicService } from './clinic.service';
 import { CreateClinicDto } from './dto/create-clinic-dto';
-import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
-import { JwtUser } from '../auth/utils/type/auth';
+import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
+import { JwtUser } from '../auth/common/type/auth';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
-import { Roles } from '../auth/utils/enum/role.enum';
+import { Roles } from '../auth/common/enum/role.enum';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { toAny } from 'src/utils/toAny';
 import { Response } from 'express';
 import { UploadLogoDto } from './dto/upload-logo-dto';
 import { FileStorageService } from '../file-storage/file-storage.service';
 import { clinic } from '@prisma/client';
-import { GetClinicHook } from './utils/permissions/hooks/clinic.get.hook';
-import { PostClinicHook } from './utils/permissions/hooks/clinic.post.hook';
-import { DeleteClinicHook } from './utils/permissions/hooks/clinic.delete.hook';
+import { GetClinicHook } from './common/permissions/hooks/clinic.get.hook';
+import { PostClinicHook } from './common/permissions/hooks/clinic.post.hook';
+import { DeleteClinicHook } from './common/permissions/hooks/clinic.delete.hook';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('clinic')
@@ -147,10 +147,11 @@ export class ClinicController {
     }
 
     const created_clinic = await this.clinicService.create({
-      clinic_name: data.clinic_name,
+      clinic_name_en: data.clinic_name_en,
+      clinic_name_th: data.clinic_name_th,
       clinic_initial: data.clinic_initial,
       clinic_description: data.clinic_description,
-      logo_filename: 'default_logo.png',
+      logo_filename: 'default_clinic_logo.png',
       customer: {
         connect: {
           customer_id,

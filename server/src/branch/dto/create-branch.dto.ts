@@ -3,7 +3,11 @@ import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 export class CreateBranchDto {
   @IsNotEmpty()
   @IsString()
-  branch_name: string;
+  branch_name_th: string;
+
+  @IsNotEmpty()
+  @IsString()
+  branch_name_en : string;
 
   @IsString()
   address_line_1: string;

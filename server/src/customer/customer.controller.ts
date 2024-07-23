@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
 import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { toAny } from 'src/utils/toAny';
-import { CustomerHook } from './utils/permissions/customer.hook';
+import { CustomerHook } from './common/permissions/customer.hook';
 
 @Controller('customer')
 export class CustomerController {

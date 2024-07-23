@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { DeveloperService } from './developer.service';
 import { excludeFromList } from '../utils/exclude';
-import { JwtAuthGuard } from '../auth/utils/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
 
 @Controller('developer')
 export class DeveloperController {

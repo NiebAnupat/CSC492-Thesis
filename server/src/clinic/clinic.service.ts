@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, employee } from '@prisma/client';
 import { log } from 'console';
 import { PrismaService } from 'nestjs-prisma';
 
@@ -27,7 +27,19 @@ export class ClinicService {
           owner_id: where.owner_id,
         },
         include: {
-          branchs: true,
+          branchs: {
+            include: {
+              person_information: {
+                where: {
+                  deleted_at: null,
+                },
+                select: {
+                  person_information_id: true,
+                  role: true,
+                },
+              },
+            },
+          },
           customer: {
             select: {
               customer_id: true,
@@ -36,7 +48,7 @@ export class ClinicService {
         },
       });
     } catch (error) {
-      log(error);
+      log(typeof error);
     }
   }
 

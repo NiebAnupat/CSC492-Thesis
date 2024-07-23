@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectS3, S3 } from 'nestjs-s3';
 import { ConfigKey } from 'src/config/config.enum';
 import { AWSConfig } from 'src/config/config.interface';
-import { FileResponse } from './utils/types/FileRespones';
+import { FileResponse } from './utils/common/FileRespones';
 import { MemoryStoredFile } from 'nestjs-form-data';
 
 @Injectable()

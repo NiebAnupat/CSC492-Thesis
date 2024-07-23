@@ -7,9 +7,9 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from 'src/config/config.enum';
 import { AppConfig } from 'src/config/config.interface';
 import { GoogleOauthController } from './google-oauth.controller';
-import { GoogleOauthStrategy } from './utils/strategy/google-oauth.strategy.ts';
-import { JwtStrategy } from './utils/strategy/jwt.strategy';
-import { LocalStrategy } from './utils/strategy/local.strategy';
+import { GoogleOauthStrategy } from './common/strategy/google-oauth.strategy.ts';
+import { JwtStrategy } from './common/strategy/jwt.strategy';
+import { LocalStrategy } from './common/strategy/local.strategy';
 import { PrismaService } from 'nestjs-prisma';
 import { DeveloperModule } from '../developer/developer.module';
 
@@ -33,6 +33,6 @@ import { DeveloperModule } from '../developer/developer.module';
     JwtStrategy,
     LocalStrategy,
   ],
-  exports: [],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CustomerService } from '../customer/customer.service';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { EmployeeService } from 'src/employee/employee.service';
+import { Roles } from 'src/auth/common/enum/role.enum';
+import { v7 } from 'uuid';
+import { log } from 'console';
 
 @Injectable()
 export class UniqueIdService {
   constructor(
     private readonly customerService: CustomerService,
-    // @Inject(forwardRef(() => ClinicService))
     private readonly clinicService: ClinicService,
-  ) {}
+  ) { }
+  
+  getUUID(): string { 
+    return v7();
+  }
 
   async generateCustomerId(): Promise<string> {
     const customer = await this.customerService.findAll();
@@ -25,5 +32,23 @@ export class UniqueIdService {
     // Will be DE01 DE02 DE03
     const branchNumber = branchs.length + 1;
     return `${clinic_initial}${String(branchNumber).padStart(2, '0')}`;
+  }
+
+  async generateEmployeeId(
+    clinic_id: number,
+    branch_id: number,
+  ): Promise<string> {
+    const clinic = await this.clinicService.findOne({ clinic_id });
+    const { branchs } = clinic;
+    const branch = branchs.find((branch) => branch.branch_id === branch_id);
+    const fistTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
+    const branchEmployees = branch.person_information.filter(
+      (person) => person.role === Roles.employee,
+    );
+    log({branchEmployees})
+    const employeeNumber = branchEmployees.length + 1;
+    // Exemple : branch_name_en is Dental Clinic
+    // Will be DEE01 DEE02 DEE03
+    return `${fistTwoLetter}E${String(employeeNumber).padStart(2, '0')}`;
   }
 }

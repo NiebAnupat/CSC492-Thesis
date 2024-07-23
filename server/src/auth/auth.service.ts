@@ -12,9 +12,9 @@ import { UniqueIdService } from '../unique-id/unique-id.service';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
 import { DateTime } from 'luxon';
 import { PrismaService } from 'nestjs-prisma';
-import { UserWithRole, ValidateUserResponse } from './utils/type/auth';
+import { UserWithRole, ValidateUserResponse } from './common/type/auth';
 import { DeveloperService } from '../developer/developer.service';
-import { Roles } from './utils/enum/role.enum';
+import { Roles } from './common/enum/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -67,14 +67,9 @@ export class AuthService {
         customer_person_info: {
           create: {
             ...customer.person_info,
-            // citizen_id: customer.person_info.citizen_id,
-            // gender: customer.person_info.gender,
-            // telephone: customer.person_info.telephone,
-            // first_name: customer.person_info.first_name,
-            // last_name: customer.person_info.last_name,
-            role: $Enums.roles.owner,
-            create_at: DateTime.now().toISO(),
-            update_at: DateTime.now().toISO(),
+            role: Roles.owner,
+            create_at: DateTime.now().toUTC().toString(),
+            update_at: DateTime.now().toUTC().toString(),
             // edit_by: undefined
           },
         },
@@ -178,7 +173,7 @@ export class AuthService {
     throw new NotFoundException();
   }
 
-  private hashPassword(password: string): Promise<string> {
+  hashPassword(password: string): Promise<string> {
     const saltRounds = 13;
     return hash(password, saltRounds);
   }
