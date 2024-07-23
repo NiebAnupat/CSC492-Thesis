@@ -12,6 +12,7 @@ import { JwtStrategy } from './common/strategy/jwt.strategy';
 import { LocalStrategy } from './common/strategy/local.strategy';
 import { PrismaService } from 'nestjs-prisma';
 import { DeveloperModule } from '../developer/developer.module';
+import { EmployeeModule } from 'src/employee/employee.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { DeveloperModule } from '../developer/developer.module';
       inject: [ConfigService],
     }),
     CustomerModule,
+    EmployeeModule,
     DeveloperModule,
   ],
   controllers: [AuthController, GoogleOauthController],

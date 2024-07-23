@@ -5,15 +5,18 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from '../../../config/config.enum';
 import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
-import { $Enums, customer, developer } from '@prisma/client';
+import { $Enums, customer, developer, employee } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
 import { JwtUser } from '../type/auth';
+import { Roles } from '../enum/role.enum';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
     private readonly customerService: CustomerService,
+    private readonly employeeService: EmployeeService,
     private readonly developerService: DeveloperService,
   ) {
     super({
@@ -33,12 +36,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const { email, role, user_id } = payload;
 
-    let user: customer | developer;
-    const { owner, developer } = $Enums.roles;
+    let user: customer | employee | developer ;
+    const { owner, employee ,developer } = Roles;
 
     switch (role) {
       case owner:
         user = await this.customerService.findOne({ email: email });
+        break;
+      case employee:
+        // user = await this.customerService.findOne({  });
         break;
       case developer:
         user = await this.developerService.findOne(email);

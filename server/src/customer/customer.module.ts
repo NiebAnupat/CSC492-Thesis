@@ -14,7 +14,7 @@ import { permissions } from './common/permissions/customer.permissions';
     DeveloperModule,
   ],
   controllers: [CustomerController],
-  providers: [CustomerService, JwtStrategy],
+  providers: [CustomerService],
   exports: [CustomerService],
 })
 export class CustomerModule {}

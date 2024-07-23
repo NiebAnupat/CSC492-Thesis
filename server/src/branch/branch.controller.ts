@@ -102,6 +102,6 @@ export class BranchController {
     if (!clinic) return new ConflictException('Branch not found');
     const branch_deleted = await this.branchService.remove({ branch_id });
     if (!branch_deleted) return new ConflictException('Branch not deleted');
-    return { message: `Branch ID ${branch_id} is deleted` };
+    return { message: `Branch ID ${branch_id} is deleted (soft)` };
   }
 }
