@@ -1,4 +1,3 @@
-import { AnyObject } from '@casl/ability/dist/types/types';
 import {
   BadRequestException,
   Injectable,
@@ -6,8 +5,6 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import {
-  AuthorizableRequest,
-  AuthorizableUser,
   SubjectBeforeFilterHook,
 } from 'nest-casl';
 import { Roles } from 'src/auth/common/enum/role.enum';

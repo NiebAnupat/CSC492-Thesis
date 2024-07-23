@@ -44,16 +44,17 @@ export class EmployeeService {
       });
     // link employee to branch
     // TODO: if user role is owner, use 1st employee as owner to link edit_by
-    await this.prisma.person_information.update({
-      where: { person_information_id },
-      data: {
-        branch: {
-          connect: {
-            branch_id,
-          },
-        },
-      },
-    });
+    // FIXME: Change relation to branch from person_information to employee
+    // await this.prisma.person_information.update({
+    //   where: { person_information_id },
+    //   data: {
+    //     branch: {
+    //       connect: {
+    //         branch_id,
+    //       },
+    //     },
+    //   },
+    // });
     log('Relational data linked');
 
     const new_employee = await this.prisma.employee.findUnique({

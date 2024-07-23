@@ -51,20 +51,21 @@ export class BranchService {
         branch_name_th: true,
         branch_name_en: true,
         clinic: { select: { owner_id: true } },
-        person_information: {
-          select: {
-            person_information_id: true,
-            role: true,
-            first_name: true,
-            last_name: true,
-            employee: {
-              select: {
-                employee_id: true,
-                employee_uid: true,
-              },
-            },
-          },
-        },
+        // FIXME: Change relation to branch from person_information to employee
+        // person_information: {
+        //   select: {
+        //     person_information_id: true,
+        //     role: true,
+        //     first_name: true,
+        //     last_name: true,
+        //     employee: {
+        //       select: {
+        //         employee_id: true,
+        //         employee_uid: true,
+        //       },
+        //     },
+        //   },
+        // },
       },
       where: { clinic_id , is_deleted: false },
       orderBy: { branch_id: 'asc' },
@@ -83,20 +84,21 @@ export class BranchService {
             owner_id: true,
           },
         },
-        person_information: {
-          select: {
-            person_information_id: true,
-            role: true,
-            first_name: true,
-            last_name: true,
-            employee: {
-              select: {
-                employee_id: true,
-                employee_uid: true,
-              },
-            },
-          },
-        },
+        // FIXME: Change relation to branch from person_information to employee
+        // person_information: {
+        //   select: {
+        //     person_information_id: true,
+        //     role: true,
+        //     first_name: true,
+        //     last_name: true,
+        //     employee: {
+        //       select: {
+        //         employee_id: true,
+        //         employee_uid: true,
+        //       },
+        //     },
+        //   },
+        // },
       },
     });
   }
