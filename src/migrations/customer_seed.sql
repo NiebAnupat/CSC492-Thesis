@@ -17,8 +17,7 @@ INSERT INTO
         create_at,
         update_at,
         edit_by,
-        deleted_at,
-        branch_id
+        deleted_at
     )
 VALUES (
         'TH',
@@ -37,7 +36,6 @@ VALUES (
         'owner'::roles,
         now(),
         now(),
-        NULL,
         NULL,
         NULL
     );
