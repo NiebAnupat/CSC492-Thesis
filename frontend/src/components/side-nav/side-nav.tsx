@@ -88,7 +88,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
                 return (
                   <Link
                     key={idx}
-                    href={'/Owner'+subItem.path}
+                    href={'/Auth'+subItem.path}
                     className={`${subItem.path === pathname ? 'font-bold' : ''
                       }`}
                   >
@@ -102,7 +102,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
       ) : (
         // Single Item
         <Link
-          href={'/Owner'+item.path}
+          href={'/Auth'+item.path}
           className={`flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-zinc-100 ${item.path === pathname ? 'bg-zinc-100' : ''
             }`}
         >
