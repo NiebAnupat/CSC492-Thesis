@@ -36,7 +36,7 @@ export class BranchController {
   @Post()
   async create(@Body() createBranchDto: CreateBranchDto, @Req() req: any) {
     const user: JwtUser = req.user as JwtUser;
-    let owner_id;
+    let owner_id : string;
     switch (user.roles[0]) {
       case Roles.developer:
         owner_id = 'TestID';
@@ -47,13 +47,17 @@ export class BranchController {
       default:
         return new ConflictException('User not found');
     }
-   const clinic = await this.clinicService.findOne({ owner_id: user.id });
-      if (!clinic) {
-        throw new NotFoundException('Clinic not found');
-      }
-      const { clinic_id } = clinic;({ owner_id });
+    const clinic = await this.clinicService.findOne({ owner_id: user.id });
+    if (!clinic) {
+      throw new NotFoundException('Clinic not found');
+    }
+    const { clinic_id } = clinic;
     if (!clinic_id) return new ConflictException('Clinic not found');
-    return this.branchService.create({ clinic_id, data: createBranchDto });
+    return this.branchService.create({
+      user_id: user.id,
+      clinic_id,
+      data: createBranchDto,
+    });
   }
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)

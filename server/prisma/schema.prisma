@@ -95,7 +95,6 @@ model branch {
   update_at           DateTime?             @default(now()) @db.Timestamp(6)
   deleted_at          DateTime?             @db.Timestamp(6)
   edit_by             String?               @db.VarChar
-  is_deleted          Boolean               @default(false)
   clinic_id           Int?
   appointment         appointment[]
   audit_log           audit_log[]

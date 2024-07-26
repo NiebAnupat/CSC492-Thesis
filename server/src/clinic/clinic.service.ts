@@ -29,13 +29,16 @@ export class ClinicService {
         include: {
           branchs: {
             include: {
-              person_information: {
-                where: {
-                  deleted_at: null,
-                },
+              employee: {
                 select: {
-                  person_information_id: true,
-                  role: true,
+                  employee_uid: true,
+                  employee_id: true,
+                  person_information: {
+                    select: {
+                      first_name: true,
+                      last_name: true,
+                    },
+                  },
                 },
               },
             },

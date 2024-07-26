@@ -57,7 +57,6 @@ export class EmployeeController {
     const { branch_id } = createEmployeeDto;
     const now = DateTime.now().toUTC().toString();
     return this.employeeService.create({
-      // user_id : owner_id,
       clinic_id,
       branch_id,
       data: {

@@ -42,9 +42,7 @@ export class UniqueIdService {
     const { branchs } = clinic;
     const branch = branchs.find((branch) => branch.branch_id === branch_id);
     const fistTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
-    const branchEmployees = branch.person_information.filter(
-      (person) => person.role === Roles.employee,
-    );
+    const branchEmployees = branch.employee
     log({branchEmployees})
     const employeeNumber = branchEmployees.length + 1;
     // Exemple : branch_name_en is Dental Clinic
