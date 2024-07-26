@@ -30,32 +30,21 @@ export class EmployeeService {
       clinic_id,
       branch_id,
     );
-    let { person_information_id, employee_uid } =
-      await this.prisma.employee.create({
-        select: {
-          person_information_id: true,
-          employee_uid: true,
+    let { employee_uid } = await this.prisma.employee.create({
+      select: {
+        employee_uid: true,
+        employee_id: true,
+        person_information: true,
+      },
+      data: {
+        employee_uid: this.uniqueIdService.getUUID(),
+        employee_id,
+        branch: {
+          connect: { branch_id },
         },
-        data: {
-          employee_uid: this.uniqueIdService.getUUID(),
-          employee_id,
-          ...data,
-        },
-      });
-    // link employee to branch
-    // TODO: if user role is owner, use 1st employee as owner to link edit_by
-    // FIXME: Change relation to branch from person_information to employee
-    // await this.prisma.person_information.update({
-    //   where: { person_information_id },
-    //   data: {
-    //     branch: {
-    //       connect: {
-    //         branch_id,
-    //       },
-    //     },
-    //   },
-    // });
-    log('Relational data linked');
+        ...data,
+      },
+    });
 
     const new_employee = await this.prisma.employee.findUnique({
       select: {
