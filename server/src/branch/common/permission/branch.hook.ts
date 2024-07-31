@@ -4,9 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import {
-  SubjectBeforeFilterHook,
-} from 'nest-casl';
+import { SubjectBeforeFilterHook } from 'nest-casl';
 import { Roles } from 'src/auth/common/enum/role.enum';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { BranchService } from 'src/branch/branch.service';

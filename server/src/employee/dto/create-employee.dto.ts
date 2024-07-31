@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
-  IsOptional,
   IsStrongPassword,
   ValidateNested,
 } from 'class-validator';
@@ -16,7 +15,7 @@ export class CreateEmployeeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  branch_id : number;
+  branch_id: number;
 
   @IsNotEmpty()
   @IsObject()

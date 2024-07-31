@@ -14,7 +14,7 @@ import { CustomerModule } from 'src/customer/customer.module';
     ClinicModule,
     CustomerModule,
     EmployeeModule,
-    ClinicModule
+    ClinicModule,
   ],
   controllers: [BranchController],
   providers: [PrismaService, BranchService],

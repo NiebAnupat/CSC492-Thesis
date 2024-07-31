@@ -16,7 +16,7 @@ import { ClinicModule } from 'src/clinic/clinic.module';
     ClinicModule,
   ],
   controllers: [EmployeeController],
-  providers: [PrismaService, EmployeeService,],
+  providers: [PrismaService, EmployeeService],
   exports: [EmployeeService],
 })
 export class EmployeeModule {}

@@ -7,7 +7,7 @@ export class CreateBranchDto {
 
   @IsNotEmpty()
   @IsString()
-  branch_name_en : string;
+  branch_name_en: string;
 
   @IsString()
   address_line_1: string;

@@ -3,15 +3,20 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../../auth.service';
 import { $Enums } from '@prisma/client';
+import { Roles } from '../enum/role.enum';
+import { Request } from 'express';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalEmailStrategy extends PassportStrategy(
+  Strategy,
+  `${Roles.owner}, ${Roles.developer}`,
+) {
   constructor(private authService: AuthService) {
     super({ usernameField: 'email' });
   }
 
   async validate(email: string, password: string): Promise<any> {
-    const user = await this.authService.validateUser(email, password);
+    const user = await this.authService.validateUser({ email, password });
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -32,5 +37,43 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       default:
         throw new UnauthorizedException();
     }
+  }
+}
+
+@Injectable()
+export class LocalEmployeeStrategy extends PassportStrategy(
+  Strategy,
+  Roles.employee,
+) {
+  constructor(private authService: AuthService) {
+    super({ usernameField: 'employee_id' , passReqToCallback: true});
+  }
+
+  async validate(
+    req: Request,
+    employee_id: string,
+    password: string,
+  ): Promise<any> {
+    const { branch_id } = req.body;
+    const user = await this.authService.validateUser({
+      employee_id,
+      password,
+      branch_id,
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.roles[0] !== Roles.employee) {
+      throw new UnauthorizedException();
+    }
+
+    
+
+    return this.authService.employee_login({
+      employee_id: user.user_id,
+      branch_id: user.branch_id,
+    });
   }
 }

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateBranchDto } from './dto/update-branch.dto';
 import { PrismaService } from 'nestjs-prisma';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
-import { Prisma, employee } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { EmployeeService } from 'src/employee/employee.service';
 import { hashPassword } from 'src/utils/hashPassword';
 import { CustomerService } from 'src/customer/customer.service';
@@ -74,6 +73,12 @@ export class BranchService {
     return this.findOne({ branch_id: newBranch.branch_id });
   }
 
+  findFirst(where: Prisma.branchWhereInput) {
+    return this.prisma.branch.findFirst({
+      where: { ...where, deleted_at: null },
+    });
+  }
+
   findAll() {
     return this.prisma.branch.findMany();
   }
@@ -133,7 +138,6 @@ export class BranchService {
   }
 
   update(id: number, data: Prisma.branchUpdateInput) {
-    // return `This action updates a #${id} branch ${updateBranchDto}`;
     return this.prisma.branch.update({
       where: { branch_id: id },
       data,

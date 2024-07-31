@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from '../../../config/config.enum';
 import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
-import { $Enums, customer, developer, employee } from '@prisma/client';
+import { customer, developer, employee } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
 import { JwtUser } from '../type/auth';
 import { Roles } from '../enum/role.enum';

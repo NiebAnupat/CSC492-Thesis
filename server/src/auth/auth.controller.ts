@@ -13,12 +13,15 @@ import { DateTime } from 'luxon';
 import { Response } from 'express';
 import { LocalAuthGuard } from './common/guard/local-auth.guard';
 import { CreateDeveloperDto } from '../developer/dto/create-developer.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from './common/enum/role.enum';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @UseGuards(LocalAuthGuard)
+  // TODO : Implement Auth for employee & dentist
+  //#region Login Section
+  @UseGuards(AuthGuard(`${Roles.owner}, ${Roles.developer}`))
   @Post('/customer/login')
   async login(@Req() req, @Res() res: Response) {
     const { access_token } = req.user;
@@ -27,6 +30,19 @@ export class AuthController {
       .status(HttpStatus.OK)
       .send({
         message: 'Customer logged in successfully',
+      })
+      .end();
+  }
+
+  @UseGuards(AuthGuard(Roles.employee))
+  @Post('/employee/login')
+  async employee_login(@Req() req, @Res() res: Response) {
+    const { access_token } = req.user;
+    this.setAccessTokenCookie(res, access_token);
+    res
+      .status(HttpStatus.OK)
+      .send({
+        message: 'Employee logged in successfully',
       })
       .end();
   }
@@ -43,7 +59,9 @@ export class AuthController {
       })
       .end();
   }
+  //#endregion
 
+  //#region Register Section
   @Post('/customer/register')
   async register(
     @Body() createCustomerDto: CreateCustomerDto,
@@ -75,8 +93,7 @@ export class AuthController {
       })
       .end();
   }
-
-  // Implement : Auth for employee & dentist
+  //#endregion
 
   private setAccessTokenCookie(res: Response, access_token: string) {
     res.cookie('access_token', access_token, {

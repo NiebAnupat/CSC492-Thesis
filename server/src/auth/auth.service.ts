@@ -5,47 +5,36 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { $Enums, customer, developer } from '@prisma/client';
+import { $Enums, customer, developer, employee } from '@prisma/client';
 import { CustomerService } from '../customer/customer.service';
 import { compare } from 'bcrypt';
 import { UniqueIdService } from '../unique-id/unique-id.service';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
 import { DateTime } from 'luxon';
-import { PrismaService } from 'nestjs-prisma';
-import { UserWithRole, ValidateUserResponse } from './common/type/auth';
+import {
+  UserWithRole,
+  Credentials,
+  ValidateUserResponse,
+} from './common/type/auth';
 import { DeveloperService } from '../developer/developer.service';
 import { Roles } from './common/enum/role.enum';
 import { hashPassword } from '../utils/hashPassword';
+import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
+import { EmployeeService } from 'src/employee/employee.service';
+import { BranchService } from 'src/branch/branch.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    private readonly branchService: BranchService,
     private readonly customerService: CustomerService,
+    private readonly employeeService: EmployeeService,
     private readonly jwtService: JwtService,
     private readonly uniqueIdService: UniqueIdService,
     private readonly developerService: DeveloperService,
   ) {}
 
-  customer_login({
-    customer_id,
-    email,
-    customer_provider,
-  }: {
-    customer_id: string;
-    email: string;
-    customer_provider: $Enums.customer_providers;
-  }): { access_token: string } {
-    return {
-      access_token: this.jwtService.sign({
-        user_id: customer_id,
-        email,
-        provider: customer_provider,
-        role: $Enums.roles.owner,
-      }),
-    };
-  }
-
+  //#region Customer Section
   async customer_register(
     customer: CreateCustomerDto,
   ): Promise<{ access_token: string }> {
@@ -87,6 +76,95 @@ export class AuthService {
       });
   }
 
+  customer_login({
+    customer_id,
+    email,
+    customer_provider,
+  }: {
+    customer_id: string;
+    email: string;
+    customer_provider: $Enums.customer_providers;
+  }): { access_token: string } {
+    return {
+      access_token: this.jwtService.sign({
+        user_id: customer_id,
+        email,
+        provider: customer_provider,
+        role: Roles.owner,
+      }),
+    };
+  }
+  //#endregion
+  //#region Employee Section
+  async employee_register(
+    data: CreateEmployeeDto,
+    create_by: string,
+  ): Promise<{ access_token: string }> {
+    // check for citizen_id is not empty
+    if (!data.person_info.citizen_id)
+      throw new BadRequestException('Citizen ID is required');
+
+    // check for employee already exists
+    const isEmployeeExits = await this.employeeService.checkEmployeeExist({
+      branch_id: data.branch_id,
+      citizen_id: data.person_info.citizen_id,
+    });
+
+    if (isEmployeeExits)
+      throw new BadRequestException('Employee already exists');
+
+    const { clinic_id } = await this.branchService.findFirst({
+      branch_id: data.branch_id,
+    });
+    const now = DateTime.now().toUTC().toString();
+    return this.employeeService
+      .create({
+        clinic_id,
+        branch_id: data.branch_id,
+        data: {
+          ...data,
+          password: await hashPassword(data.password),
+          person_information: {
+            create: {
+              ...data.person_info,
+              role: Roles.employee,
+              create_at: now,
+              update_at: now,
+              edit_by: create_by,
+            },
+          },
+        },
+      })
+      .then((user) => {
+        return this.employee_login({
+          employee_id: user.employee_id,
+          branch_id: user.branch_id,
+        });
+      })
+      .catch((error) => {
+        throw new InternalServerErrorException(error);
+      });
+  }
+
+  employee_login({
+    employee_id,
+    branch_id,
+  }: {
+    employee_id: string;
+    branch_id: number;
+  }): {
+    access_token: string;
+  } {
+    return {
+      access_token: this.jwtService.sign({
+        user_id: employee_id,
+        branch_id: branch_id,
+        role: Roles.employee,
+      }),
+    };
+  }
+  //#endregion
+  //#region Developer Section
   async developer_register({
     email,
     password,
@@ -121,22 +199,24 @@ export class AuthService {
       access_token: this.jwtService.sign({
         user_id: dev_id,
         email,
-        role: $Enums.roles.developer,
+        role: Roles.developer,
       }),
     };
   }
+  //#endregion
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<ValidateUserResponse> {
-    const { owner, developer } = $Enums.roles;
-    const { _user, roles } = await this.getUserWithRole(email);
+  async validateUser(data: Credentials): Promise<ValidateUserResponse> {
+    const { owner, employee, developer } = Roles;
+    const { email, password, employee_id, branch_id } = data;
+    const { _user, roles } = await this.getUserWithRole({
+      email,
+      employee_id,
+      branch_id,
+    });
 
-    let user: customer | developer;
+    let user: customer | employee | developer;
     switch (roles[0]) {
       case owner:
-        // customer section
         user = _user as customer;
         if (
           user.provider === $Enums.customer_providers.google ||
@@ -149,6 +229,17 @@ export class AuthService {
             package: user.package,
           };
         } else throw new BadRequestException('Invalid password');
+      case employee:
+        // employee section
+        user = _user as employee;
+        if (await compare(password, user.password)) {
+          return {
+            user_id: user.employee_id,
+            branch_id: user.branch_id,
+            roles: [employee],
+          };
+        }
+        break;
       case developer:
         // developer section
         user = _user as developer;
@@ -165,13 +256,20 @@ export class AuthService {
     }
   }
 
-  private async getUserWithRole(email: string): Promise<UserWithRole> {
-    let user: customer | developer;
+  private async getUserWithRole(
+    data: Credentials,
+  ): Promise<UserWithRole> {
+    const { email, employee_id, branch_id } = data;
+    let user: customer | employee | developer;
+    if (employee_id && branch_id) {
+      user = await this.employeeService.findFirst({ employee_id, branch_id });
+      if (user) return { _user: user, roles: [Roles.employee] };
+      else throw new NotFoundException();
+    }
     user = await this.customerService.findOne({ email });
     if (user) return { _user: user, roles: [Roles.owner] };
     user = await this.developerService.findOne(email);
     if (user) return { _user: user, roles: [Roles.developer] };
     throw new NotFoundException();
   }
- 
 }

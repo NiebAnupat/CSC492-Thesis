@@ -21,7 +21,6 @@ import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { toAny } from 'src/utils/toAny';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { JwtUser } from 'src/auth/common/type/auth';
-import { Roles } from 'src/auth/common/enum/role.enum';
 import { BranchHook } from './common/permission/branch.hook';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
@@ -36,17 +35,17 @@ export class BranchController {
   @Post()
   async create(@Body() createBranchDto: CreateBranchDto, @Req() req: any) {
     const user: JwtUser = req.user as JwtUser;
-    let owner_id : string;
-    switch (user.roles[0]) {
-      case Roles.developer:
-        owner_id = 'TestID';
-        break;
-      case Roles.owner:
-        owner_id = user.id;
-        break;
-      default:
-        return new ConflictException('User not found');
-    }
+    // let owner_id: string;
+    // switch (user.roles[0]) {
+    //   case Roles.developer:
+    //     owner_id = 'TestID';
+    //     break;
+    //   case Roles.owner:
+    //     owner_id = user.id;
+    //     break;
+    //   default:
+    //     return new ConflictException('User not found');
+    // }
     const clinic = await this.clinicService.findOne({ owner_id: user.id });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');

@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { PrismaService } from 'nestjs-prisma';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
-import { Roles } from 'src/auth/common/enum/role.enum';
-import { employee, Prisma, branch } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { Except } from 'type-fest';
-import { log } from 'console';
 
 @Injectable()
 export class EmployeeService {
@@ -16,7 +13,6 @@ export class EmployeeService {
   ) {}
 
   async create({
-    // user_id,
     clinic_id,
     branch_id,
     data,
@@ -30,7 +26,7 @@ export class EmployeeService {
       clinic_id,
       branch_id,
     );
-    let { employee_uid } = await this.prisma.employee.create({
+    const { employee_uid } = await this.prisma.employee.create({
       select: {
         employee_uid: true,
         employee_id: true,
@@ -50,12 +46,17 @@ export class EmployeeService {
       select: {
         employee_uid: true,
         employee_id: true,
-        person_information: true,
+        branch_id: true,
+        // person_information: true,
       },
       where: { employee_uid },
     });
 
     return new_employee;
+  }
+
+  findFirst(where: Prisma.employeeWhereInput) {
+    return this.prisma.employee.findFirst({ where });
   }
 
   findAll() {
@@ -75,8 +76,27 @@ export class EmployeeService {
     });
   }
 
+  // check does exist by branch_id and citizen_id
+  async checkEmployeeExist({
+    branch_id,
+    citizen_id,
+  }: {
+    branch_id: number;
+    citizen_id: string;
+  }) {
+    return !!(await this.prisma.employee.findFirst({
+      where: {
+        branch_id,
+        person_information: {
+          citizen_id,
+          deleted_at: null,
+        },
+      },
+    }));
+  }
+
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
+    return `This action updates a #${id} employee ${updateEmployeeDto}`;
   }
 
   remove(where: Prisma.employeeWhereUniqueInput) {

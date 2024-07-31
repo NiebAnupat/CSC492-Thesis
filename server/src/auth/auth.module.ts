@@ -9,10 +9,14 @@ import { AppConfig } from 'src/config/config.interface';
 import { GoogleOauthController } from './google-oauth.controller';
 import { GoogleOauthStrategy } from './common/strategy/google-oauth.strategy.ts';
 import { JwtStrategy } from './common/strategy/jwt.strategy';
-import { LocalStrategy } from './common/strategy/local.strategy';
+import {
+  LocalEmailStrategy,
+  LocalEmployeeStrategy,
+} from './common/strategy/local.strategy';
 import { PrismaService } from 'nestjs-prisma';
 import { DeveloperModule } from '../developer/developer.module';
 import { EmployeeModule } from 'src/employee/employee.module';
+import { BranchModule } from 'src/branch/branch.module';
 
 @Module({
   imports: [
@@ -24,6 +28,7 @@ import { EmployeeModule } from 'src/employee/employee.module';
       inject: [ConfigService],
     }),
     CustomerModule,
+    BranchModule,
     EmployeeModule,
     DeveloperModule,
   ],
@@ -33,7 +38,8 @@ import { EmployeeModule } from 'src/employee/employee.module';
     AuthService,
     GoogleOauthStrategy,
     JwtStrategy,
-    LocalStrategy,
+    LocalEmailStrategy,
+    LocalEmployeeStrategy,
   ],
   exports: [AuthService],
 })

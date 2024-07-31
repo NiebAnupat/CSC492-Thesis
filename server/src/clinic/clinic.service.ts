@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, employee } from '@prisma/client';
-import { log } from 'console';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
@@ -51,7 +50,7 @@ export class ClinicService {
         },
       });
     } catch (error) {
-      log(typeof error);
+      throw new Error(error);
     }
   }
 

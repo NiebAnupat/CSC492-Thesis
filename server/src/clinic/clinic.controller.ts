@@ -25,9 +25,7 @@ import { Response } from 'express';
 import { UploadLogoDto } from './dto/upload-logo-dto';
 import { FileStorageService } from '../file-storage/file-storage.service';
 import { clinic } from '@prisma/client';
-import { GetClinicHook } from './common/permissions/hooks/clinic.get.hook';
-import { PostClinicHook } from './common/permissions/hooks/clinic.post.hook';
-import { DeleteClinicHook } from './common/permissions/hooks/clinic.delete.hook';
+import { ClinicHook } from './common/permissions/clinic.hook';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('clinic')
@@ -37,7 +35,7 @@ export class ClinicController {
     private readonly fileStorageService: FileStorageService,
   ) {}
 
-  @UseAbility(Actions.update, toAny('clinic'), PostClinicHook)
+  @UseAbility(Actions.update, toAny('clinic'), ClinicHook)
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post('logo')
   async uploadLogo(
@@ -69,7 +67,7 @@ export class ClinicController {
     }
   }
 
-  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
+  @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get('logo')
   async getLogo(@Req() req: any, @Res() res: Response) {
     try {
@@ -102,15 +100,14 @@ export class ClinicController {
     }
   }
 
-  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
+  @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get()
   async findAll() {
     return this.clinicService.findAll();
   }
 
-
   // TODO: Make get clinic from user_id for each role
-  @UseAbility(Actions.read, toAny('clinic'), GetClinicHook)
+  @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get(':clinic_id')
   async findOne(
     @Param('clinic_id', new DefaultValuePipe(0), ParseIntPipe)
@@ -131,7 +128,7 @@ export class ClinicController {
     const user: JwtUser = req.user;
     let customer_id = '';
     if (user.roles[0] === Roles.developer) customer_id = 'TestID';
-    if (user.roles[0] === Roles.owner) customer_id = user.id;
+    else if (user.roles[0] === Roles.owner) customer_id = user.id;
 
     // check clinic is exist
     const clinic = await this.clinicService.findOne({
@@ -161,7 +158,7 @@ export class ClinicController {
     return res.status(HttpStatus.CREATED).json(created_clinic).end();
   }
 
-  @UseAbility(Actions.delete, toAny('clinic'), DeleteClinicHook)
+  @UseAbility(Actions.delete, toAny('clinic'), ClinicHook)
   @Delete()
   async remove(@Req() req: any) {
     const user: JwtUser = req.user;

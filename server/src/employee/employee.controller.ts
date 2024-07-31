@@ -10,7 +10,6 @@ import {
   HttpStatus,
   Res,
   Req,
-  ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
@@ -38,17 +37,17 @@ export class EmployeeController {
   @Post()
   async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto) {
     const user: JwtUser = req.user;
-    let owner_id;
-    switch (user.roles[0]) {
-      case Roles.developer:
-        owner_id = 'TestID';
-        break;
-      case Roles.owner:
-        owner_id = user.id;
-        break;
-      default:
-        return new ConflictException('User not found');
-    }
+    // let owner_id;
+    // switch (user.roles[0]) {
+    //   case Roles.developer:
+    //     owner_id = 'TestID';
+    //     break;
+    //   case Roles.owner:
+    //     owner_id = user.id;
+    //     break;
+    //   default:
+    //     return new ConflictException('User not found');
+    // }
     const clinic = await this.clinicService.findOne({ owner_id: user.id });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
@@ -60,9 +59,7 @@ export class EmployeeController {
       clinic_id,
       branch_id,
       data: {
-        password: await hashPassword(
-          createEmployeeDto.password,
-        ),
+        password: await hashPassword(createEmployeeDto.password),
         person_information: {
           create: {
             ...createEmployeeDto.person_info,
@@ -90,6 +87,7 @@ export class EmployeeController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     // return this.employeeService.findOne(+id);
+    throw new Error(`Method not implemented. ${id}`);
   }
 
   @Patch(':id')
@@ -98,10 +96,12 @@ export class EmployeeController {
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ) {
     // return this.employeeService.update(+id, updateEmployeeDto);
+    throw new Error(`Method not implemented. ${id} ${updateEmployeeDto}`);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     // return this.employeeService.remove(+id);
+    throw new Error(`Method not implemented. ${id}`);
   }
 }
