@@ -137,8 +137,7 @@ export class AuthService {
       })
       .then((user) => {
         return this.employee_login({
-          employee_id: user.employee_id,
-          branch_id: user.branch_id,
+          employee_uid: user.employee_uid,
         });
       })
       .catch((error) => {
@@ -146,19 +145,12 @@ export class AuthService {
       });
   }
 
-  employee_login({
-    employee_id,
-    branch_id,
-  }: {
-    employee_id: string;
-    branch_id: number;
-  }): {
+  employee_login({ employee_uid }: { employee_uid: string }): {
     access_token: string;
   } {
     return {
       access_token: this.jwtService.sign({
-        user_id: employee_id,
-        branch_id: branch_id,
+        user_id: employee_uid,
         role: Roles.employee,
       }),
     };
@@ -234,8 +226,7 @@ export class AuthService {
         user = _user as employee;
         if (await compare(password, user.password)) {
           return {
-            user_id: user.employee_id,
-            branch_id: user.branch_id,
+            user_id: user.employee_uid,
             roles: [employee],
           };
         }
@@ -256,9 +247,7 @@ export class AuthService {
     }
   }
 
-  private async getUserWithRole(
-    data: Credentials,
-  ): Promise<UserWithRole> {
+  private async getUserWithRole(data: Credentials): Promise<UserWithRole> {
     const { email, employee_id, branch_id } = data;
     let user: customer | employee | developer;
     if (employee_id && branch_id) {

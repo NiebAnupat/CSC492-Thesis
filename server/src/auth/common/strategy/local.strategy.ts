@@ -72,8 +72,7 @@ export class LocalEmployeeStrategy extends PassportStrategy(
     
 
     return this.authService.employee_login({
-      employee_id: user.user_id,
-      branch_id: user.branch_id,
+      employee_uid: user.user_id,
     });
   }
 }
