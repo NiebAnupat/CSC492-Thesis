@@ -9,10 +9,11 @@ import { Roles } from 'src/auth/common/enum/role.enum';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { BranchService } from 'src/branch/branch.service';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { CASLHook } from 'src/common/interfaces/CASLHook.interface';
 import { HookRequest } from 'src/common/types/hook.request';
 
 @Injectable()
-export class BranchHook implements SubjectBeforeFilterHook {
+export class BranchHook implements SubjectBeforeFilterHook , CASLHook{
   constructor(
     private readonly clinicService: ClinicService,
     private readonly branchService: BranchService,
@@ -30,7 +31,7 @@ export class BranchHook implements SubjectBeforeFilterHook {
     }
   }
 
-  private async methodGet(request: HookRequest, user: JwtUser) {
+   async methodGet(request: HookRequest, user: JwtUser) {
     let url = request.url;
     // remove /api from url
     url = url.replace('/api/branch', '');
@@ -60,7 +61,7 @@ export class BranchHook implements SubjectBeforeFilterHook {
         .clinic.owner_id,
     };
   }
-  private async methodPatchOrDelete(request: HookRequest) {
+   async methodPatchOrDelete(request: HookRequest) {
     const { branch_id } = request.params;
     if (!branch_id) {
       throw new BadRequestException('Branch ID is required');

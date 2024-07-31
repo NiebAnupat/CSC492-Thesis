@@ -34,7 +34,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any): Promise<UnauthorizedException | JwtUser> {
     // This payload will be the decrypted token payload you provided when signing the token
 
-    const { email, role, user_id, uid } = payload;
+    const { email, role, user_id } = payload;
+    
 
     let user: customer | employee | developer;
     const { owner, employee, developer } = Roles;
@@ -44,7 +45,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         user = await this.customerService.findOne({ email: email });
         break;
       case employee:
-        user = await this.employeeService.findOne({ employee_uid: uid });
+        user = await this.employeeService.findOne({ employee_uid : user_id });
         break;
       case developer:
         user = await this.developerService.findOne(email);
@@ -59,10 +60,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       id: user_id,
-      email,
       roles: [role],
+      ...(email && { email }),
       ...(role === owner && { package: user['package'] }),
-      ...(role === employee && { uid: user['employee_uid'] }),
     };
   }
 }

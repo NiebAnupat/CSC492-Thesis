@@ -9,17 +9,16 @@ export type Subject = Subjects<{
 
 export const permissions: Permissions<Role, Subject, Actions> = {
   owner({ user, can }) {
-    can(Actions.create, 'employee').because(
+    // TODO : Get owner_id from hook
+    can(Actions.manage,'employee', { owner_id: user.id }).because(
       'User is the owner of the employee',
     );
-    can(Actions.read, 'employee', { owner_id: user.id }).because(
-      'User is the owner of the employee',
-    );
-    can(Actions.update, 'employee', { owner_id: user.id }).because(
-      'User is the owner of the employee',
-    );
-    can(Actions.delete, 'employee').because(
-      'User is the owner of the employee',
+  },
+
+  // TODO: Add permissions for employee
+  employee({ user, can }) {
+    can(Actions.read, 'employee', { employee_uid: user.id }).because(
+      'User is the employee',
     );
   },
 };

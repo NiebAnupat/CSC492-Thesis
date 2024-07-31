@@ -81,9 +81,10 @@ export class EmployeeController {
       res.status(HttpStatus.NO_CONTENT).send({
         message: 'No employees found',
       });
-    return employees;
+    res.status(HttpStatus.OK).send(employees);
   }
 
+  @UseAbility('read', toAny('employee'))
   @Get(':id')
   findOne(@Param('id') id: string) {
     // return this.employeeService.findOne(+id);

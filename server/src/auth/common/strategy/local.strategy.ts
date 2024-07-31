@@ -67,9 +67,7 @@ export class LocalEmployeeStrategy extends PassportStrategy(
 
     if (user.roles[0] !== Roles.employee) {
       throw new UnauthorizedException();
-    }
-
-    
+    } 
 
     return this.authService.employee_login({
       employee_uid: user.user_id,

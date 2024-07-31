@@ -7,10 +7,11 @@ import { Prisma, clinic } from '@prisma/client';
 import { SubjectBeforeFilterHook } from 'nest-casl';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { CASLHook } from 'src/common/interfaces/CASLHook.interface';
 import { HookRequest } from 'src/common/types/hook.request';
 
 @Injectable()
-export class ClinicHook implements SubjectBeforeFilterHook {
+export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
   constructor(private readonly clinicService: ClinicService) {}
   async run(request: HookRequest): Promise<any> {
     const user: JwtUser = request.user as JwtUser;
@@ -24,7 +25,7 @@ export class ClinicHook implements SubjectBeforeFilterHook {
         throw new BadRequestException('Method not allowed');
     }
   }
-  private async methodGet(request: HookRequest, user: JwtUser) {
+  async methodGet(request: HookRequest, user: JwtUser) {
     const url = request.url;
     if (url === '/api/clinic/logo/' || url === '/api/clinic/logo') {
       return await this.getClinic({ owner_id: user.id });
@@ -37,7 +38,7 @@ export class ClinicHook implements SubjectBeforeFilterHook {
     }
     return await this.getClinic({ clinic_id: parseInt(clinic_id) });
   }
-  private async methodPatchOrDelete(request: HookRequest) {
+  async methodPatchOrDelete(request: HookRequest) {
     const user: JwtUser = request.user as JwtUser;
     return await this.getClinic({ owner_id: user.id });
   }
