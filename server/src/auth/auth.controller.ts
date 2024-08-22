@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Req,
@@ -15,10 +16,20 @@ import { LocalAuthGuard } from './common/guard/local-auth.guard';
 import { CreateDeveloperDto } from '../developer/dto/create-developer.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from './common/enum/role.enum';
+import { JwtUser } from './common/type/auth';
+import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
+  
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  async profile(@Req() req: any) {
+    const user: JwtUser = req.user;
+    return user;
+  }
+
   // TODO : Implement Auth for employee & dentist
   //#region Login Section
   @UseGuards(AuthGuard(`${Roles.owner}, ${Roles.developer}`))

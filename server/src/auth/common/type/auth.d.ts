@@ -28,4 +28,5 @@ export type JwtUser = {
   email?: string;
   roles: Role[];
   package?: $Enums.packages;
+  owner_id?: string;
 };

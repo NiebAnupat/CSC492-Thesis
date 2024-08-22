@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from '../../../config/config.enum';
 import { AppConfig } from '../../../config/config.interface';
 import { CustomerService } from '../../../customer/customer.service';
-import { customer, developer, employee } from '@prisma/client';
+import { customer, developer, employee, branch } from '@prisma/client';
 import { DeveloperService } from '../../../developer/developer.service';
 import { JwtUser } from '../type/auth';
 import { Roles } from '../enum/role.enum';
@@ -33,9 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any): Promise<UnauthorizedException | JwtUser> {
     // This payload will be the decrypted token payload you provided when signing the token
-
     const { email, role, user_id } = payload;
-    
 
     let user: customer | employee | developer;
     const { owner, employee, developer } = Roles;
@@ -45,7 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         user = await this.customerService.findOne({ email: email });
         break;
       case employee:
-        user = await this.employeeService.findOne({ employee_uid : user_id });
+        user = await this.employeeService.findOne({ employee_uid: user_id });
         break;
       case developer:
         user = await this.developerService.findOne(email);
@@ -63,6 +61,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       roles: [role],
       ...(email && { email }),
       ...(role === owner && { package: user['package'] }),
+      ...(role === employee && { owner_id: user['branch']['clinic'].owner_id }),
     };
   }
 }

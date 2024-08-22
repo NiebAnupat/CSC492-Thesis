@@ -22,6 +22,8 @@ import { toAny } from 'src/utils/toAny';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { BranchHook } from './common/permission/branch.hook';
+import { Roles } from 'src/auth/common/enum/role.enum';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
@@ -29,6 +31,7 @@ export class BranchController {
   constructor(
     private readonly branchService: BranchService,
     private readonly clinicService: ClinicService,
+    private readonly employeeService: EmployeeService,
   ) {}
 
   @UseAbility(Actions.create, toAny('branch'))
@@ -69,12 +72,28 @@ export class BranchController {
   @Get('/clinic')
   async findBranchesByClinic(@Req() req: any) {
     const user: JwtUser = req.user as JwtUser;
-    const clinic = await this.clinicService.findOne({ owner_id: user.id });
-    if (!clinic) return new NotFoundException('Clinic not found');
-    const branchs = await this.branchService.findBranchesByClinic(
-      clinic.clinic_id,
-    );
-    return branchs;
+
+    switch (user.roles[0]) {
+      case Roles.developer:
+        return { owner_id: 'TestID' };
+      case Roles.owner: {
+        const clinic = await this.clinicService.findOne({ owner_id: user.id });
+        if (!clinic) return new NotFoundException('Clinic not found');
+        const branchs = await this.branchService.findBranchesByClinic(
+          clinic.clinic_id,
+        );
+        return branchs;
+      }
+      case Roles.employee: {
+        const { branch} = await this.employeeService.findOne({
+          employee_uid: user.id,
+        });
+
+        return branch;
+      }
+      default:
+        return new ConflictException('User not found');
+    }
   }
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)

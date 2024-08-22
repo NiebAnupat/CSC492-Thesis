@@ -9,6 +9,7 @@ import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { CASLHook } from 'src/common/interfaces/CASLHook.interface';
 import { HookRequest } from 'src/common/types/hook.request';
+import { getUrl } from 'src/utils/getUrl';
 
 @Injectable()
 export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
@@ -19,15 +20,16 @@ export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
     switch (method) {
       case 'GET':
         return await this.methodGet(request, user);
-      case 'PATCH' || 'DELETE':
+      case 'PATCH':
+      case 'DELETE':
         return await this.methodPatchOrDelete(request);
       default:
         throw new BadRequestException('Method not allowed');
     }
   }
   async methodGet(request: HookRequest, user: JwtUser) {
-    const url = request.url;
-    if (url === '/api/clinic/logo/' || url === '/api/clinic/logo') {
+    const url = getUrl(request.url);
+    if (url === '/clinic/logo/' || url === '/clinic/logo') {
       return await this.getClinic({ owner_id: user.id });
     }
 

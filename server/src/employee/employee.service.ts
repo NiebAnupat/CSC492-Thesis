@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { PrismaService } from 'nestjs-prisma';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, clinic } from '@prisma/client';
 import { Except } from 'type-fest';
 
 @Injectable()
 export class EmployeeService {
+  private readonly logger = new Logger(EmployeeService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly uniqueIdService: UniqueIdService,
@@ -56,7 +57,14 @@ export class EmployeeService {
   }
 
   findFirst(where: Prisma.employeeWhereInput) {
-    return this.prisma.employee.findFirst({ where });
+    this.logger.log('findFirst');
+    return this.prisma.employee.findFirst({ where , include: {
+      branch: {
+        include: {
+          clinic: true
+        }
+      }
+    }});
   }
 
   findAll() {
@@ -64,6 +72,7 @@ export class EmployeeService {
   }
 
   findOne(where: Prisma.employeeWhereUniqueInput) {
+    this.logger.log('findOne');
     return this.prisma.employee.findUnique({
       where: {
         ...where,
@@ -73,6 +82,13 @@ export class EmployeeService {
           },
         },
       },
+      include: {
+        branch: {
+          include: {
+            clinic: true
+          }
+        }
+      }
     });
   }
 

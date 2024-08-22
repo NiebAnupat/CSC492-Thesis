@@ -33,6 +33,7 @@ export class EmployeeController {
     private readonly employeeService: EmployeeService,
   ) {}
 
+
   @UseAbility('create', toAny('employee'))
   @Post()
   async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto) {
@@ -48,6 +49,7 @@ export class EmployeeController {
     //   default:
     //     return new ConflictException('User not found');
     // }
+
     const clinic = await this.clinicService.findOne({ owner_id: user.id });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
