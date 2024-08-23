@@ -14,6 +14,7 @@ const APPConfig = registerAs(
       stage: process.env.STAGE,
       port: process.env.PORT || 4000,
       jwtSecret: process.env.JWT_SECRET,
+      encodeSecret: process.env.ENCODE_SECRET,
       originsURL: process.env.ORIGINS_WHITELIST.split(' '),
       domainName: process.env.DOMAIN_NAME,
     }) as AppConfig,

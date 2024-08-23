@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -21,8 +22,8 @@ import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
-  
+  constructor(private readonly authService: AuthService) {}
+
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async profile(@Req() req: any) {
@@ -47,7 +48,10 @@ export class AuthController {
 
   @UseGuards(AuthGuard(Roles.employee))
   @Post('/employee/login')
-  async employee_login(@Req() req, @Res() res: Response) {
+  async employee_login(
+    @Req() req,
+    @Res() res: Response,
+  ) {
     const { access_token } = req.user;
     this.setAccessTokenCookie(res, access_token);
     res

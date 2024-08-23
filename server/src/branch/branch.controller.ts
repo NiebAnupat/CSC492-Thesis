@@ -12,6 +12,8 @@ import {
   Req,
   ParseIntPipe,
   DefaultValuePipe,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { BranchService } from './branch.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
@@ -24,11 +26,13 @@ import { JwtUser } from 'src/auth/common/type/auth';
 import { BranchHook } from './common/permission/branch.hook';
 import { Roles } from 'src/auth/common/enum/role.enum';
 import { EmployeeService } from 'src/employee/employee.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
 export class BranchController {
   constructor(
+    private readonly authService : AuthService,
     private readonly branchService: BranchService,
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
@@ -60,6 +64,13 @@ export class BranchController {
       clinic_id,
       data: createBranchDto,
     });
+  }
+
+  @UseAbility(Actions.create, toAny('branch'))
+  @Post('/generateEmployeeAuthUrl')
+  async generateEmployeeAuthUrl(@Body() data: { branch_id: number }) {
+    // TODO : Can generate url for only owner or manager of the branch
+    return this.authService.generateBranchEmployeeAuthUrl(data.branch_id);
   }
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)

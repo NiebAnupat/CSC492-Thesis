@@ -2,6 +2,7 @@ export interface AppConfig {
   stage: string;
   port: number;
   jwtSecret: string;
+  encodeSecret: string;
   originsURL: string[];
   domainName: string;
 }

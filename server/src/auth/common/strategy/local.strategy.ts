@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../../auth.service';
 import { $Enums } from '@prisma/client';
 import { Roles } from '../enum/role.enum';
@@ -11,11 +11,13 @@ export class LocalEmailStrategy extends PassportStrategy(
   Strategy,
   `${Roles.owner}, ${Roles.developer}`,
 ) {
+  private readonly logger = new Logger(LocalEmailStrategy.name);
   constructor(private authService: AuthService) {
     super({ usernameField: 'email' });
   }
 
   async validate(email: string, password: string): Promise<any> {
+    this.logger.log('Validating customer');
     const user = await this.authService.validateUser({ email, password });
     if (!user) {
       throw new UnauthorizedException();
@@ -45,8 +47,10 @@ export class LocalEmployeeStrategy extends PassportStrategy(
   Strategy,
   Roles.employee,
 ) {
-  constructor(private authService: AuthService) {
-    super({ usernameField: 'employee_id' , passReqToCallback: true});
+  private readonly logger = new Logger(LocalEmployeeStrategy.name);
+
+  constructor(private readonly authService: AuthService) {
+    super({ usernameField: 'employee_id', passReqToCallback: true });
   }
 
   async validate(
@@ -54,7 +58,15 @@ export class LocalEmployeeStrategy extends PassportStrategy(
     employee_id: string,
     password: string,
   ): Promise<any> {
-    const { branch_id } = req.body;
+    this.logger.log('Validating employee');
+    // const { branch_id } = req.body;
+    const { b, iv } = req.query;
+    console.log({ b: b.toString().trim().replaceAll(' ', '') });
+    const branch_id = await this.authService.decodeBranchEmployeeAuthUrl({
+      encryptedText: b.toString().trim().replaceAll(' ', ''),
+      iv: iv.toString(),
+    });
+    console.log({ branch_id });
     const user = await this.authService.validateUser({
       employee_id,
       password,
@@ -67,7 +79,7 @@ export class LocalEmployeeStrategy extends PassportStrategy(
 
     if (user.roles[0] !== Roles.employee) {
       throw new UnauthorizedException();
-    } 
+    }
 
     return this.authService.employee_login({
       employee_uid: user.user_id,

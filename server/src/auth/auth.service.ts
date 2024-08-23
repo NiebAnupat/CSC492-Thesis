@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -22,9 +24,14 @@ import { hashPassword } from '../utils/hashPassword';
 import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
 import { EmployeeService } from 'src/employee/employee.service';
 import { BranchService } from 'src/branch/branch.service';
+import { ConfigService } from '@nestjs/config';
+import { AppConfig } from 'src/config/config.interface';
+import { ConfigKey } from 'src/config/config.enum';
+import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 @Injectable()
 export class AuthService {
+  private readonly _appConfig: AppConfig;
   constructor(
     private readonly branchService: BranchService,
     private readonly customerService: CustomerService,
@@ -32,7 +39,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly uniqueIdService: UniqueIdService,
     private readonly developerService: DeveloperService,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    if (!this._appConfig)
+      this._appConfig = this.config.get<AppConfig>(ConfigKey.App);
+  }
 
   //#region Customer Section
   async customer_register(
@@ -197,6 +208,29 @@ export class AuthService {
   }
   //#endregion
 
+  //#region Branch Section
+  async generateBranchEmployeeAuthUrl(branch_id: number): Promise<string> {
+    const iv = randomBytes(16);
+    const key = this._appConfig.encodeSecret;
+    const algorithm = 'aes-256-cbc';
+    const cipher = createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(branch_id.toString(), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return `${this._appConfig.originsURL[0]}/auth/employee/login?b=${encrypted}&iv=${iv.toString('hex')}`;
+  }
+
+  async decodeBranchEmployeeAuthUrl(encrypted: {
+    encryptedText: string;
+    iv: string;
+  }): Promise<number> {
+    const key = this._appConfig.encodeSecret;
+    const algorithm = 'aes-256-cbc';
+    const decipher = createDecipheriv(algorithm, key, Buffer.from(encrypted.iv, 'hex'));
+    let decrypted = decipher.update(encrypted.encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return parseInt(decrypted);
+  }
+  //#endregion
   async validateUser(data: Credentials): Promise<ValidateUserResponse> {
     const { owner, employee, developer } = Roles;
     const { email, password, employee_id, branch_id } = data;
