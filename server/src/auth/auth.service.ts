@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -31,6 +32,7 @@ import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly _appConfig: AppConfig;
   constructor(
     private readonly branchService: BranchService,
@@ -49,6 +51,7 @@ export class AuthService {
   async customer_register(
     customer: CreateCustomerDto,
   ): Promise<{ access_token: string }> {
+    this.logger.log('Customer register');
     // check for customer already exists
     const isEmailExits = await this.customerService.findOne({
       email: customer.email,
@@ -95,7 +98,8 @@ export class AuthService {
     customer_id: string;
     email: string;
     customer_provider: $Enums.customer_providers;
-  }): { access_token: string } {
+    }): { access_token: string } {
+    this.logger.log('Customer logged in successfully');
     return {
       access_token: this.jwtService.sign({
         user_id: customer_id,
@@ -111,6 +115,7 @@ export class AuthService {
     data: CreateEmployeeDto,
     create_by: string,
   ): Promise<{ access_token: string }> {
+    this.logger.log('Employee register');
     // check for citizen_id is not empty
     if (!data.person_info.citizen_id)
       throw new BadRequestException('Citizen ID is required');
@@ -159,6 +164,7 @@ export class AuthService {
   employee_login({ employee_uid }: { employee_uid: string }): {
     access_token: string;
   } {
+    this.logger.log('Employee logged in successfully');
     return {
       access_token: this.jwtService.sign({
         user_id: employee_uid,
@@ -177,6 +183,7 @@ export class AuthService {
   }): Promise<{
     access_token: string;
   }> {
+    this.logger.log('Developer register');
     // check for developer already exists
     const isEmailExits = await this.developerService.findOne(email);
     if (isEmailExits) throw new BadRequestException('Developer already exists');
@@ -210,12 +217,14 @@ export class AuthService {
 
   //#region Branch Section
   async generateBranchEmployeeAuthUrl(branch_id: number): Promise<string> {
+    this.logger.log('Generating branch employee auth url');
     const iv = randomBytes(16);
     const key = this._appConfig.encodeSecret;
     const algorithm = 'aes-256-cbc';
     const cipher = createCipheriv(algorithm, key, iv);
     let encrypted = cipher.update(branch_id.toString(), 'utf8', 'hex');
     encrypted += cipher.final('hex');
+    // TODO : In future we can use short url service to generate short url
     return `${this._appConfig.originsURL[0]}/auth/employee/login?b=${encrypted}&iv=${iv.toString('hex')}`;
   }
 
@@ -223,15 +232,21 @@ export class AuthService {
     encryptedText: string;
     iv: string;
   }): Promise<number> {
+    this.logger.log('Decoding branch employee auth url');
     const key = this._appConfig.encodeSecret;
     const algorithm = 'aes-256-cbc';
-    const decipher = createDecipheriv(algorithm, key, Buffer.from(encrypted.iv, 'hex'));
+    const decipher = createDecipheriv(
+      algorithm,
+      key,
+      Buffer.from(encrypted.iv, 'hex'),
+    );
     let decrypted = decipher.update(encrypted.encryptedText, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return parseInt(decrypted);
   }
   //#endregion
   async validateUser(data: Credentials): Promise<ValidateUserResponse> {
+    this.logger.log('Validating user');
     const { owner, employee, developer } = Roles;
     const { email, password, employee_id, branch_id } = data;
     const { _user, roles } = await this.getUserWithRole({
@@ -282,6 +297,7 @@ export class AuthService {
   }
 
   private async getUserWithRole(data: Credentials): Promise<UserWithRole> {
+    this.logger.log('Getting user with role');
     const { email, employee_id, branch_id } = data;
     let user: customer | employee | developer;
     if (employee_id && branch_id) {

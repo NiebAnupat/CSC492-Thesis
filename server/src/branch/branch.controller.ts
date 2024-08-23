@@ -70,7 +70,8 @@ export class BranchController {
   @Post('/generateEmployeeAuthUrl')
   async generateEmployeeAuthUrl(@Body() data: { branch_id: number }) {
     // TODO : Can generate url for only owner or manager of the branch
-    return this.authService.generateBranchEmployeeAuthUrl(data.branch_id);
+    const url = await this.authService.generateBranchEmployeeAuthUrl(data.branch_id);
+    return { url };
   }
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)

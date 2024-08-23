@@ -59,14 +59,11 @@ export class LocalEmployeeStrategy extends PassportStrategy(
     password: string,
   ): Promise<any> {
     this.logger.log('Validating employee');
-    // const { branch_id } = req.body;
     const { b, iv } = req.query;
-    console.log({ b: b.toString().trim().replaceAll(' ', '') });
     const branch_id = await this.authService.decodeBranchEmployeeAuthUrl({
-      encryptedText: b.toString().trim().replaceAll(' ', ''),
+      encryptedText: b.toString(),
       iv: iv.toString(),
     });
-    console.log({ branch_id });
     const user = await this.authService.validateUser({
       employee_id,
       password,
