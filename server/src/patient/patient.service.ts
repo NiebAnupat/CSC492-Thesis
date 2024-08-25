@@ -17,7 +17,7 @@ export class PatientService {
     branch_id: number;
     data: Prisma.patientCreateInput;
   }) {
-    this.logger.log('Create patient');
+    this.logger.log('Create');
 
     // check if person_info.citizen_id is already exist
     const isExist = await this.checkPatientExist(
@@ -41,12 +41,12 @@ export class PatientService {
   }
 
   findAll() {
-    this.logger.log('FindAll patient');
+    this.logger.log('FindAll');
     return this.prisma.patient.findMany();
   }
 
   findBranchPatients(branch_id: number) {
-    this.logger.log('FindBranchPatients patient');
+    this.logger.log('FindBranchPatients');
     return this.prisma.patient.findMany({
       where: {
         branch_id,
@@ -55,14 +55,14 @@ export class PatientService {
   }
 
   findCount(where: Prisma.patientWhereInput) {
-    this.logger.log('FindCount patient');
+    this.logger.log('FindCount');
     return this.prisma.patient.count({
       where,
     });
   }
 
   findOne(where: Prisma.patientWhereUniqueInput) {
-    this.logger.log('FindOne patient');
+    this.logger.log('FindOne');
     return this.prisma.patient.findUnique({
       where,
     });
@@ -72,7 +72,7 @@ export class PatientService {
     where: Prisma.patientWhereUniqueInput,
     data: Prisma.patientUpdateInput,
   ) {
-    this.logger.log('Update patient');
+    this.logger.log('Update');
     return this.prisma.patient.update({
       where,
       data,
@@ -80,7 +80,7 @@ export class PatientService {
   }
 
   remove(where: Prisma.patientWhereUniqueInput) {
-    this.logger.log('Remove patient');
+    this.logger.log('Remove');
     return this.prisma.patient.delete({
       where,
     });
