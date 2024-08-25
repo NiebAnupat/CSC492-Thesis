@@ -7,6 +7,7 @@ import { PatientService } from './patient.service';
 @Module({
   imports: [BranchModule],
   controllers: [PatientController],
-  providers: [PrismaService,PatientService],
+  providers: [PrismaService, PatientService],
+  exports: [PatientService],
 })
 export class PatientModule {}

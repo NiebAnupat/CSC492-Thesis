@@ -22,7 +22,8 @@ export class EmployeeService {
     clinic_id: number;
     branch_id: number;
     data: Except<Prisma.employeeCreateInput, 'employee_id' | 'employee_uid'>;
-  }) {
+    }) {
+    // TODO : Move uniqueIdService To Controller
     const employee_id = await this.uniqueIdService.generateEmployeeId(
       clinic_id,
       branch_id,

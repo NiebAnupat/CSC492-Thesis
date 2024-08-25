@@ -1,14 +1,19 @@
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
-  ValidateNested,
+  ValidateNested
 } from 'class-validator';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
 export class CreatePatientDto {
+  @IsOptional()
+  patient_uid: string;
+
+  @IsOptional()
+  hn: string;
+
   @IsOptional()
   current_medication: string;
 
@@ -17,10 +22,6 @@ export class CreatePatientDto {
 
   @IsOptional()
   congenital_disease: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  branch_id: number;
 
   @IsOptional()
   is_pregnant: boolean = false;

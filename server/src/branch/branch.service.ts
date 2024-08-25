@@ -12,9 +12,9 @@ export class BranchService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly customerService: CustomerService,
-    private readonly uniqueIdService: UniqueIdService,
     private readonly employeeService: EmployeeService,
     private readonly clinicService: ClinicService,
+    private readonly uniqueIdService: UniqueIdService,
   ) {}
 
   async create({

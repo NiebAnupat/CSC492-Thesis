@@ -643,7 +643,7 @@ enum genders {
 enum roles {
   admin
   dentist
-  // counter_staff
+  patient
   employee
   manager
   owner

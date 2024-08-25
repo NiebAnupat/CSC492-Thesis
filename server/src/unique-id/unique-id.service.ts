@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CustomerService } from '../customer/customer.service';
-import { ClinicService } from 'src/clinic/clinic.service';
-import { v7 } from 'uuid';
 import { log } from 'console';
+import { ClinicService } from 'src/clinic/clinic.service';
+import { PatientService } from 'src/patient/patient.service';
+import { v7 } from 'uuid';
+import { CustomerService } from '../customer/customer.service';
 
 @Injectable()
 export class UniqueIdService {
   constructor(
     private readonly customerService: CustomerService,
     private readonly clinicService: ClinicService,
+    private readonly patientService: PatientService,
   ) {}
 
   getUUID(): string {
@@ -46,5 +48,18 @@ export class UniqueIdService {
     // Exemple : branch_name_en is Dental Clinic
     // Will be DEE01 DEE02 DEE03
     return `${fistTwoLetter}E${String(employeeNumber).padStart(2, '0')}`;
+  }
+
+  async generateHN( clinic_id: number,
+    branch_id: number,): Promise<string> {
+    const clinic = await this.clinicService.findOne({ clinic_id })
+    const { branchs } = clinic;
+    const branch = branchs.find((branch) => branch.branch_id === branch_id);
+    const firstTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
+    const patient_count = await this.patientService.findCount({ branch_id });
+    const patientNumber = patient_count + 1;
+    // Exemple : branch_name_en is Dental Clinic
+    // Will be DEP00001 DEP00002 DEP00003
+    return `${firstTwoLetter}P${String(patientNumber).padStart(5, '0')}`;
   }
 }

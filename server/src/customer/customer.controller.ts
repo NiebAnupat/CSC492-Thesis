@@ -1,15 +1,16 @@
-import { Controller, Get, Param, Delete, UseGuards } from '@nestjs/common';
-import { CustomerService } from './customer.service';
-import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
-import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
+import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
 import { toAny } from 'src/utils/toAny';
+import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
 import { CustomerHook } from './common/permissions/customer.hook';
+import { CustomerService } from './customer.service';
 
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  // TODO : Implement this method
   // @Post()
   // create(@Body() createCustomerDto: Partial<Prisma>) {
   //   return this.customerService.create(createCustomerDto);

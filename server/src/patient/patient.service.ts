@@ -1,32 +1,36 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
-import { Except } from 'type-fest';
 
 @Injectable()
 export class PatientService {
   private readonly logger = new Logger(PatientService.name);
   constructor(
     private readonly prisma: PrismaService,
-    // private readonly uniqueIdService: UniqueIdService,
   ) {}
   async create({
     branch_id,
     data,
   }: {
     branch_id: number;
-    data: Except<Prisma.patientCreateInput, 'hn' | 'patient_uid'>;
+    data: Prisma.patientCreateInput;
   }) {
     this.logger.log('Create patient');
-    // const hn = await this.uniqueIdService.generateHN(branch_id);
-    // const patient_uid = this.uniqueIdService.getUUID();
-    const hn = 'asd';
-    const patient_uid = 'asd';
+
+    // check if person_info.citizen_id is already exist
+    const isExist = await this.prisma.person_information.findFirst({
+      where: {
+        citizen_id: data.person_information.create.citizen_id,
+      },
+    });
+
+    if (isExist) {
+      throw new BadRequestException('Citizen ID is already exist');
+    }
+
     return this.prisma.patient.create({
       data: {
         ...data,
-        hn,
-        patient_uid,
         branch: {
           connect: {
             branch_id,

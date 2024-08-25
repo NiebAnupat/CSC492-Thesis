@@ -25,6 +25,7 @@ export type UserWithRole = {
 export type JwtUser = {
   id: string;
   uid?: string;
+  branch_id?: number;
   email?: string;
   roles: Role[];
   package?: $Enums.packages;

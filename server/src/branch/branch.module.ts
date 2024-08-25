@@ -1,21 +1,21 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { BranchService } from './branch.service';
-import { BranchController } from './branch.controller';
-import { ClinicModule } from 'src/clinic/clinic.module';
-import { PrismaService } from 'nestjs-prisma';
-import { permissions } from './common/permission/branch.permissions';
 import { CaslModule } from 'nest-casl';
-import { EmployeeModule } from 'src/employee/employee.module';
-import { CustomerModule } from 'src/customer/customer.module';
+import { PrismaService } from 'nestjs-prisma';
 import { AuthModule } from 'src/auth/auth.module';
+import { ClinicModule } from 'src/clinic/clinic.module';
+import { CustomerModule } from 'src/customer/customer.module';
+import { EmployeeModule } from 'src/employee/employee.module';
+import { BranchController } from './branch.controller';
+import { BranchService } from './branch.service';
+import { permissions } from './common/permission/branch.permissions';
 
 @Module({
   imports: [
     CaslModule.forFeature({ permissions }),
     ClinicModule,
     CustomerModule,
-    EmployeeModule,
     ClinicModule,
+    EmployeeModule,
     forwardRef(() => AuthModule),
   ],
   controllers: [BranchController],
