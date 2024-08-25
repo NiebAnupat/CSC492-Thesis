@@ -18,7 +18,9 @@ export class EmployeeService {
     clinic_id: number;
     branch_id: number;
     data: Prisma.employeeCreateInput;
-  }) {
+    }) {
+    
+    this.logger.log('Create employee');
  
     return this.prisma.employee.create({
       select: {
@@ -50,6 +52,7 @@ export class EmployeeService {
   }
 
   findAll() {
+    this.logger.log('findAll');
     return this.prisma.employee.findMany();
   }
 
@@ -81,7 +84,8 @@ export class EmployeeService {
   }: {
     branch_id: number;
     citizen_id: string;
-  }) {
+    }) {
+    this.logger.log('checkEmployeeExist');
     return !!(await this.prisma.employee.findFirst({
       where: {
         branch_id,
@@ -94,11 +98,13 @@ export class EmployeeService {
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+    this.logger.log('update');
     // TODO: implement update employee
     return `This action updates a #${id} employee ${updateEmployeeDto}`;
   }
 
   remove(where: Prisma.employeeWhereUniqueInput) {
+    this.logger.log('remove');
     return this.prisma.employee.update({
       where,
       data: {

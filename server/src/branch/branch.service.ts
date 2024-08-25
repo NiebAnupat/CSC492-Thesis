@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { DateTime } from 'luxon';
 import { PrismaService } from 'nestjs-prisma';
 import { ClinicService } from 'src/clinic/clinic.service';
 
 @Injectable()
 export class BranchService {
+  private readonly logger = new Logger(BranchService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly clinicService: ClinicService,
@@ -18,6 +20,7 @@ export class BranchService {
     clinic_id: number;
     data: Partial<Prisma.branchCreateInput & { branch_display_id: string }>;
   }) {
+    this.logger.log('Create branch');
     const clinic = await this.clinicService.findOne({ clinic_id });
     return this.prisma.branch.create({
       data: {
@@ -36,16 +39,19 @@ export class BranchService {
   }
 
   findFirst(where: Prisma.branchWhereInput) {
+    this.logger.log('findFirst');
     return this.prisma.branch.findFirst({
       where: { ...where, deleted_at: null },
     });
   }
 
   findAll() {
+    this.logger.log('findAll');
     return this.prisma.branch.findMany();
   }
 
   findBranchesByClinic(clinic_id: number) {
+    this.logger.log('findBranchesByClinic');
     return this.prisma.branch.findMany({
       select: {
         branch_id: true,
@@ -75,6 +81,7 @@ export class BranchService {
     where: Prisma.branchWhereUniqueInput,
     include: Prisma.branchInclude = { clinic: { select: { owner_id: true } } },
   ) {
+    this.logger.log('findOne');
     return this.prisma.branch.findUnique({
       where: {
         ...where,
@@ -85,6 +92,7 @@ export class BranchService {
   }
 
   update(id: number, data: Prisma.branchUpdateInput) {
+    this.logger.log('update');
     return this.prisma.branch.update({
       where: { branch_id: id },
       data,
@@ -92,6 +100,7 @@ export class BranchService {
   }
 
   remove(where: Prisma.branchWhereUniqueInput) {
-    return this.prisma.branch.update({ where, data: { deleted_at: null } });
+    this.logger.log('remove');
+    return this.prisma.branch.update({ where, data: { deleted_at: DateTime.now().toUTC().toString() } });
   }
 }

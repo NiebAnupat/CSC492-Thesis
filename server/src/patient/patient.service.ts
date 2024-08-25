@@ -20,20 +20,12 @@ export class PatientService {
     this.logger.log('Create patient');
 
     // check if person_info.citizen_id is already exist
-    const isExist = await this.branchService.findOne(
-      { branch_id },
-      {
-        patient: {
-          where: {
-            person_information: {
-              citizen_id: data.person_information.create.citizen_id,
-            },
-          },
-        },
-      },
+    const isExist = await this.checkPatientExist(
+      branch_id,
+      data.person_information.create.citizen_id,
     );
     if (isExist) {
-      throw new BadRequestException('Citizen ID is already exist');
+      throw new BadRequestException('Patient Citizen ID is already exist');
     }
 
     return this.prisma.patient.create({
@@ -92,5 +84,21 @@ export class PatientService {
     return this.prisma.patient.delete({
       where,
     });
+  }
+
+  async checkPatientExist(branch_id: number, citizen_id: string) {
+    return !!(await this.branchService.findOne(
+      { branch_id },
+      {
+        patient: {
+          where: {
+            person_information: {
+              citizen_id,
+              deleted_at: null,
+            },
+          },
+        },
+      },
+    ));
   }
 }

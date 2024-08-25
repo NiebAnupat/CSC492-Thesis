@@ -54,7 +54,6 @@ export class AuthService {
 
     if (isEmailExits) throw new BadRequestException('Customer already exists');
 
-
     return this.customerService
       .create({
         customer_id: customer.customer_id,
@@ -199,6 +198,7 @@ export class AuthService {
   }
 
   developer_login({ dev_id, email }: { dev_id: string; email: string }) {
+    this.logger.log('Developer login');
     return {
       access_token: this.jwtService.sign({
         user_id: dev_id,
