@@ -4,21 +4,20 @@ import {
   Get,
   HttpStatus,
   Post,
-  Query,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
-import { DateTime } from 'luxon';
-import { Response } from 'express';
-import { LocalAuthGuard } from './common/guard/local-auth.guard';
-import { CreateDeveloperDto } from '../developer/dto/create-developer.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
+import { DateTime } from 'luxon';
+import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
+import { CreateDeveloperDto } from '../developer/dto/create-developer.dto';
+import { AuthService } from './auth.service';
 import { Roles } from './common/enum/role.enum';
-import { JwtUser } from './common/type/auth';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { LocalAuthGuard } from './common/guard/local-auth.guard';
+import { JwtUser } from './common/type/auth';
 
 @Controller('auth')
 export class AuthController {
@@ -48,10 +47,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard(Roles.employee))
   @Post('/employee/login')
-  async employee_login(
-    @Req() req,
-    @Res() res: Response,
-  ) {
+  async employee_login(@Req() req, @Res() res: Response) {
     const { access_token } = req.user;
     this.setAccessTokenCookie(res, access_token);
     res

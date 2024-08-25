@@ -10,9 +10,9 @@ import { useRequestLogging } from './middleware/request-logging';
 
 async function bootstrap() {
   // Create the app
-  const app = await NestFactory.create(AppModule,
-    { logger: ['error', 'warn', 'log', 'debug', 'verbose'] }
-  );
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   useRequestLogging(app);

@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
-import { UniqueIdService } from 'src/unique-id/unique-id.service';
 import { Prisma } from '@prisma/client';
-import { EmployeeService } from 'src/employee/employee.service';
-import { hashPassword } from 'src/utils/hashPassword';
-import { CustomerService } from 'src/customer/customer.service';
+import { PrismaService } from 'nestjs-prisma';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { CustomerService } from 'src/customer/customer.service';
+import { EmployeeService } from 'src/employee/employee.service';
+import { UniqueIdService } from 'src/unique-id/unique-id.service';
+import { hashPassword } from 'src/utils/hashPassword';
 
 @Injectable()
 export class BranchService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly uniqueIdService: UniqueIdService,
     private readonly customerService: CustomerService,
+    private readonly uniqueIdService: UniqueIdService,
     private readonly employeeService: EmployeeService,
     private readonly clinicService: ClinicService,
   ) {}
@@ -109,31 +109,16 @@ export class BranchService {
     });
   }
 
-  findOne(where: Prisma.branchWhereUniqueInput) {
+  findOne(
+    where: Prisma.branchWhereUniqueInput,
+    include: Prisma.branchInclude = { clinic: { select: { owner_id: true } } },
+  ) {
     return this.prisma.branch.findUnique({
       where: {
         ...where,
         deleted_at: null,
       },
-      include: {
-        clinic: {
-          select: {
-            owner_id: true,
-          },
-        },
-        employee: {
-          select: {
-            employee_id: true,
-            employee_uid: true,
-            person_information: {
-              select: {
-                first_name: true,
-                last_name: true,
-              },
-            },
-          },
-        },
-      },
+      include,
     });
   }
 

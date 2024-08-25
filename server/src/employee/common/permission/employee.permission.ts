@@ -10,7 +10,7 @@ export type Subject = Subjects<{
 export const permissions: Permissions<Role, Subject, Actions> = {
   owner({ user, can }) {
     // TODO : Get owner_id from hook (Later)
-    can(Actions.manage,'employee', { owner_id: user.id }).because(
+    can(Actions.manage, 'employee', { owner_id: user.id }).because(
       'User is the owner of the employee',
     );
   },

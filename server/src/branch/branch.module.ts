@@ -16,7 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     CustomerModule,
     EmployeeModule,
     ClinicModule,
-    forwardRef(() => AuthModule)
+    forwardRef(() => AuthModule),
   ],
   controllers: [BranchController],
   providers: [PrismaService, BranchService],

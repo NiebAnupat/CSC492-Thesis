@@ -35,7 +35,7 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
   }
 
   async methodGet(request: HookRequest, user: JwtUser) {
-    let url = getUrl(request.url);
+    const url = getUrl(request.url);
 
     switch (user.roles[0]) {
       case Roles.developer:

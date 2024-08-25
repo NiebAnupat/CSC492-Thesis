@@ -1,7 +1,5 @@
 import {
   BadRequestException,
-  forwardRef,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -98,7 +96,7 @@ export class AuthService {
     customer_id: string;
     email: string;
     customer_provider: $Enums.customer_providers;
-    }): { access_token: string } {
+  }): { access_token: string } {
     this.logger.log('Customer logged in successfully');
     return {
       access_token: this.jwtService.sign({

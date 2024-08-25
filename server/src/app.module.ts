@@ -1,25 +1,26 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { configSchema } from './config/config.schema';
-import { AuthModule } from './auth/auth.module';
-import { configurations } from './config/configuration';
-import { CustomerModule } from './customer/customer.module';
-import { UniqueIdModule } from './unique-id/unique-id.module';
-import { DeveloperModule } from './developer/developer.module';
-import { ClinicModule } from './clinic/clinic.module';
+import { CaslModule } from 'nest-casl';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { PrismaModule, PrismaService } from 'nestjs-prisma';
-import { CaslModule } from 'nest-casl';
-import { Role } from './auth/common/type/roles';
-import { Roles } from './auth/common/enum/role.enum';
 import { S3Module } from 'nestjs-s3';
-import { AWSConfig } from './config/config.interface';
-import { ConfigKey } from './config/config.enum';
-import { FileStorageModule } from './file-storage/file-storage.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { Roles } from './auth/common/enum/role.enum';
+import { Role } from './auth/common/type/roles';
 import { BranchModule } from './branch/branch.module';
+import { ClinicModule } from './clinic/clinic.module';
+import { ConfigKey } from './config/config.enum';
+import { AWSConfig } from './config/config.interface';
+import { configSchema } from './config/config.schema';
+import { configurations } from './config/configuration';
+import { CustomerModule } from './customer/customer.module';
+import { DeveloperModule } from './developer/developer.module';
 import { EmployeeModule } from './employee/employee.module';
+import { FileStorageModule } from './file-storage/file-storage.module';
+import { PatientModule } from './patient/patient.module';
+import { UniqueIdModule } from './unique-id/unique-id.module';
 
 @Module({
   imports: [
@@ -53,11 +54,12 @@ import { EmployeeModule } from './employee/employee.module';
     AuthModule,
     CustomerModule,
     EmployeeModule,
-    UniqueIdModule,
     DeveloperModule,
     FileStorageModule,
     ClinicModule,
     BranchModule,
+    PatientModule,
+    UniqueIdModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

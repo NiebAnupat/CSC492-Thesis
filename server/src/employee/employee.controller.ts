@@ -1,29 +1,29 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
   HttpStatus,
-  Res,
-  Req,
   NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { AccessGuard, UseAbility } from 'nest-casl';
-import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
-import { toAny } from 'src/utils/toAny';
 import { Response } from 'express';
-import { Roles } from 'src/auth/common/enum/role.enum';
 import { DateTime } from 'luxon';
+import { AccessGuard, UseAbility } from 'nest-casl';
+import { Roles } from 'src/auth/common/enum/role.enum';
+import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { hashPassword } from 'src/utils/hashPassword';
+import { toAny } from 'src/utils/toAny';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { EmployeeService } from './employee.service';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('employee')
@@ -32,7 +32,6 @@ export class EmployeeController {
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
   ) {}
-
 
   @UseAbility('create', toAny('employee'))
   @Post()
@@ -89,6 +88,7 @@ export class EmployeeController {
   @UseAbility('read', toAny('employee'))
   @Get(':id')
   findOne(@Param('id') id: string) {
+    // TODO: Implement this method
     // return this.employeeService.findOne(+id);
     throw new Error(`Method not implemented. ${id}`);
   }
@@ -98,12 +98,16 @@ export class EmployeeController {
     @Param('id') id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ) {
+    // TODO: Implement this method
+
     // return this.employeeService.update(+id, updateEmployeeDto);
     throw new Error(`Method not implemented. ${id} ${updateEmployeeDto}`);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
+    // TODO: Implement this method
+
     // return this.employeeService.remove(+id);
     throw new Error(`Method not implemented. ${id}`);
   }

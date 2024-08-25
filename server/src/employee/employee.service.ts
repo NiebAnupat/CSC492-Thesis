@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
-import { Prisma, clinic } from '@prisma/client';
 import { Except } from 'type-fest';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -58,13 +58,16 @@ export class EmployeeService {
 
   findFirst(where: Prisma.employeeWhereInput) {
     this.logger.log('findFirst');
-    return this.prisma.employee.findFirst({ where , include: {
-      branch: {
-        include: {
-          clinic: true
-        }
-      }
-    }});
+    return this.prisma.employee.findFirst({
+      where,
+      include: {
+        branch: {
+          include: {
+            clinic: true,
+          },
+        },
+      },
+    });
   }
 
   findAll() {
@@ -85,10 +88,10 @@ export class EmployeeService {
       include: {
         branch: {
           include: {
-            clinic: true
-          }
-        }
-      }
+            clinic: true,
+          },
+        },
+      },
     });
   }
 
@@ -112,6 +115,7 @@ export class EmployeeService {
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+    // TODO: implement update employee
     return `This action updates a #${id} employee ${updateEmployeeDto}`;
   }
 

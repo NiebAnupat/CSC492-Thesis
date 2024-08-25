@@ -1,38 +1,36 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  NotFoundException,
   ConflictException,
-  Req,
-  ParseIntPipe,
+  Controller,
   DefaultValuePipe,
-  forwardRef,
-  Inject,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { AuthService } from 'src/auth/auth.service';
+import { Roles } from 'src/auth/common/enum/role.enum';
+import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
+import { JwtUser } from 'src/auth/common/type/auth';
+import { ClinicService } from 'src/clinic/clinic.service';
+import { EmployeeService } from 'src/employee/employee.service';
+import { toAny } from 'src/utils/toAny';
 import { BranchService } from './branch.service';
+import { BranchHook } from './common/permission/branch.hook';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
-import { AccessGuard, Actions, UseAbility } from 'nest-casl';
-import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
-import { toAny } from 'src/utils/toAny';
-import { ClinicService } from 'src/clinic/clinic.service';
-import { JwtUser } from 'src/auth/common/type/auth';
-import { BranchHook } from './common/permission/branch.hook';
-import { Roles } from 'src/auth/common/enum/role.enum';
-import { EmployeeService } from 'src/employee/employee.service';
-import { AuthService } from 'src/auth/auth.service';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
 export class BranchController {
   constructor(
-    private readonly authService : AuthService,
+    private readonly authService: AuthService,
     private readonly branchService: BranchService,
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
@@ -70,7 +68,9 @@ export class BranchController {
   @Post('/generateEmployeeAuthUrl')
   async generateEmployeeAuthUrl(@Body() data: { branch_id: number }) {
     // TODO : Can generate url for only owner or manager of the branch
-    const url = await this.authService.generateBranchEmployeeAuthUrl(data.branch_id);
+    const url = await this.authService.generateBranchEmployeeAuthUrl(
+      data.branch_id,
+    );
     return { url };
   }
 
@@ -97,7 +97,7 @@ export class BranchController {
         return branchs;
       }
       case Roles.employee: {
-        const { branch} = await this.employeeService.findOne({
+        const { branch } = await this.employeeService.findOne({
           employee_uid: user.id,
         });
 

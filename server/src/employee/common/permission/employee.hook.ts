@@ -22,10 +22,9 @@ export class EmployeeHook implements SubjectBeforeFilterHook, CASLHook {
   }
 
   methodGet(request: HookRequest, user: JwtUser): Promise<any> {
-    return Promise.resolve({owner_id: user.owner_id});
+    return Promise.resolve({ owner_id: user.owner_id });
   }
   methodPatchOrDelete(request: HookRequest): Promise<any> {
-    
-    return Promise.resolve({owner_id: request.params.owner_id});
+    return Promise.resolve({ owner_id: request.params.owner_id });
   }
 }

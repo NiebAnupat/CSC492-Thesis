@@ -83,7 +83,7 @@ export class ClinicService {
       where: {
         ...params.where,
         deleted_at: null,
-      }
+      },
     });
   }
 

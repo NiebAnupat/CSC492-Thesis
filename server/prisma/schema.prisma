@@ -18,7 +18,7 @@ model developer {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model appointment {
   appointment_id         String                  @id @db.VarChar
-  hn                     String?                 @db.VarChar
+  patient_uid            String?                 @db.VarChar
   dentist_id             String?                 @db.VarChar
   appointment_date       DateTime?               @db.Date
   appointment_time       DateTime?               @db.Time(6)
@@ -35,7 +35,7 @@ model appointment {
   branch                 branch                  @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   dentist                dentist?                @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction, onUpdate: Cascade)
   employee               employee?               @relation(fields: [edit_by], references: [employee_uid], onDelete: NoAction, onUpdate: Cascade)
-  patient                patient?                @relation(fields: [hn], references: [hn], onDelete: NoAction, onUpdate: Cascade)
+  patient                patient?                @relation(fields: [patient_uid], references: [patient_uid], onDelete: NoAction, onUpdate: Cascade)
   treatment_nv_operation treatment_nv_operation? @relation(fields: [nv_operation_id], references: [nv_operation_id], onDelete: NoAction, onUpdate: Cascade)
 }
 
@@ -69,18 +69,18 @@ model customer {
 }
 
 model clinic {
-  clinic_id          Int      @id @default(autoincrement())
-  clinic_name_en     String   @db.VarChar
-  clinic_name_th     String   @db.VarChar
-  clinic_initial     String   @db.VarChar
-  clinic_description String?  @db.Text
-  logo_filename      String   @db.VarChar
-  owner_id           String   @unique @db.VarChar
-  create_at          DateTime @default(now()) @db.Timestamp(6)
-  update_at          DateTime @default(now()) @db.Timestamp(6)
+  clinic_id          Int       @id @default(autoincrement())
+  clinic_name_en     String    @db.VarChar
+  clinic_name_th     String    @db.VarChar
+  clinic_initial     String    @db.VarChar
+  clinic_description String?   @db.Text
+  logo_filename      String    @db.VarChar
+  owner_id           String    @unique @db.VarChar
+  create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at          DateTime  @default(now()) @db.Timestamp(6)
   deleted_at         DateTime? @db.Timestamp(6)
   branchs            branch[]
-  customer           customer @relation(fields: [owner_id], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)
+  customer           customer  @relation(fields: [owner_id], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)
 }
 
 model branch {
@@ -333,7 +333,8 @@ model operation_type {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model patient {
-  hn                       String              @id @db.VarChar
+  patient_uid              String              @id @db.VarChar
+  hn                       String              @db.VarChar
   person_information_id    Int?
   current_medication       String?
   drug_allergy             String?
@@ -353,8 +354,8 @@ model patient {
 model patient_tag {
   patient_tag_record_id Int       @id @default(autoincrement())
   tag_id                Int?
-  hn                    String?   @db.VarChar
-  patient               patient?  @relation(fields: [hn], references: [hn], onDelete: NoAction, onUpdate: Cascade)
+  patient_uid           String?   @db.VarChar
+  patient               patient?  @relation(fields: [patient_uid], references: [patient_uid], onDelete: NoAction, onUpdate: Cascade)
   tag_list              tag_list? @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: Cascade)
 }
 
@@ -480,7 +481,7 @@ model tag_list {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model treatment {
   treatment_id                  String                          @id @db.VarChar
-  hn                            String?                         @db.VarChar
+  patient_uid                   String?                         @db.VarChar
   dentist_id                    String?                         @db.VarChar
   subject                       String?
   objective                     String?
@@ -500,7 +501,7 @@ model treatment {
   branch                        branch?                         @relation(fields: [branch_id], references: [branch_id], onDelete: NoAction, onUpdate: Cascade)
   dentist                       dentist?                        @relation(fields: [dentist_id], references: [dentist_id], onDelete: NoAction, onUpdate: Cascade)
   employee_edited               employee?                       @relation(fields: [edit_by], references: [employee_uid], onDelete: NoAction, onUpdate: Cascade)
-  patient                       patient?                        @relation(fields: [hn], references: [hn], onDelete: NoAction, onUpdate: Cascade)
+  patient                       patient?                        @relation(fields: [patient_uid], references: [patient_uid], onDelete: NoAction, onUpdate: Cascade)
   treatment_document            treatment_document[]
   treatment_nv                  treatment_nv[]
   treatment_operation           treatment_operation[]
