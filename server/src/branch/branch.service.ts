@@ -2,36 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { ClinicService } from 'src/clinic/clinic.service';
-import { CustomerService } from 'src/customer/customer.service';
-import { EmployeeService } from 'src/employee/employee.service';
-import { UniqueIdService } from 'src/unique-id/unique-id.service';
-import { hashPassword } from 'src/utils/hashPassword';
 
 @Injectable()
 export class BranchService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly customerService: CustomerService,
-    private readonly employeeService: EmployeeService,
     private readonly clinicService: ClinicService,
-    private readonly uniqueIdService: UniqueIdService,
   ) {}
 
   async create({
-    user_id,
     clinic_id,
     data,
   }: {
     user_id: string;
     clinic_id: number;
-    data: Partial<Prisma.branchCreateInput>;
+    data: Partial<Prisma.branchCreateInput & { branch_display_id: string }>;
   }) {
-    const branchDisplayId =
-      await this.uniqueIdService.generateBranchDisplayId(clinic_id);
     const clinic = await this.clinicService.findOne({ clinic_id });
-    const newBranch = await this.prisma.branch.create({
+    return this.prisma.branch.create({
       data: {
-        branch_display_id: branchDisplayId,
+        branch_display_id: data.branch_display_id,
         branch_name_th: data.branch_name_th,
         branch_name_en: data.branch_name_en,
         address_line_1: data.address_line_1,
@@ -43,34 +33,6 @@ export class BranchService {
         },
       },
     });
-
-    const { person_information_id } = await this.customerService.findOne({
-      customer_id: user_id,
-    });
-    const employee = await this.employeeService.create({
-      clinic_id,
-      branch_id: newBranch.branch_id,
-      data: {
-        password: await hashPassword('admin'),
-        person_information: {
-          connect: { person_information_id },
-        },
-      },
-    });
-
-    if (!employee) {
-      throw new Error('1st Employee not created');
-    }
-
-    // update branch manager_id & edit_by
-    await this.update(newBranch.branch_id, {
-      branch_manager: {
-        connect: { employee_uid: employee.employee_uid },
-      },
-      edit_by: employee.employee_id,
-    });
-
-    return this.findOne({ branch_id: newBranch.branch_id });
   }
 
   findFirst(where: Prisma.branchWhereInput) {

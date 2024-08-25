@@ -587,12 +587,12 @@ model treatment_record_template {
 model person_information {
   person_information_id              Int        @id @default(autoincrement())
   nationality                        String?    @db.VarChar
-  citizen_id                         String?    @unique(map: "person_information_citizen_id_idx") @db.Char(13)
+  citizen_id                         String?    @db.Char(13)
   gender                             genders?
   prefix                             String?    @db.VarChar
   first_name                         String     @db.VarChar
   last_name                          String     @db.VarChar
-  telephone                          String?    @unique(map: "person_information_telephone_idx") @db.Char(10)
+  telephone                          String?    @db.Char(10)
   address_line_1                     String?    @db.Text
   address_line_2                     String?    @db.Text
   provice_id                         Int?

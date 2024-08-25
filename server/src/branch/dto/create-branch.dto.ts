@@ -9,6 +9,9 @@ export class CreateBranchDto {
   @IsString()
   branch_name_en: string;
 
+  @IsOptional()
+  branch_display_id: string;
+
   @IsString()
   address_line_1: string;
 

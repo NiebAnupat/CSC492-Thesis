@@ -5,28 +5,26 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { $Enums, customer, developer, employee } from '@prisma/client';
-import { CustomerService } from '../customer/customer.service';
 import { compare } from 'bcrypt';
-import { UniqueIdService } from '../unique-id/unique-id.service';
-import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { DateTime } from 'luxon';
+import { BranchService } from 'src/branch/branch.service';
+import { ConfigKey } from 'src/config/config.enum';
+import { AppConfig } from 'src/config/config.interface';
+import { EmployeeService } from 'src/employee/employee.service';
+import { CustomerService } from '../customer/customer.service';
+import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
+import { DeveloperService } from '../developer/developer.service';
+import { hashPassword } from '../utils/hashPassword';
+import { Roles } from './common/enum/role.enum';
 import {
-  UserWithRole,
   Credentials,
+  UserWithRole,
   ValidateUserResponse,
 } from './common/type/auth';
-import { DeveloperService } from '../developer/developer.service';
-import { Roles } from './common/enum/role.enum';
-import { hashPassword } from '../utils/hashPassword';
-import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
-import { EmployeeService } from 'src/employee/employee.service';
-import { BranchService } from 'src/branch/branch.service';
-import { ConfigService } from '@nestjs/config';
-import { AppConfig } from 'src/config/config.interface';
-import { ConfigKey } from 'src/config/config.enum';
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +35,6 @@ export class AuthService {
     private readonly customerService: CustomerService,
     private readonly employeeService: EmployeeService,
     private readonly jwtService: JwtService,
-    private readonly uniqueIdService: UniqueIdService,
     private readonly developerService: DeveloperService,
     private readonly config: ConfigService,
   ) {
@@ -57,11 +54,10 @@ export class AuthService {
 
     if (isEmailExits) throw new BadRequestException('Customer already exists');
 
-    const new_customer_id = await this.uniqueIdService.generateCustomerId();
 
     return this.customerService
       .create({
-        customer_id: new_customer_id,
+        customer_id: customer.customer_id,
         email: customer.email,
         package: $Enums.packages.free,
         provider: $Enums.customer_providers.local,
@@ -109,55 +105,55 @@ export class AuthService {
   }
   //#endregion
   //#region Employee Section
-  async employee_register(
-    data: CreateEmployeeDto,
-    create_by: string,
-  ): Promise<{ access_token: string }> {
-    this.logger.log('Employee register');
-    // check for citizen_id is not empty
-    if (!data.person_info.citizen_id)
-      throw new BadRequestException('Citizen ID is required');
+  // async employee_register(
+  //   data: CreateEmployeeDto,
+  //   create_by: string,
+  // ): Promise<{ access_token: string }> {
+  //   this.logger.log('Employee register');
+  //   // check for citizen_id is not empty
+  //   if (!data.person_info.citizen_id)
+  //     throw new BadRequestException('Citizen ID is required');
 
-    // check for employee already exists
-    const isEmployeeExits = await this.employeeService.checkEmployeeExist({
-      branch_id: data.branch_id,
-      citizen_id: data.person_info.citizen_id,
-    });
+  //   // check for employee already exists
+  //   const isEmployeeExits = await this.employeeService.checkEmployeeExist({
+  //     branch_id: data.branch_id,
+  //     citizen_id: data.person_info.citizen_id,
+  //   });
 
-    if (isEmployeeExits)
-      throw new BadRequestException('Employee already exists');
+  //   if (isEmployeeExits)
+  //     throw new BadRequestException('Employee already exists');
 
-    const { clinic_id } = await this.branchService.findFirst({
-      branch_id: data.branch_id,
-    });
-    const now = DateTime.now().toUTC().toString();
-    return this.employeeService
-      .create({
-        clinic_id,
-        branch_id: data.branch_id,
-        data: {
-          ...data,
-          password: await hashPassword(data.password),
-          person_information: {
-            create: {
-              ...data.person_info,
-              role: Roles.employee,
-              create_at: now,
-              update_at: now,
-              edit_by: create_by,
-            },
-          },
-        },
-      })
-      .then((user) => {
-        return this.employee_login({
-          employee_uid: user.employee_uid,
-        });
-      })
-      .catch((error) => {
-        throw new InternalServerErrorException(error);
-      });
-  }
+  //   const { clinic_id } = await this.branchService.findFirst({
+  //     branch_id: data.branch_id,
+  //   });
+  //   const now = DateTime.now().toUTC().toString();
+  //   return this.employeeService
+  //     .create({
+  //       clinic_id,
+  //       branch_id: data.branch_id,
+  //       data: {
+  //         ...data,
+  //         password: await hashPassword(data.password),
+  //         person_information: {
+  //           create: {
+  //             ...data.person_info,
+  //             role: Roles.employee,
+  //             create_at: now,
+  //             update_at: now,
+  //             edit_by: create_by,
+  //           },
+  //         },
+  //       },
+  //     })
+  //     .then((user) => {
+  //       return this.employee_login({
+  //         employee_uid: user.employee_uid,
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       throw new InternalServerErrorException(error);
+  //     });
+  // }
 
   employee_login({ employee_uid }: { employee_uid: string }): {
     access_token: string;

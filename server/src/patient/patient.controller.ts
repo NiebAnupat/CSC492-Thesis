@@ -29,7 +29,7 @@ export class PatientController {
   ) {}
 
   @Post()
-  async create(@Body() createPatientDto: CreatePatientDto, @User() user: any) {
+  async create(@Body() createPatientDto: CreatePatientDto, @User() user) {
     this.logger.log('Create patient');
     createPatientDto.person_info.edit_by = user.uid;
     const branch = await this.branchService.findOne({

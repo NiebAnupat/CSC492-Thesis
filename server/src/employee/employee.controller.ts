@@ -19,6 +19,7 @@ import { Roles } from 'src/auth/common/enum/role.enum';
 import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
+import { UniqueIdService } from 'src/unique-id/unique-id.service';
 import { hashPassword } from 'src/utils/hashPassword';
 import { toAny } from 'src/utils/toAny';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -31,6 +32,7 @@ export class EmployeeController {
   constructor(
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
+    private readonly uniqueIdService: UniqueIdService
   ) {}
 
   @UseAbility('create', toAny('employee'))
@@ -56,10 +58,16 @@ export class EmployeeController {
     const { clinic_id } = clinic;
     const { branch_id } = createEmployeeDto;
     const now = DateTime.now().toUTC().toString();
+    const employee_id = await this.uniqueIdService.generateEmployeeId(
+      clinic_id,
+      branch_id,
+    );
     return this.employeeService.create({
       clinic_id,
       branch_id,
       data: {
+        employee_uid: await this.uniqueIdService.getUUID(),
+        employee_id,
         password: await hashPassword(createEmployeeDto.password),
         person_information: {
           create: {

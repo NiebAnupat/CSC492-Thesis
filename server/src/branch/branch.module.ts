@@ -5,6 +5,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ClinicModule } from 'src/clinic/clinic.module';
 import { CustomerModule } from 'src/customer/customer.module';
 import { EmployeeModule } from 'src/employee/employee.module';
+import { UniqueIdModule } from 'src/unique-id/unique-id.module';
 import { BranchController } from './branch.controller';
 import { BranchService } from './branch.service';
 import { permissions } from './common/permission/branch.permissions';
@@ -16,6 +17,7 @@ import { permissions } from './common/permission/branch.permissions';
     CustomerModule,
     ClinicModule,
     EmployeeModule,
+    UniqueIdModule,
     forwardRef(() => AuthModule),
   ],
   controllers: [BranchController],

@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+import { BranchService } from 'src/branch/branch.service';
 
 @Injectable()
 export class PatientService {
   private readonly logger = new Logger(PatientService.name);
   constructor(
     private readonly prisma: PrismaService,
+    private readonly branchService: BranchService,
   ) {}
   async create({
     branch_id,
@@ -18,12 +20,18 @@ export class PatientService {
     this.logger.log('Create patient');
 
     // check if person_info.citizen_id is already exist
-    const isExist = await this.prisma.person_information.findFirst({
-      where: {
-        citizen_id: data.person_information.create.citizen_id,
+    const isExist = await this.branchService.findOne(
+      { branch_id },
+      {
+        patient: {
+          where: {
+            person_information: {
+              citizen_id: data.person_information.create.citizen_id,
+            },
+          },
+        },
       },
-    });
-
+    );
     if (isExist) {
       throw new BadRequestException('Citizen ID is already exist');
     }
@@ -42,7 +50,7 @@ export class PatientService {
 
   findAll() {
     this.logger.log('FindAll patient');
-    return this.prisma.patient.findMany()
+    return this.prisma.patient.findMany();
   }
 
   findBranchPatients(branch_id: number) {
