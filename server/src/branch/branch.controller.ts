@@ -1,17 +1,17 @@
 import {
-  Body,
-  ConflictException,
-  Controller,
-  DefaultValuePipe,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
+    Body,
+    ConflictException,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
 import { isNull } from 'lodash';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
@@ -64,13 +64,13 @@ export class BranchController {
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
-    const { clinic_id } = clinic;
-    if (!clinic_id) return new ConflictException('Clinic not found');
+    const { clinic_uid } = clinic;
+    if (!clinic_uid) return new ConflictException('Clinic not found');
     createBranchDto.branch_display_id =
-      await this.uniqueIdService.generateBranchDisplayId(clinic_id);
+      await this.uniqueIdService.generateBranchDisplayId(clinic_uid);
     const newBranch = await this.branchService.create({
       user_id: user.id,
-      clinic_id,
+      clinic_uid,
       data: createBranchDto,
     });
     const { person_information_id } = await this.customerService.findOne({
@@ -78,13 +78,13 @@ export class BranchController {
     });
 
     const employee_id = await this.uniqueIdService.generateEmployeeId(
-      clinic_id,
-      newBranch.branch_id,
+      clinic_uid,
+      newBranch.branch_uid,
     );
 
     const employee = await this.employeeService.create({
-      clinic_id,
-      branch_id: newBranch.branch_id,
+      clinic_uid,
+      branch_uid: newBranch.branch_uid,
       data: {
         employee_uid: await this.uniqueIdService.getUUID(),
         employee_id,
@@ -100,22 +100,22 @@ export class BranchController {
     }
 
     // update branch manager_id & edit_by
-    await this.branchService.update(newBranch.branch_id, {
+    await this.branchService.update(newBranch.branch_uid, {
       branch_manager: {
         connect: { employee_uid: employee.employee_uid },
       },
       edit_by: employee.employee_uid,
     });
 
-    return this.branchService.findOne({ branch_id: newBranch.branch_id });
+    return this.branchService.findOne({ branch_uid: newBranch.branch_uid });
   }
 
   @UseAbility(Actions.create, toAny('branch'))
   @Post('/generateEmployeeAuthUrl')
-  async generateEmployeeAuthUrl(@Body() data: { branch_id: number }) {
+  async generateEmployeeAuthUrl(@Body() data: { branch_uid: number }) {
     // TODO : Can generate url for only owner or manager of the branch
     const url = await this.authService.generateBranchEmployeeAuthUrl(
-      data.branch_id,
+      data.branch_uid,
     );
     return { url };
   }
@@ -137,7 +137,7 @@ export class BranchController {
         const clinic = await this.clinicService.findOne({ owner_id: user.id });
         if (!clinic) return new NotFoundException('Clinic not found');
         const branchs = await this.branchService.findBranchesByClinic(
-          clinic.clinic_id,
+          clinic.clinic_uid,
         );
         return branchs;
       }
@@ -154,33 +154,33 @@ export class BranchController {
   }
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)
-  @Get(':branch_id')
+  @Get(':branch_uid')
   async findOne(
-    @Param('branch_id', new DefaultValuePipe(0), ParseIntPipe)
-    branch_id: number,
+    @Param('branch_uid', new DefaultValuePipe(0), ParseIntPipe)
+    branch_uid: number,
   ) {
-    const branch = await this.branchService.findOne({ branch_id });
+    const branch = await this.branchService.findOne({ branch_uid });
     if (!branch) return new NotFoundException('Branch not found');
     return branch;
   }
 
   @UseAbility(Actions.update, toAny('branch'), BranchHook)
-  @Patch(':branch_id')
+  @Patch(':branch_uid')
   update(
-    @Param('branch_id', new DefaultValuePipe(0), ParseIntPipe)
-    branch_id: number,
+    @Param('branch_uid', new DefaultValuePipe(0), ParseIntPipe)
+    branch_uid: number,
     @Body() updateBranchDto: UpdateBranchDto,
   ) {
-    return this.branchService.update(branch_id, updateBranchDto);
+    return this.branchService.update(branch_uid, updateBranchDto);
   }
 
   @UseAbility(Actions.delete, toAny('branch'), BranchHook)
-  @Delete(':branch_id')
-  async remove(@Param('branch_id', new ParseIntPipe()) branch_id: number) {
-    const clinic = await this.branchService.findOne({ branch_id });
+  @Delete(':branch_uid')
+  async remove(@Param('branch_uid', new ParseIntPipe()) branch_uid: number) {
+    const clinic = await this.branchService.findOne({ branch_uid });
     if (!clinic) return new ConflictException('Branch not found');
-    const branch_deleted = await this.branchService.remove({ branch_id });
+    const branch_deleted = await this.branchService.remove({ branch_uid });
     if (!branch_deleted) return new ConflictException('Branch not deleted');
-    return { message: `Branch ID ${branch_id} is deleted (soft)` };
+    return { message: `Branch ID ${branch_uid} is deleted (soft)` };
   }
 }

@@ -1,9 +1,9 @@
 import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+    Logger,
+    NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -21,9 +21,9 @@ import { DeveloperService } from '../developer/developer.service';
 import { hashPassword } from '../utils/hashPassword';
 import { Roles } from './common/enum/role.enum';
 import {
-  Credentials,
-  UserWithRole,
-  ValidateUserResponse,
+    Credentials,
+    UserWithRole,
+    ValidateUserResponse,
 } from './common/type/auth';
 
 @Injectable()
@@ -115,21 +115,21 @@ export class AuthService {
 
   //   // check for employee already exists
   //   const isEmployeeExits = await this.employeeService.checkEmployeeExist({
-  //     branch_id: data.branch_id,
+  //     branch_uid: data.branch_uid,
   //     citizen_id: data.person_info.citizen_id,
   //   });
 
   //   if (isEmployeeExits)
   //     throw new BadRequestException('Employee already exists');
 
-  //   const { clinic_id } = await this.branchService.findFirst({
-  //     branch_id: data.branch_id,
+  //   const { clinic_uid } = await this.branchService.findFirst({
+  //     branch_uid: data.branch_uid,
   //   });
   //   const now = DateTime.now().toUTC().toString();
   //   return this.employeeService
   //     .create({
-  //       clinic_id,
-  //       branch_id: data.branch_id,
+  //       clinic_uid,
+  //       branch_uid: data.branch_uid,
   //       data: {
   //         ...data,
   //         password: await hashPassword(data.password),
@@ -210,13 +210,13 @@ export class AuthService {
   //#endregion
 
   //#region Branch Section
-  async generateBranchEmployeeAuthUrl(branch_id: number): Promise<string> {
+  async generateBranchEmployeeAuthUrl(branch_uid: number): Promise<string> {
     this.logger.log('Generating branch employee auth url');
     const iv = randomBytes(16);
     const key = this._appConfig.encodeSecret;
     const algorithm = 'aes-256-cbc';
     const cipher = createCipheriv(algorithm, key, iv);
-    let encrypted = cipher.update(branch_id.toString(), 'utf8', 'hex');
+    let encrypted = cipher.update(branch_uid.toString(), 'utf8', 'hex');
     encrypted += cipher.final('hex');
     // TODO : In future we can use short url service to generate short url
     return `${this._appConfig.originsURL[0]}/auth/employee/login?b=${encrypted}&iv=${iv.toString('hex')}`;
@@ -242,11 +242,11 @@ export class AuthService {
   async validateUser(data: Credentials): Promise<ValidateUserResponse> {
     this.logger.log('Validating user');
     const { owner, employee, developer } = Roles;
-    const { email, password, employee_id, branch_id } = data;
+    const { email, password, employee_id, branch_uid } = data;
     const { _user, roles } = await this.getUserWithRole({
       email,
       employee_id,
-      branch_id,
+      branch_uid,
     });
 
     let user: customer | employee | developer;
@@ -292,10 +292,10 @@ export class AuthService {
 
   private async getUserWithRole(data: Credentials): Promise<UserWithRole> {
     this.logger.log('Getting user with role');
-    const { email, employee_id, branch_id } = data;
+    const { email, employee_id, branch_uid } = data;
     let user: customer | employee | developer;
-    if (employee_id && branch_id) {
-      user = await this.employeeService.findFirst({ employee_id, branch_id });
+    if (employee_id && branch_uid) {
+      user = await this.employeeService.findFirst({ employee_id, branch_uid });
       if (user) return { _user: user, roles: [Roles.employee] };
       else throw new NotFoundException();
     }

@@ -25,8 +25,8 @@ export class UniqueIdService {
     return `C${yearShort}${String(customer.length + 1).padStart(5, '0')}`;
   }
 
-  async generateBranchDisplayId(clinic_id: number): Promise<string> {
-    const clinic = await this.clinicService.findOne({ clinic_id });
+  async generateBranchDisplayId(clinic_uid: string): Promise<string> {
+    const clinic = await this.clinicService.findOne({ clinic_uid });
     const { clinic_initial, branchs } = clinic;
     // Exemple : clinic_initial is DE
     // Will be DE01 DE02 DE03
@@ -35,12 +35,12 @@ export class UniqueIdService {
   }
 
   async generateEmployeeId(
-    clinic_id: number,
-    branch_id: number,
+    clinic_uid: string,
+    branch_uid: string,
   ): Promise<string> {
-    const clinic = await this.clinicService.findOne({ clinic_id });
+    const clinic = await this.clinicService.findOne({ clinic_uid });
     const { branchs } = clinic;
-    const branch = branchs.find((branch) => branch.branch_id === branch_id);
+    const branch = branchs.find((branch) => branch.branch_uid === branch_uid);
     const fistTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
     const branchEmployees = branch.employee;
     log({ branchEmployees });
@@ -50,13 +50,12 @@ export class UniqueIdService {
     return `${fistTwoLetter}E${String(employeeNumber).padStart(2, '0')}`;
   }
 
-  async generateHN( clinic_id: number,
-    branch_id: number,): Promise<string> {
-    const clinic = await this.clinicService.findOne({ clinic_id })
+  async generateHN(clinic_uid: string, branch_uid: string): Promise<string> {
+    const clinic = await this.clinicService.findOne({ clinic_uid });
     const { branchs } = clinic;
-    const branch = branchs.find((branch) => branch.branch_id === branch_id);
+    const branch = branchs.find((branch) => branch.branch_uid === branch_uid);
     const firstTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
-    const patient_count = await this.patientService.findCount({ branch_id });
+    const patient_count = await this.patientService.findCount({ branch_uid });
     const patientNumber = patient_count + 1;
     // Exemple : branch_name_en is Dental Clinic
     // Will be DEP00001 DEP00002 DEP00003

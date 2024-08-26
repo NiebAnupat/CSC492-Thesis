@@ -11,17 +11,17 @@ export class PatientService {
     private readonly branchService: BranchService,
   ) {}
   async create({
-    branch_id,
+    branch_uid,
     data,
   }: {
-    branch_id: number;
+    branch_uid: string;
     data: Prisma.patientCreateInput;
   }) {
     this.logger.log('Create');
 
     // check if person_info.citizen_id is already exist
     const isExist = await this.checkPatientExist(
-      branch_id,
+      branch_uid,
       data.person_information.create.citizen_id,
     );
     if (isExist) {
@@ -33,24 +33,33 @@ export class PatientService {
         ...data,
         branch: {
           connect: {
-            branch_id,
+            branch_uid,
           },
         },
       },
     });
   }
-
-  findAll() {
-    this.logger.log('FindAll');
-    return this.prisma.patient.findMany();
+  findAll(skip: number, take: number) {
+    this.logger.log(`FindAll with pagination : {skip:${skip} | take:${take}}`);
+    return this.prisma.patient.findMany({
+      skip,
+      take,
+    });
   }
 
-  findBranchPatients(branch_id: number) {
-    this.logger.log('FindBranchPatients');
+  findBranchPatients(branch_uid: string, skip: number, take: number) {
+    this.logger.log(
+      `FindBranchPatients with pagination : {skip:${skip} | take:${take}}`,
+    );
     return this.prisma.patient.findMany({
       where: {
-        branch_id,
+        branch_uid,
       },
+      include: {
+        person_information: true,
+      },
+      skip,
+      take,
     });
   }
 
@@ -86,9 +95,9 @@ export class PatientService {
     });
   }
 
-  async checkPatientExist(branch_id: number, citizen_id: string) {
+  async checkPatientExist(branch_uid: string, citizen_id: string) {
     return !!(await this.branchService.findOne(
-      { branch_id },
+      { branch_uid },
       {
         patient: {
           where: {

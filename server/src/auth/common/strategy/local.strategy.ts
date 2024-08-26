@@ -1,10 +1,10 @@
-import { Strategy } from 'passport-local';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../../auth.service';
+import { PassportStrategy } from '@nestjs/passport';
 import { $Enums } from '@prisma/client';
-import { Roles } from '../enum/role.enum';
 import { Request } from 'express';
+import { Strategy } from 'passport-local';
+import { AuthService } from '../../auth.service';
+import { Roles } from '../enum/role.enum';
 
 @Injectable()
 export class LocalEmailStrategy extends PassportStrategy(
@@ -60,14 +60,14 @@ export class LocalEmployeeStrategy extends PassportStrategy(
   ): Promise<any> {
     this.logger.log('Validating employee');
     const { b, iv } = req.query;
-    const branch_id = await this.authService.decodeBranchEmployeeAuthUrl({
+    const branch_uid = await this.authService.decodeBranchEmployeeAuthUrl({
       encryptedText: b.toString(),
       iv: iv.toString(),
     });
     const user = await this.authService.validateUser({
       employee_id,
       password,
-      branch_id,
+      branch_uid,
     });
 
     if (!user) {

@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
+    BadRequestException,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { Prisma, clinic } from '@prisma/client';
 import { SubjectBeforeFilterHook } from 'nest-casl';
@@ -33,12 +33,12 @@ export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
       return await this.getClinic({ owner_id: user.id });
     }
 
-    const { clinic_id } = request.params;
+    const { clinic_uid } = request.params;
 
-    if (Number.isNaN(parseInt(clinic_id))) {
+    if (Number.isNaN(parseInt(clinic_uid))) {
       throw new BadRequestException('Clinic ID is required');
     }
-    return await this.getClinic({ clinic_id: parseInt(clinic_id) });
+    return await this.getClinic({ clinic_uid: parseInt(clinic_uid) });
   }
   async methodPatchOrDelete(request: HookRequest) {
     const user: JwtUser = request.user as JwtUser;

@@ -5,7 +5,7 @@ export type Credentials = {
   email?: string;
   password?: string;
   employee_id?: string;
-  branch_id?: number;
+  branch_uid?: number;
 };
 
 export type ValidateUserResponse = {
@@ -14,7 +14,7 @@ export type ValidateUserResponse = {
   email?: string;
   roles: Role[];
   package?: $Enums.packages;
-  branch_id?: number;
+  branch_uid?: number;
 };
 
 export type UserWithRole = {
@@ -25,7 +25,7 @@ export type UserWithRole = {
 export type JwtUser = {
   id: string;
   uid?: string;
-  branch_id?: number;
+  branch_uid?: string;
   email?: string;
   roles: Role[];
   package?: $Enums.packages;

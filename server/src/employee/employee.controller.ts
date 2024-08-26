@@ -1,16 +1,16 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpStatus,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Req,
-  Res,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    Patch,
+    Post,
+    Req,
+    Res,
+    UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { DateTime } from 'luxon';
@@ -55,16 +55,16 @@ export class EmployeeController {
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
-    const { clinic_id } = clinic;
-    const { branch_id } = createEmployeeDto;
+    const { clinic_uid } = clinic;
+    const { branch_uid } = createEmployeeDto;
     const now = DateTime.now().toUTC().toString();
     const employee_id = await this.uniqueIdService.generateEmployeeId(
-      clinic_id,
-      branch_id,
+      clinic_uid,
+      branch_uid,
     );
     return this.employeeService.create({
-      clinic_id,
-      branch_id,
+      clinic_uid,
+      branch_uid,
       data: {
         employee_uid: await this.uniqueIdService.getUUID(),
         employee_id,

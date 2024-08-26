@@ -1,8 +1,8 @@
 import { ForbiddenError } from '@casl/ability';
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
+    BadRequestException,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { SubjectBeforeFilterHook } from 'nest-casl';
@@ -54,13 +54,13 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
           }
           return { owner_id: owner_id };
         }
-        // if url is /branch/:branch_id
-        const { branch_id } = request.params;
-        if (Number.isNaN(parseInt(branch_id))) {
+        // if url is /branch/:branch_uid
+        const { branch_uid } = request.params;
+        if (Number.isNaN(parseInt(branch_uid))) {
           throw new BadRequestException('Branch ID is required');
         }
         return {
-          owner_id: (await this.getBranch({ branch_id: parseInt(branch_id) }))
+          owner_id: (await this.getBranch({ branch_uid: parseInt(branch_uid) }))
             .clinic.owner_id,
         };
       }
@@ -85,11 +85,11 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
     }
   }
   async methodPatchOrDelete(request: HookRequest) {
-    const { branch_id } = request.params;
-    if (!branch_id) {
+    const { branch_uid } = request.params;
+    if (!branch_uid) {
       throw new BadRequestException('Branch ID is required');
     }
-    const branch = await this.getBranch({ branch_id: parseInt(branch_id) });
+    const branch = await this.getBranch({ branch_uid: parseInt(branch_uid) });
     return { owner_id: branch.clinic.owner_id };
   }
 

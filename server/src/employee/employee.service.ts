@@ -11,12 +11,12 @@ export class EmployeeService {
   ) {}
 
   async create({
-    branch_id,
+    branch_uid,
     data,
   }: {
     // user_id: string;
-    clinic_id: number;
-    branch_id: number;
+    clinic_uid: number;
+    branch_uid: number;
     data: Prisma.employeeCreateInput;
     }) {
     
@@ -30,7 +30,7 @@ export class EmployeeService {
       data: {
         ...data,
         branch: {
-          connect: { branch_id },
+          connect: { branch_uid },
         },
       },
     });
@@ -77,18 +77,18 @@ export class EmployeeService {
     });
   }
 
-  // check does exist by branch_id and citizen_id
+  // check does exist by branch_uid and citizen_id
   async checkEmployeeExist({
-    branch_id,
+    branch_uid,
     citizen_id,
   }: {
-    branch_id: number;
+    branch_uid: number;
     citizen_id: string;
     }) {
     this.logger.log('checkEmployeeExist');
     return !!(await this.prisma.employee.findFirst({
       where: {
-        branch_id,
+        branch_uid,
         person_information: {
           citizen_id,
           deleted_at: null,

@@ -13,15 +13,15 @@ export class BranchService {
   ) {}
 
   async create({
-    clinic_id,
+    clinic_uid,
     data,
   }: {
     user_id: string;
-    clinic_id: number;
+    clinic_uid: number;
     data: Partial<Prisma.branchCreateInput & { branch_display_id: string }>;
   }) {
     this.logger.log('Create branch');
-    const clinic = await this.clinicService.findOne({ clinic_id });
+    const clinic = await this.clinicService.findOne({ clinic_uid });
     return this.prisma.branch.create({
       data: {
         branch_display_id: data.branch_display_id,
@@ -32,7 +32,7 @@ export class BranchService {
         telephone: data.telephone,
         logo_filename: clinic.logo_filename,
         clinic: {
-          connect: { clinic_id },
+          connect: { clinic_uid },
         },
       },
     });
@@ -50,11 +50,11 @@ export class BranchService {
     return this.prisma.branch.findMany();
   }
 
-  findBranchesByClinic(clinic_id: number) {
+  findBranchesByClinic(clinic_uid: number) {
     this.logger.log('findBranchesByClinic');
     return this.prisma.branch.findMany({
       select: {
-        branch_id: true,
+        branch_uid: true,
         branch_display_id: true,
         branch_name_th: true,
         branch_name_en: true,
@@ -72,8 +72,8 @@ export class BranchService {
           },
         },
       },
-      where: { clinic_id, deleted_at: null },
-      orderBy: { branch_id: 'asc' },
+      where: { clinic_uid, deleted_at: null },
+      orderBy: { branch_uid: 'asc' },
     });
   }
 
@@ -94,7 +94,7 @@ export class BranchService {
   update(id: number, data: Prisma.branchUpdateInput) {
     this.logger.log('update');
     return this.prisma.branch.update({
-      where: { branch_id: id },
+      where: { branch_uid: id },
       data,
     });
   }

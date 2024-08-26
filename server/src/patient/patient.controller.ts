@@ -5,8 +5,12 @@ import {
   Get,
   Logger,
   NotFoundException,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { isNull } from 'lodash';
@@ -33,18 +37,18 @@ export class PatientController {
     this.logger.log('Create patient');
     createPatientDto.person_info.edit_by = user.uid;
     const branch = await this.branchService.findOne({
-      branch_id: user.branch_id,
+      branch_uid: user.branch_uid,
     });
     if (isNull(branch)) return NotFoundException;
-    const { branch_id, clinic_id } = branch;
+    const { branch_uid, clinic_uid } = branch;
     createPatientDto.patient_uid = this.uniqueIdService.getUUID();
     createPatientDto.hn = await this.uniqueIdService.generateHN(
-      clinic_id,
-      branch_id,
+      clinic_uid,
+      branch_uid,
     );
     const { person_info, ...data } = createPatientDto;
     return this.patientService.create({
-      branch_id: branch.branch_id,
+      branch_uid: branch_uid,
       data: {
         ...data,
         person_information: {
@@ -59,15 +63,30 @@ export class PatientController {
   }
 
   @Get()
-  findAll() {
-    this.logger.log('FindAll patient');
-    return this.patientService.findAll();
+  findAll(
+    @Query('skip', ParseIntPipe) skip = 0,
+    @Query('take', ParseIntPipe) take = 10,
+    @User() user,
+  ) {
+    this.logger.log(
+      `FindAll patients with pagination for branch_uid : ${user.branch_uid}`,
+    );
+    return this.patientService.findBranchPatients(user.branch_uid, skip, take);
   }
 
-  @Get(':id')
-  findOne() {
-    this.logger.log('FindOne patient');
-    throw new Error('Method not implemented.');
+  @Get(':patient_uid')
+  findOne(@Param('patient_uid', ParseUUIDPipe) patient_uid: string) {
+    this.logger.log('FindOne');
+    return this.patientService.findOne({ patient_uid });
+  }
+
+  @Get('branch/:branch_uid')
+  findBranchPatients(
+    @Param('branch_uid', ParseUUIDPipe) branch_uid: string,
+    @Query('skip', ParseIntPipe) skip = 0,
+    @Query('take', ParseIntPipe) take = 10,
+  ) {
+    return this.patientService.findBranchPatients(branch_uid, skip, take);
   }
 
   @Patch(':id')

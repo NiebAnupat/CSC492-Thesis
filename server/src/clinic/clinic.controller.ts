@@ -1,31 +1,31 @@
 import {
-  Body,
-  ConflictException,
-  Controller,
-  DefaultValuePipe,
-  Delete,
-  Get,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Post,
-  Req,
-  Res,
-  UseGuards,
+    Body,
+    ConflictException,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    HttpStatus,
+    Param,
+    ParseIntPipe,
+    Post,
+    Req,
+    Res,
+    UseGuards,
 } from '@nestjs/common';
-import { ClinicService } from './clinic.service';
-import { CreateClinicDto } from './dto/create-clinic-dto';
+import { clinic } from '@prisma/client';
+import { Response } from 'express';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
+import { toAny } from 'src/utils/toAny';
+import { Roles } from '../auth/common/enum/role.enum';
 import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
 import { JwtUser } from '../auth/common/type/auth';
-import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
-import { Roles } from '../auth/common/enum/role.enum';
-import { AccessGuard, Actions, UseAbility } from 'nest-casl';
-import { toAny } from 'src/utils/toAny';
-import { Response } from 'express';
-import { UploadLogoDto } from './dto/upload-logo-dto';
 import { FileStorageService } from '../file-storage/file-storage.service';
-import { clinic } from '@prisma/client';
+import { ClinicService } from './clinic.service';
 import { ClinicHook } from './common/permissions/clinic.hook';
+import { CreateClinicDto } from './dto/create-clinic-dto';
+import { UploadLogoDto } from './dto/upload-logo-dto';
 
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('clinic')
@@ -55,7 +55,7 @@ export class ClinicController {
     try {
       await this.fileStorageService.uploadFile(file, newFileNeame);
       await this.clinicService.update({
-        where: { clinic_id: user_clinic.clinic_id },
+        where: { clinic_uid: user_clinic.clinic_uid },
         data: { logo_filename: newFileNeame },
       });
       res
@@ -108,12 +108,12 @@ export class ClinicController {
 
   // TODO: Make get clinic from user_id for each role
   @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
-  @Get(':clinic_id')
+  @Get(':clinic_uid')
   async findOne(
-    @Param('clinic_id', new DefaultValuePipe(0), ParseIntPipe)
-    clinic_id: number,
+    @Param('clinic_uid', new DefaultValuePipe(0), ParseIntPipe)
+    clinic_uid: number,
   ) {
-    const clinic = await this.clinicService.findOne({ clinic_id });
+    const clinic = await this.clinicService.findOne({ clinic_uid });
     if (!clinic) return new ConflictException('Clinic is not exist');
     return clinic;
   }
@@ -162,15 +162,15 @@ export class ClinicController {
   @Delete()
   async remove(@Req() req: any) {
     const user: JwtUser = req.user;
-    const { clinic_id } = await this.getClinicID(user.id);
-    return this.clinicService.delete({ clinic_id });
+    const { clinic_uid } = await this.getClinicID(user.id);
+    return this.clinicService.delete({ clinic_uid });
   }
 
-  private async getClinicID(owner_id: string): Promise<{ clinic_id: number }> {
+  private async getClinicID(owner_id: string): Promise<{ clinic_uid: number }> {
     const clinic = await this.clinicService.findOne({ owner_id });
     if (!clinic) {
       throw new ConflictException('Clinic is not exist');
     }
-    return { clinic_id: clinic.clinic_id };
+    return { clinic_uid: clinic.clinic_uid };
   }
 }

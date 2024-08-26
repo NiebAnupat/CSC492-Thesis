@@ -7,8 +7,8 @@ export class ClinicService {
   private readonly logger = new Logger(ClinicService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  async checkClinicExist(clinic_id: number): Promise<boolean> {
-    return !!(await this.findOne({ clinic_id }));
+  async checkClinicExist(clinic_uid: number): Promise<boolean> {
+    return !!(await this.findOne({ clinic_uid }));
   }
 
   findAll() {
@@ -26,7 +26,7 @@ export class ClinicService {
     try {
       return this.prisma.clinic.findUnique({
         where: {
-          clinic_id: where.clinic_id,
+          clinic_uid: where.clinic_uid,
           owner_id: where.owner_id,
           deleted_at: null,
         },
@@ -35,7 +35,7 @@ export class ClinicService {
             include: {
               clinic: {
                 select: {
-                  clinic_id: true,
+                  clinic_uid: true,
                   owner_id: true,
                 },
               },
