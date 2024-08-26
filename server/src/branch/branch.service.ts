@@ -17,7 +17,7 @@ export class BranchService {
     data,
   }: {
     user_id: string;
-    clinic_uid: number;
+    clinic_uid: string;
     data: Partial<Prisma.branchCreateInput & { branch_display_id: string }>;
   }) {
     this.logger.log('Create branch');
@@ -50,7 +50,7 @@ export class BranchService {
     return this.prisma.branch.findMany();
   }
 
-  findBranchesByClinic(clinic_uid: number) {
+  findBranchesByClinic(clinic_uid: string) {
     this.logger.log('findBranchesByClinic');
     return this.prisma.branch.findMany({
       select: {
@@ -91,7 +91,7 @@ export class BranchService {
     });
   }
 
-  update(id: number, data: Prisma.branchUpdateInput) {
+  update(id: string, data: Prisma.branchUpdateInput) {
     this.logger.log('update');
     return this.prisma.branch.update({
       where: { branch_uid: id },

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { employee, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+import { Roles } from 'src/auth/common/enum/role.enum';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
@@ -17,6 +18,15 @@ export class EmployeeService {
     data: Prisma.employeeCreateInput;
   }) {
     this.logger.log('Create employee');
+
+    // check if person_info.citizen_id is already exist
+    const isExist = await this.checkEmployeeExist({
+      branch_uid,
+      citizen_id: data.person_information.create.citizen_id,
+    });
+    if (isExist) {
+      throw new BadRequestException('Employee Citizen ID is already exist');
+    }
 
     return this.prisma.employee.create({
       select: {
@@ -80,6 +90,19 @@ export class EmployeeService {
     });
   }
 
+  findBranchEmployees(branch_uid: string, skip: number, take: number) {
+    return this.prisma.employee.findMany({
+      where: {
+        branch_uid,
+      },
+      include: {
+        person_information: true,
+      },
+      skip,
+      take,
+    });
+  }
+
   // check does exist by branch_uid and citizen_id
   async checkEmployeeExist({
     branch_uid,
@@ -95,6 +118,7 @@ export class EmployeeService {
         person_information: {
           citizen_id,
           deleted_at: null,
+          role: Roles.employee,
         },
       },
     }));
@@ -115,6 +139,17 @@ export class EmployeeService {
           update: {
             deleted_at: new Date(),
           },
+        },
+      },
+    });
+  }
+
+  checkEmployeeExistByBranch(branch_uid: string, citizen_id: string) {
+    return this.prisma.employee.findFirst({
+      where: {
+        branch_uid,
+        person_information: {
+          citizen_id,
         },
       },
     });

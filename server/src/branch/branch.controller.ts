@@ -2,12 +2,11 @@ import {
   Body,
   ConflictException,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -73,8 +72,8 @@ export class BranchController {
       clinic_uid,
       data: createBranchDto,
     });
-    const { person_information_id } = await this.customerService.findOne({
-      customer_id: user.id,
+    const { person_information_uid } = await this.customerService.findOne({
+      customer_uid: user.id,
     });
 
     const employee_id = await this.uniqueIdService.generateEmployeeId(
@@ -90,7 +89,7 @@ export class BranchController {
         employee_id,
         password: await hashPassword('admin'),
         person_information: {
-          connect: { person_information_id },
+          connect: { person_information_uid },
         },
       },
     });
@@ -112,11 +111,12 @@ export class BranchController {
 
   @UseAbility(Actions.create, toAny('branch'))
   @Post('/generateEmployeeAuthUrl')
-  async generateEmployeeAuthUrl(@Body() data: { branch_uid: number }) {
+  async generateEmployeeAuthUrl(
+    @Body('branch_id', ParseUUIDPipe) branch_uid: string,
+  ) {
     // TODO : Can generate url for only owner or manager of the branch
-    const url = await this.authService.generateBranchEmployeeAuthUrl(
-      data.branch_uid,
-    );
+    const url =
+      await this.authService.generateBranchEmployeeAuthUrl(branch_uid);
     return { url };
   }
 
@@ -155,8 +155,8 @@ export class BranchController {
   @UseAbility(Actions.read, toAny('branch'), BranchHook)
   @Get(':branch_uid')
   async findOne(
-    @Param('branch_uid', new DefaultValuePipe(0), ParseIntPipe)
-    branch_uid: number,
+    @Param('branch_uid', ParseUUIDPipe)
+    branch_uid: string,
   ) {
     const branch = await this.branchService.findOne({ branch_uid });
     if (!branch) return new NotFoundException('Branch not found');
@@ -166,8 +166,8 @@ export class BranchController {
   @UseAbility(Actions.update, toAny('branch'), BranchHook)
   @Patch(':branch_uid')
   update(
-    @Param('branch_uid', new DefaultValuePipe(0), ParseIntPipe)
-    branch_uid: number,
+    @Param('branch_uid', ParseUUIDPipe)
+    branch_uid: string,
     @Body() updateBranchDto: UpdateBranchDto,
   ) {
     return this.branchService.update(branch_uid, updateBranchDto);
@@ -175,7 +175,10 @@ export class BranchController {
 
   @UseAbility(Actions.delete, toAny('branch'), BranchHook)
   @Delete(':branch_uid')
-  async remove(@Param('branch_uid', new ParseIntPipe()) branch_uid: number) {
+  async remove(
+    @Param('branch_uid', ParseUUIDPipe)
+    branch_uid: string,
+  ) {
     const clinic = await this.branchService.findOne({ branch_uid });
     if (!clinic) return new ConflictException('Branch not found');
     const branch_deleted = await this.branchService.remove({ branch_uid });

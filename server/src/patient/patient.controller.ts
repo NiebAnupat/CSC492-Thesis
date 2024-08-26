@@ -48,7 +48,7 @@ export class PatientController {
     );
     const { person_info, ...data } = createPatientDto;
     return this.patientService.create({
-      branch_uid: branch_uid,
+      branch_uid,
       data: {
         ...data,
         person_information: {

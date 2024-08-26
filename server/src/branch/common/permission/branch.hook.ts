@@ -13,6 +13,7 @@ import { ClinicService } from 'src/clinic/clinic.service';
 import { CASLHook } from 'src/common/interfaces/CASLHook.interface';
 import { HookRequest } from 'src/common/types/hook.request';
 import { getUrl } from 'src/utils/getUrl';
+import { validate } from 'uuid';
 
 @Injectable()
 export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
@@ -56,12 +57,12 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
         }
         // if url is /branch/:branch_uid
         const { branch_uid } = request.params;
-        if (Number.isNaN(parseInt(branch_uid))) {
+        if (!validate(branch_uid)) {
           throw new BadRequestException('Branch ID is required');
         }
         return {
           owner_uid: (
-            await this.getBranch({ branch_uid: parseInt(branch_uid) })
+            await this.getBranch({ branch_uid })
           ).clinic.owner_uid,
         };
       }
@@ -90,7 +91,7 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
     if (!branch_uid) {
       throw new BadRequestException('Branch ID is required');
     }
-    const branch = await this.getBranch({ branch_uid: parseInt(branch_uid) });
+    const branch = await this.getBranch({ branch_uid });
     return { owner_uid: branch.clinic.owner_uid };
   }
 

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { log } from 'console';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { PatientService } from 'src/patient/patient.service';
 import { v7 } from 'uuid';
@@ -16,7 +15,6 @@ export class UniqueIdService {
   getUUID(): string {
     return v7();
   }
-
 
   async generateCustomerId(): Promise<string> {
     const customer = await this.customerService.findAll();
@@ -44,7 +42,6 @@ export class UniqueIdService {
     const branch = branchs.find((branch) => branch.branch_uid === branch_uid);
     const fistTwoLetter = branch.branch_name_en.slice(0, 2).toUpperCase();
     const branchEmployees = branch.employee;
-    log({ branchEmployees });
     const employeeNumber = branchEmployees.length + 1;
     // Exemple : branch_name_en is Dental Clinic
     // Will be DEE01 DEE02 DEE03

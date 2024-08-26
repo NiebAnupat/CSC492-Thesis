@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
   IsStrongPassword,
-  ValidateNested,
+  IsUUID,
+  ValidateNested
 } from 'class-validator';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
@@ -21,8 +21,8 @@ export class CreateEmployeeDto {
   password: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  branch_uid: number;
+  @IsUUID()
+  branch_uid: string;
 
   @IsNotEmpty()
   @IsObject()

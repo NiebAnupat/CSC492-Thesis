@@ -2,12 +2,11 @@ import {
   Body,
   ConflictException,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpStatus,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Req,
   Res,
@@ -17,6 +16,7 @@ import { clinic } from '@prisma/client';
 import { Response } from 'express';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
+import { User } from 'src/auth/common/decorator/user.decorator';
 import { toAny } from 'src/utils/toAny';
 import { Roles } from '../auth/common/enum/role.enum';
 import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
@@ -42,8 +42,8 @@ export class ClinicController {
     @Body() data: UploadLogoDto,
     @Req() req: any,
     @Res() res: Response,
+    @User() user,
   ) {
-    const user: JwtUser = req.user;
     const user_clinic = await this.clinicService.findOne({
       owner_uid: user.id,
     });
@@ -110,8 +110,8 @@ export class ClinicController {
   @UseAbility(Actions.read, toAny('clinic'), ClinicHook)
   @Get(':clinic_uid')
   async findOne(
-    @Param('clinic_uid', new DefaultValuePipe(0), ParseIntPipe)
-    clinic_uid: number,
+    @Param('clinic_uid', ParseUUIDPipe)
+    clinic_uid: string,
   ) {
     const clinic = await this.clinicService.findOne({ clinic_uid });
     if (!clinic) return new ConflictException('Clinic is not exist');
@@ -124,15 +124,15 @@ export class ClinicController {
     @Body() data: CreateClinicDto,
     @Req() req: any,
     @Res() res: Response,
+    @User() user,
   ) {
-    const user: JwtUser = req.user;
-    let customer_id = '';
-    if (user.roles[0] === Roles.developer) customer_id = 'TestID';
-    else if (user.roles[0] === Roles.owner) customer_id = user.id;
+    let customer_uid = '';
+    if (user.roles[0] === Roles.developer) customer_uid = 'TestID';
+    else if (user.roles[0] === Roles.owner) customer_uid = user.id;
 
     // check clinic is exist
     const clinic = await this.clinicService.findOne({
-      owner_uid: customer_id,
+      owner_uid: customer_uid,
     });
 
     if (clinic) {
@@ -150,7 +150,7 @@ export class ClinicController {
       logo_filename: 'default_clinic_logo.png',
       customer: {
         connect: {
-          customer_id,
+          customer_uid,
         },
       },
     });
@@ -168,7 +168,7 @@ export class ClinicController {
 
   private async getClinicID(
     owner_uid: string,
-  ): Promise<{ clinic_uid: number }> {
+  ): Promise<{ clinic_uid: string }> {
     const clinic = await this.clinicService.findOne({ owner_uid });
     if (!clinic) {
       throw new ConflictException('Clinic is not exist');

@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
 import { toAny } from 'src/utils/toAny';
@@ -25,10 +25,10 @@ export class CustomerController {
 
   @UseAbility(Actions.read, toAny('customer'), CustomerHook)
   @UseGuards(JwtAuthGuard, AccessGuard)
-  @Get(':customer_id')
-  async findOne(@Param('customer_id') customer_id: string) {
+  @Get(':customer_uid')
+  async findOne(@Param('customer_uid', ParseUUIDPipe) customer_uid: string) {
     return excludeFromObject(
-      await this.customerService.findOne({ customer_id }),
+      await this.customerService.findOne({ customer_uid }),
       ['password'],
     );
   }
@@ -41,8 +41,8 @@ export class CustomerController {
   //   return this.customerService.update();
   // }
 
-  @Delete(':customer_id')
-  remove(@Param('customer_id') customer_id: string) {
-    return this.customerService.softDelete({ customer_id });
+  @Delete(':customer_uid')
+  remove(@Param('customer_uid', ParseUUIDPipe) customer_uid: string) {
+    return this.customerService.softDelete({ customer_uid });
   }
 }

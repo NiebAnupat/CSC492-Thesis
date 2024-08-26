@@ -209,13 +209,13 @@ export class AuthService {
   //#endregion
 
   //#region Branch Section
-  async generateBranchEmployeeAuthUrl(branch_uid: number): Promise<string> {
+  async generateBranchEmployeeAuthUrl(branch_uid: string): Promise<string> {
     this.logger.log('Generating branch employee auth url');
     const iv = randomBytes(16);
     const key = this._appConfig.encodeSecret;
     const algorithm = 'aes-256-cbc';
     const cipher = createCipheriv(algorithm, key, iv);
-    let encrypted = cipher.update(branch_uid.toString(), 'utf8', 'hex');
+    let encrypted = cipher.update(branch_uid, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     // TODO : In future we can use short url service to generate short url
     return `${this._appConfig.originsURL[0]}/auth/employee/login?b=${encrypted}&iv=${iv.toString('hex')}`;

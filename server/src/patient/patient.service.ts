@@ -37,6 +37,9 @@ export class PatientService {
           },
         },
       },
+      include: {
+        person_information: true,
+      },
     });
   }
   findAll(skip: number, take: number) {
@@ -96,18 +99,17 @@ export class PatientService {
   }
 
   async checkPatientExist(branch_uid: string, citizen_id: string) {
-    return !!(await this.branchService.findOne(
-      { branch_uid },
-      {
-        patient: {
-          where: {
-            person_information: {
-              citizen_id,
-              deleted_at: null,
-            },
+    return !!(await this.branchService.findFirst({
+      branch_uid,
+      deleted_at: null,
+      patient: {
+        some: {
+          person_information: {
+            citizen_id,
+            deleted_at: null,
           },
         },
       },
-    ));
+    }));
   }
 }

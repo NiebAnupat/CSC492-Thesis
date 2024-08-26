@@ -6,8 +6,11 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -15,11 +18,12 @@ import {
 import { Response } from 'express';
 import { DateTime } from 'luxon';
 import { AccessGuard, UseAbility } from 'nest-casl';
+import { User } from 'src/auth/common/decorator/user.decorator';
 import { Roles } from 'src/auth/common/enum/role.enum';
 import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
-import { JwtUser } from 'src/auth/common/type/auth';
 import { ClinicService } from 'src/clinic/clinic.service';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
+import { excludeFromList } from 'src/utils/exclude';
 import { hashPassword } from 'src/utils/hashPassword';
 import { toAny } from 'src/utils/toAny';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -37,21 +41,17 @@ export class EmployeeController {
 
   @UseAbility('create', toAny('employee'))
   @Post()
-  async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto) {
-    const user: JwtUser = req.user;
-    // let owner_uid;
-    // switch (user.roles[0]) {
-    //   case Roles.developer:
-    //     owner_uid = 'TestID';
-    //     break;
-    //   case Roles.owner:
-    //     owner_uid = user.id;
-    //     break;
-    //   default:
-    //     return new ConflictException('User not found');
-    // }
+  async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto, @User() user) {
 
-    const clinic = await this.clinicService.findOne({ owner_uid: user.id });
+    let owner_uid;
+
+    if (user.role === Roles.owner) {
+      owner_uid = user.id;
+    } else {
+      owner_uid = user.owner_uid;
+    }
+
+    const clinic = await this.clinicService.findOne({ owner_uid });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
@@ -75,7 +75,8 @@ export class EmployeeController {
             role: Roles.employee,
             create_at: now,
             update_at: now,
-            // edit_by: user.id,
+            hire_date: now,
+            edit_by: user.id,
           },
         },
       },
@@ -90,7 +91,20 @@ export class EmployeeController {
       res.status(HttpStatus.NO_CONTENT).send({
         message: 'No employees found',
       });
-    res.status(HttpStatus.OK).send(employees);
+    res.status(HttpStatus.OK).send(excludeFromList(employees, ['password']));
+  }
+
+  @UseAbility('read', toAny('employee'))
+  @Get('branch/:branch_uid')
+  async findBranchEmployees(
+    @Param('branch_uid', ParseUUIDPipe) branch_uid: string,
+    @Query('skip', ParseIntPipe) skip = 0,
+    @Query('take', ParseIntPipe) take = 10,
+  ) {
+    return excludeFromList(
+      await this.employeeService.findBranchEmployees(branch_uid, skip, take),
+      ['password'],
+    );
   }
 
   @UseAbility('read', toAny('employee'))

@@ -17,6 +17,9 @@ export const permissions: Permissions<Role, Subject, Actions> = {
 
   // TODO: Add permissions for employee (Later)
   employee({ user, can }) {
+    // TODO : Update this permission (Later)
+    // Now manage permission is for dev
+    can(Actions.manage, 'employee',)
     can(Actions.read, 'employee', { employee_uid: user.id }).because(
       'User is the employee',
     );
