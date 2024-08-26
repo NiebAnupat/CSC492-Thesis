@@ -7,7 +7,7 @@ import { EmployeeController } from './employee.controller';
 import { EmployeeService } from './employee.service';
 
 @Module({
-  imports: [CaslModule.forFeature({ permissions }), ClinicModule,],
+  imports: [CaslModule.forFeature({ permissions }), ClinicModule],
   controllers: [EmployeeController],
   providers: [PrismaService, EmployeeService],
   exports: [EmployeeService],

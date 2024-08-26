@@ -58,7 +58,7 @@ export class BranchService {
         branch_display_id: true,
         branch_name_th: true,
         branch_name_en: true,
-        clinic: { select: { owner_id: true } },
+        clinic: { select: { owner_uid: true } },
         employee: {
           select: {
             employee_id: true,
@@ -79,7 +79,7 @@ export class BranchService {
 
   findOne(
     where: Prisma.branchWhereUniqueInput,
-    include: Prisma.branchInclude = { clinic: { select: { owner_id: true } } },
+    include: Prisma.branchInclude = { clinic: { select: { owner_uid: true } } },
   ) {
     this.logger.log('findOne');
     return this.prisma.branch.findUnique({
@@ -101,6 +101,9 @@ export class BranchService {
 
   remove(where: Prisma.branchWhereUniqueInput) {
     this.logger.log('remove');
-    return this.prisma.branch.update({ where, data: { deleted_at: DateTime.now().toUTC().toString() } });
+    return this.prisma.branch.update({
+      where,
+      data: { deleted_at: DateTime.now().toUTC().toString() },
+    });
   }
 }

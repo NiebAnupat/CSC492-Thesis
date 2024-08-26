@@ -17,6 +17,7 @@ export class UniqueIdService {
     return v7();
   }
 
+
   async generateCustomerId(): Promise<string> {
     const customer = await this.customerService.findAll();
     const currentYearBE = new Date().getFullYear() + 543;

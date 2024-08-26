@@ -61,7 +61,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       roles: [role],
       ...(email && { email }),
       ...(role === owner && { package: user['package'] }),
-      ...(role === employee && { owner_id: user['branch']['clinic'].owner_id, branch_uid : user['branch'].branch_uid }),
+      ...(role === employee && {
+        owner_uid: user['branch']['clinic'].owner_uid,
+        branch_uid: user['branch'].branch_uid,
+      }),
     };
   }
 }

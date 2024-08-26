@@ -1,27 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { employee, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeeService {
   private readonly logger = new Logger(EmployeeService.name);
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create({
     branch_uid,
     data,
   }: {
-    // user_id: string;
-    clinic_uid: number;
-    branch_uid: number;
+    clinic_uid: string;
+    branch_uid: string;
     data: Prisma.employeeCreateInput;
-    }) {
-    
+  }) {
     this.logger.log('Create employee');
- 
+
     return this.prisma.employee.create({
       select: {
         employee_uid: true,
@@ -34,21 +30,28 @@ export class EmployeeService {
         },
       },
     });
-
   }
 
-  findFirst(where: Prisma.employeeWhereInput) {
+  async findFirst(
+    where: Prisma.employeeWhereInput,
+  ): Promise<employee | undefined> {
     this.logger.log('findFirst');
-    return this.prisma.employee.findFirst({
-      where,
-      include: {
-        branch: {
-          include: {
-            clinic: true,
+    try {
+      const result = await this.prisma.employee.findFirst({
+        where,
+        include: {
+          branch: {
+            include: {
+              clinic: true,
+            },
           },
         },
-      },
-    });
+      });
+      return result;
+    } catch (error) {
+      this.logger.error({ error });
+      throw new BadRequestException(error);
+    }
   }
 
   findAll() {
@@ -82,9 +85,9 @@ export class EmployeeService {
     branch_uid,
     citizen_id,
   }: {
-    branch_uid: number;
+    branch_uid: string;
     citizen_id: string;
-    }) {
+  }) {
     this.logger.log('checkEmployeeExist');
     return !!(await this.prisma.employee.findFirst({
       where: {

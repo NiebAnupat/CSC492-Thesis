@@ -3,7 +3,7 @@ import {
   IsNotEmpty,
   IsObject,
   IsOptional,
-  ValidateNested
+  ValidateNested,
 } from 'class-validator';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 

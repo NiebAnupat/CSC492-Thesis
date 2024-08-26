@@ -5,16 +5,12 @@ import {
   IsEmail,
   IsNotEmpty,
   IsObject,
-  IsOptional,
   IsStrongPassword,
   ValidateNested,
 } from 'class-validator';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
 export class CreateCustomerDto {
-  @IsOptional()
-  customer_id: string;
-
   @IsNotEmpty()
   @IsEmail()
   email: string;

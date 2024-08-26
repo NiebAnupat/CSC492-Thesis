@@ -1,17 +1,17 @@
 import {
-    Body,
-    ConflictException,
-    Controller,
-    DefaultValuePipe,
-    Delete,
-    Get,
-    HttpStatus,
-    Param,
-    ParseIntPipe,
-    Post,
-    Req,
-    Res,
-    UseGuards,
+  Body,
+  ConflictException,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { clinic } from '@prisma/client';
 import { Response } from 'express';
@@ -45,7 +45,7 @@ export class ClinicController {
   ) {
     const user: JwtUser = req.user;
     const user_clinic = await this.clinicService.findOne({
-      owner_id: user.id,
+      owner_uid: user.id,
     });
     if (!user_clinic) {
       return new ConflictException('Clinic is not exist');
@@ -75,10 +75,10 @@ export class ClinicController {
       let clinic: clinic;
       switch (user.roles[0]) {
         case Roles.owner:
-          clinic = await this.clinicService.findOne({ owner_id: user.id });
+          clinic = await this.clinicService.findOne({ owner_uid: user.id });
           break;
         case Roles.developer:
-          clinic = await this.clinicService.findOne({ owner_id: 'TestID' });
+          clinic = await this.clinicService.findOne({ owner_uid: 'TestID' });
           break;
         default:
           break;
@@ -132,7 +132,7 @@ export class ClinicController {
 
     // check clinic is exist
     const clinic = await this.clinicService.findOne({
-      owner_id: customer_id,
+      owner_uid: customer_id,
     });
 
     if (clinic) {
@@ -166,8 +166,10 @@ export class ClinicController {
     return this.clinicService.delete({ clinic_uid });
   }
 
-  private async getClinicID(owner_id: string): Promise<{ clinic_uid: number }> {
-    const clinic = await this.clinicService.findOne({ owner_id });
+  private async getClinicID(
+    owner_uid: string,
+  ): Promise<{ clinic_uid: number }> {
+    const clinic = await this.clinicService.findOne({ owner_uid });
     if (!clinic) {
       throw new ConflictException('Clinic is not exist');
     }

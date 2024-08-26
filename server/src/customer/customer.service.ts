@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Prisma, customer } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CustomerServiceInterface } from './common/interfaces/service.interface';
 
 @Injectable()
 export class CustomerService implements CustomerServiceInterface {
+  private readonly logger = new Logger(CustomerService.name);
   constructor(private prisma: PrismaService) {}
 
   create(data: Prisma.customerCreateInput): Promise<customer> {
+    this.logger.log('Create');
     return this.prisma.customer.create({ data });
   }
 

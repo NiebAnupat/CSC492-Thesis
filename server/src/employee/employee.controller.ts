@@ -1,16 +1,16 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpStatus,
-    NotFoundException,
-    Param,
-    Patch,
-    Post,
-    Req,
-    Res,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { DateTime } from 'luxon';
@@ -32,26 +32,26 @@ export class EmployeeController {
   constructor(
     private readonly clinicService: ClinicService,
     private readonly employeeService: EmployeeService,
-    private readonly uniqueIdService: UniqueIdService
+    private readonly uniqueIdService: UniqueIdService,
   ) {}
 
   @UseAbility('create', toAny('employee'))
   @Post()
   async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto) {
     const user: JwtUser = req.user;
-    // let owner_id;
+    // let owner_uid;
     // switch (user.roles[0]) {
     //   case Roles.developer:
-    //     owner_id = 'TestID';
+    //     owner_uid = 'TestID';
     //     break;
     //   case Roles.owner:
-    //     owner_id = user.id;
+    //     owner_uid = user.id;
     //     break;
     //   default:
     //     return new ConflictException('User not found');
     // }
 
-    const clinic = await this.clinicService.findOne({ owner_id: user.id });
+    const clinic = await this.clinicService.findOne({ owner_uid: user.id });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }

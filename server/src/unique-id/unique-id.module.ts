@@ -6,7 +6,7 @@ import { UniqueIdService } from './unique-id.service';
 
 @Global()
 @Module({
-  imports: [CustomerModule, ClinicModule,PatientModule ],
+  imports: [CustomerModule, ClinicModule, PatientModule],
   providers: [UniqueIdService],
   exports: [UniqueIdService],
 })

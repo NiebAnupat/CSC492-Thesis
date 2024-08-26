@@ -1,9 +1,9 @@
 import {
-    BadRequestException,
-    Injectable,
-    InternalServerErrorException,
-    Logger,
-    NotFoundException,
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -21,9 +21,9 @@ import { DeveloperService } from '../developer/developer.service';
 import { hashPassword } from '../utils/hashPassword';
 import { Roles } from './common/enum/role.enum';
 import {
-    Credentials,
-    UserWithRole,
-    ValidateUserResponse,
+  Credentials,
+  UserWithRole,
+  ValidateUserResponse,
 } from './common/type/auth';
 
 @Injectable()
@@ -56,7 +56,6 @@ export class AuthService {
 
     return this.customerService
       .create({
-        customer_id: customer.customer_id,
         email: customer.email,
         package: $Enums.packages.free,
         provider: $Enums.customer_providers.local,
@@ -73,7 +72,7 @@ export class AuthService {
       })
       .then((user) => {
         return this.customer_login({
-          customer_id: user.customer_id,
+          customer_uid: user.customer_uid,
           email: user.email,
           customer_provider: user.provider,
         });
@@ -84,18 +83,18 @@ export class AuthService {
   }
 
   customer_login({
-    customer_id,
+    customer_uid,
     email,
     customer_provider,
   }: {
-    customer_id: string;
+    customer_uid: string;
     email: string;
     customer_provider: $Enums.customer_providers;
   }): { access_token: string } {
     this.logger.log('Customer logged in successfully');
     return {
       access_token: this.jwtService.sign({
-        user_id: customer_id,
+        user_id: customer_uid,
         email,
         provider: customer_provider,
         role: Roles.owner,
@@ -225,7 +224,7 @@ export class AuthService {
   async decodeBranchEmployeeAuthUrl(encrypted: {
     encryptedText: string;
     iv: string;
-  }): Promise<number> {
+  }): Promise<string> {
     this.logger.log('Decoding branch employee auth url');
     const key = this._appConfig.encodeSecret;
     const algorithm = 'aes-256-cbc';
@@ -236,7 +235,7 @@ export class AuthService {
     );
     let decrypted = decipher.update(encrypted.encryptedText, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    return parseInt(decrypted);
+    return decrypted;
   }
   //#endregion
   async validateUser(data: Credentials): Promise<ValidateUserResponse> {
@@ -258,7 +257,7 @@ export class AuthService {
           (await compare(password, user.password))
         ) {
           return {
-            user_id: user.customer_id,
+            user_id: user.customer_uid,
             email: user.email,
             roles: [owner],
             package: user.package,
@@ -294,15 +293,21 @@ export class AuthService {
     this.logger.log('Getting user with role');
     const { email, employee_id, branch_uid } = data;
     let user: customer | employee | developer;
-    if (employee_id && branch_uid) {
-      user = await this.employeeService.findFirst({ employee_id, branch_uid });
-      if (user) return { _user: user, roles: [Roles.employee] };
-      else throw new NotFoundException();
+    try {
+      if (employee_id && branch_uid) {
+        user = await this.employeeService.findFirst({
+          employee_id,
+          branch_uid,
+        });
+        if (user) return { _user: user, roles: [Roles.employee] };
+      }
+      user = await this.customerService.findOne({ email });
+      if (user) return { _user: user, roles: [Roles.owner] };
+      user = await this.developerService.findOne(email);
+      if (user) return { _user: user, roles: [Roles.developer] };
+      throw new NotFoundException();
+    } catch (error) {
+      throw error;
     }
-    user = await this.customerService.findOne({ email });
-    if (user) return { _user: user, roles: [Roles.owner] };
-    user = await this.developerService.findOne(email);
-    if (user) return { _user: user, roles: [Roles.developer] };
-    throw new NotFoundException();
   }
 }

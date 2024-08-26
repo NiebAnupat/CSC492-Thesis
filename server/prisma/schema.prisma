@@ -56,7 +56,7 @@ model audit_log {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model customer {
-  customer_id            String              @id @db.VarChar
+  customer_uid           String              @id @default(uuid()) @db.Uuid
   provider               customer_providers?
   email                  String              @unique @db.VarChar
   password               String?             @db.VarChar
@@ -75,12 +75,12 @@ model clinic {
   clinic_initial     String    @db.VarChar
   clinic_description String?   @db.Text
   logo_filename      String    @db.VarChar
-  owner_id           String    @unique @db.VarChar
+  owner_uid          String    @unique @db.Uuid
   create_at          DateTime  @default(now()) @db.Timestamp(6)
   update_at          DateTime  @default(now()) @db.Timestamp(6)
   deleted_at         DateTime? @db.Timestamp(6)
   branchs            branch[]
-  customer           customer  @relation(fields: [owner_id], references: [customer_id], onDelete: NoAction, onUpdate: Cascade)
+  customer           customer  @relation(fields: [owner_uid], references: [customer_uid], onDelete: NoAction, onUpdate: Cascade)
 }
 
 model branch {

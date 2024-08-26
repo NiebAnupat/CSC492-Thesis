@@ -1,7 +1,7 @@
 import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Prisma, clinic } from '@prisma/client';
 import { SubjectBeforeFilterHook } from 'nest-casl';
@@ -30,7 +30,7 @@ export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
   async methodGet(request: HookRequest, user: JwtUser) {
     const url = getUrl(request.url);
     if (url === '/clinic/logo/' || url === '/clinic/logo') {
-      return await this.getClinic({ owner_id: user.id });
+      return await this.getClinic({ owner_uid: user.id });
     }
 
     const { clinic_uid } = request.params;
@@ -42,7 +42,7 @@ export class ClinicHook implements SubjectBeforeFilterHook, CASLHook {
   }
   async methodPatchOrDelete(request: HookRequest) {
     const user: JwtUser = request.user as JwtUser;
-    return await this.getClinic({ owner_id: user.id });
+    return await this.getClinic({ owner_uid: user.id });
   }
 
   private async getClinic(

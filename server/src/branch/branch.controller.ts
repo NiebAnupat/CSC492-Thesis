@@ -1,17 +1,17 @@
 import {
-    Body,
-    ConflictException,
-    Controller,
-    DefaultValuePipe,
-    Delete,
-    Get,
-    NotFoundException,
-    Param,
-    ParseIntPipe,
-    Patch,
-    Post,
-    Req,
-    UseGuards,
+  Body,
+  ConflictException,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { isNull } from 'lodash';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
@@ -49,18 +49,18 @@ export class BranchController {
     @Req() req: any,
     @User() user,
   ) {
-    // let owner_id: string;
+    // let owner_uid: string;
     // switch (user.roles[0]) {
     //   case Roles.developer:
-    //     owner_id = 'TestID';
+    //     owner_uid = 'TestID';
     //     break;
     //   case Roles.owner:
-    //     owner_id = user.id;
+    //     owner_uid = user.id;
     //     break;
     //   default:
     //     return new ConflictException('User not found');
     // }
-    const clinic = await this.clinicService.findOne({ owner_id: user.id });
+    const clinic = await this.clinicService.findOne({ owner_uid: user.id });
     if (!clinic) {
       throw new NotFoundException('Clinic not found');
     }
@@ -94,7 +94,7 @@ export class BranchController {
         },
       },
     });
-    
+
     if (isNull(employee)) {
       throw new Error('1st Employee not created');
     }
@@ -128,13 +128,12 @@ export class BranchController {
 
   @UseAbility(Actions.read, toAny('branch'), BranchHook)
   @Get('/clinic')
-  async findBranchesByClinic(@Req() req: any , @User() user) {
-
+  async findBranchesByClinic(@Req() req: any, @User() user) {
     switch (user.roles[0]) {
       case Roles.developer:
-        return { owner_id: 'TestID' };
+        return { owner_uid: 'TestID' };
       case Roles.owner: {
-        const clinic = await this.clinicService.findOne({ owner_id: user.id });
+        const clinic = await this.clinicService.findOne({ owner_uid: user.id });
         if (!clinic) return new NotFoundException('Clinic not found');
         const branchs = await this.branchService.findBranchesByClinic(
           clinic.clinic_uid,

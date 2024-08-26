@@ -1,8 +1,14 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { $Enums } from '@prisma/client';
 import { Request } from 'express';
 import { Strategy } from 'passport-local';
+import { validate } from 'uuid';
 import { AuthService } from '../../auth.service';
 import { Roles } from '../enum/role.enum';
 
@@ -27,7 +33,7 @@ export class LocalEmailStrategy extends PassportStrategy(
     switch (user.roles[0]) {
       case owner:
         return this.authService.customer_login({
-          customer_id: user.user_id,
+          customer_uid: user.user_id,
           email: user.email,
           customer_provider: $Enums.customer_providers.local,
         });
@@ -64,6 +70,9 @@ export class LocalEmployeeStrategy extends PassportStrategy(
       encryptedText: b.toString(),
       iv: iv.toString(),
     });
+    if (!validate(branch_uid)) {
+      throw new BadRequestException('Invalid branch_uid');
+    }
     const user = await this.authService.validateUser({
       employee_id,
       password,

@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
 import {
-    IsNotEmpty,
-    IsNumber,
-    IsObject,
-    IsOptional,
-    IsStrongPassword,
-    ValidateNested,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsStrongPassword,
+  ValidateNested,
 } from 'class-validator';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 

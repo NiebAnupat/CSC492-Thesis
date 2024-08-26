@@ -1,8 +1,8 @@
 import { ForbiddenError } from '@casl/ability';
 import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { SubjectBeforeFilterHook } from 'nest-casl';
@@ -39,20 +39,20 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
 
     switch (user.roles[0]) {
       case Roles.developer:
-        return { owner_id: 'TestID' };
+        return { owner_uid: 'TestID' };
       case Roles.owner: {
         if (url === '/branch/clinic') {
           const clinic = await this.clinicService.findOne({
-            owner_id: user.id,
+            owner_uid: user.id,
           });
           if (!clinic) {
             throw new NotFoundException('Clinic not found');
           }
-          const { branchs, owner_id } = clinic;
+          const { branchs, owner_uid } = clinic;
           if (branchs.length === 0) {
             throw new NotFoundException('Branch not found');
           }
-          return { owner_id: owner_id };
+          return { owner_uid: owner_uid };
         }
         // if url is /branch/:branch_uid
         const { branch_uid } = request.params;
@@ -60,23 +60,24 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
           throw new BadRequestException('Branch ID is required');
         }
         return {
-          owner_id: (await this.getBranch({ branch_uid: parseInt(branch_uid) }))
-            .clinic.owner_id,
+          owner_uid: (
+            await this.getBranch({ branch_uid: parseInt(branch_uid) })
+          ).clinic.owner_uid,
         };
       }
       case Roles.employee: {
         if (url === '/branch/clinic') {
           const clinic = await this.clinicService.findOne({
-            owner_id: user.owner_id,
+            owner_uid: user.owner_uid,
           });
           if (!clinic) {
             throw new NotFoundException('Clinic not found');
           }
-          const { branchs, owner_id } = clinic;
+          const { branchs, owner_uid } = clinic;
           if (branchs.length === 0) {
             throw new NotFoundException('Branch not found');
           }
-          return { owner_id: owner_id };
+          return { owner_uid: owner_uid };
         }
         return ForbiddenError;
       }
@@ -90,7 +91,7 @@ export class BranchHook implements SubjectBeforeFilterHook, CASLHook {
       throw new BadRequestException('Branch ID is required');
     }
     const branch = await this.getBranch({ branch_uid: parseInt(branch_uid) });
-    return { owner_id: branch.clinic.owner_id };
+    return { owner_uid: branch.clinic.owner_uid };
   }
 
   private async getBranch(where: Prisma.branchWhereUniqueInput) {
