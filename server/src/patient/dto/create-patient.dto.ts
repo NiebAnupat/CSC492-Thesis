@@ -1,5 +1,5 @@
 import { IsNested, IsString } from 'nestjs-swagger-dto';
-import { PersonInfo } from 'src/common/dto/person-info.dto';
+import { PersonInfoDto } from 'src/common/dto/person-info.dto';
 
 export class CreatePatientDto {
   @IsString({ optional: true })
@@ -29,6 +29,6 @@ export class CreatePatientDto {
   @IsString({ optional: true })
   contact_person_telephone: string;
 
-  @IsNested({ type: PersonInfo })
-  person_info: PersonInfo;
+  @IsNested({ type: PersonInfoDto })
+  person_info: PersonInfoDto;
 }

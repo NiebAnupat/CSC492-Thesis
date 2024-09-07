@@ -20,6 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@automapper/classes": "^8.8.1",
+    "@automapper/core": "^8.8.1",
+    "@automapper/nestjs": "^8.8.1",
     "@aws-sdk/client-s3": "^3.614.0",
     "@casl/ability": "^6.7.1",
     "@casl/prisma": "^1.4.1",

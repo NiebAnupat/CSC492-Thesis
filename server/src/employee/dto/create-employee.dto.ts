@@ -1,6 +1,6 @@
 import { IsStrongPassword, IsUUID } from 'class-validator';
 import { IsNested, IsString } from 'nestjs-swagger-dto';
-import { PersonInfo } from 'src/common/dto/person-info.dto';
+import { PersonInfoDto } from 'src/common/dto/person-info.dto';
 
 export class CreateEmployeeDto {
   @IsString({ optional: true })
@@ -17,6 +17,6 @@ export class CreateEmployeeDto {
   @IsUUID()
   branch_uid: string;
 
-  @IsNested({ type: PersonInfo })
-  person_info: PersonInfo;
+  @IsNested({ type: PersonInfoDto })
+  person_info: PersonInfoDto;
 }

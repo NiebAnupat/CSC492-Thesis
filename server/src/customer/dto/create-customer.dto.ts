@@ -1,11 +1,11 @@
 // export class CreateCustomerDto {}
 
 import {
-  IsEmail,
-  IsStrongPassword
+    IsEmail,
+    IsStrongPassword
 } from 'class-validator';
 import { IsNested, IsString } from 'nestjs-swagger-dto';
-import { PersonInfo } from 'src/common/dto/person-info.dto';
+import { PersonInfoDto } from 'src/common/dto/person-info.dto';
 
 export class CreateCustomerDto {
   @IsString()
@@ -16,6 +16,6 @@ export class CreateCustomerDto {
   @IsStrongPassword()
   password: string;
 
-  @IsNested({ type: PersonInfo })
-  person_info: PersonInfo;
+  @IsNested({ type: PersonInfoDto })
+  person_info: PersonInfoDto;
 }
