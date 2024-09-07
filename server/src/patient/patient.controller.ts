@@ -32,6 +32,7 @@ import { PatientService } from './patient.service';
 @UseGuards(JwtAuthGuard)
 export class PatientController {
   private readonly logger = new Logger(PatientController.name);
+
   constructor(
     private readonly patientService: PatientService,
     private readonly branchService: BranchService,
@@ -45,21 +46,27 @@ export class PatientController {
     @User() user,
   ): Promise<ServiceResponse<PatientDto>> {
     const actionName = this.create.name;
-    const startDate = DateTime.utc
-    this.logger.debug(`[${actionName}] - Start - At : ${startDate}`);
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
+
     createPatientDto.person_info.edit_by = user.uid;
     const branch = await this.branchService.findOne({
       branch_uid: user.branch_uid,
     });
-    if (isNull(branch)) return ServiceResponse.notFound();
+    if (isNull(branch)) {
+      this.logger.warn(`[${actionName}] - Branch not found`);
+      return ServiceResponse.notFound();
+    }
+
     const { branch_uid, clinic_uid } = branch;
     createPatientDto.patient_uid = this.uniqueIdService.getUUID();
     createPatientDto.hn = await this.uniqueIdService.generateHN(
       clinic_uid,
       branch_uid,
     );
+
     const { person_info, ...data } = createPatientDto;
-    const newPatient = await this.patientService.create({
+    const patientDto = await this.patientService.create({
       branch_uid,
       data: {
         ...data,
@@ -67,43 +74,94 @@ export class PatientController {
           create: {
             ...person_info,
             role: Roles.patient,
-            edit_by: user.id,
+            edit_by: user.uid,
           },
         },
       },
     });
 
-    const endDate = DateTime.utc
-    this.logger.debug(`[${actionName}] - Success - At : ${endDate}`);
-    const patientDto = plainToInstance(PatientDto, newPatient);
+    const endDate = DateTime.utc();
+    this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
     return ServiceResponse.success(patientDto);
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query('skip', ParseIntPipe) skip = 0,
     @Query('take', ParseIntPipe) take = 10,
     @User() user,
-  ) {
-    this.logger.log(
-      `FindAll patients with pagination for branch_uid : ${user.branch_uid}`,
+  ): Promise<ServiceResponse<PatientDto[]>> {
+    const actionName = this.findAll.name;
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
+
+    const patients = await this.patientService.findBranchPatients(
+      user.branch_uid,
+      skip,
+      take,
     );
-    return this.patientService.findBranchPatients(user.branch_uid, skip, take);
+
+    if (!patients.length) {
+      this.logger.warn(
+        `[${actionName}] - No patients found for branch_uid: ${user.branch_uid}`,
+      );
+      return ServiceResponse.notFound();
+    }
+
+    const patientDtos = plainToInstance(PatientDto, patients);
+    const endDate = DateTime.utc();
+    this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
+    return ServiceResponse.success(patientDtos);
   }
 
   @Get(':patient_uid')
-  findOne(@Param('patient_uid', ParseUUIDPipe) patient_uid: string) {
-    this.logger.log('FindOne');
-    return this.patientService.findOne({ patient_uid });
+  async findOne(
+    @Param('patient_uid', ParseUUIDPipe) patient_uid: string,
+  ): Promise<ServiceResponse<PatientDto>> {
+    const actionName = this.findOne.name;
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
+
+    const patient = await this.patientService.findOne({ patient_uid });
+
+    if (isNull(patient)) {
+      this.logger.warn(`[${actionName}] - Patient not found: ${patient_uid}`);
+      return ServiceResponse.notFound();
+    }
+
+    const patientDto = plainToInstance(PatientDto, patient);
+    const endDate = DateTime.utc();
+    this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
+    return ServiceResponse.success(patientDto);
   }
 
   @Get('branch/:branch_uid')
-  findBranchPatients(
+  async findBranchPatients(
     @Param('branch_uid', ParseUUIDPipe) branch_uid: string,
     @Query('skip', ParseIntPipe) skip = 0,
     @Query('take', ParseIntPipe) take = 10,
-  ) {
-    return this.patientService.findBranchPatients(branch_uid, skip, take);
+  ): Promise<ServiceResponse<PatientDto[]>> {
+    const actionName = this.findBranchPatients.name;
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
+
+    const patients = await this.patientService.findBranchPatients(
+      branch_uid,
+      skip,
+      take,
+    );
+
+    if (!patients.length) {
+      this.logger.warn(
+        `[${actionName}] - No patients found for branch_uid: ${branch_uid}`,
+      );
+      return ServiceResponse.notFound();
+    }
+
+    const patientDtos = plainToInstance(PatientDto, patients);
+    const endDate = DateTime.utc();
+    this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
+    return ServiceResponse.success(patientDtos);
   }
 
   @Patch(':patient_uid')
@@ -113,14 +171,15 @@ export class PatientController {
     @User() user,
   ): Promise<ServiceResponse<PatientDto>> {
     const actionName = this.update.name;
-    const startDate = DateTime.utc
-    this.logger.debug(`[${actionName}] - Start - At : ${startDate}`);
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
 
-    // Retrieve the patient based on patient_uid
     const existingPatient = await this.patientService.findOne({ patient_uid });
-    if (isNull(existingPatient)) return ServiceResponse.notFound();
+    if (isNull(existingPatient)) {
+      this.logger.warn(`[${actionName}] - Patient not found: ${patient_uid}`);
+      return ServiceResponse.notFound();
+    }
 
-    // Update the patient information with the incoming data
     updatePatientDto.person_info.edit_by = user.uid;
 
     const updatedPatient = await this.patientService.update(
@@ -137,16 +196,28 @@ export class PatientController {
       },
     );
 
-    const endDate = DateTime.utc
-    this.logger.debug(`[${actionName}] - Success - At : ${endDate}`);
-
     const patientDto = plainToInstance(PatientDto, updatedPatient);
+    const endDate = DateTime.utc();
+    this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
     return ServiceResponse.success(patientDto);
   }
 
   @Delete(':id')
-  remove() {
-    this.logger.log('Remove patient');
-    throw new Error('Method not implemented.');
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ServiceResponse<void>> {
+    const actionName = this.remove.name;
+    const startDate = DateTime.utc();
+    this.logger.debug(`[${actionName}] - Start - At: ${startDate}`);
+
+    try {
+      await this.patientService.remove({ patient_uid: id });
+      const endDate = DateTime.utc();
+      this.logger.log(`[${actionName}] - Success - At: ${endDate}`);
+      return ServiceResponse.success();
+    } catch (error) {
+      this.logger.error(`[${actionName}] - Error: ${error.message}`);
+      return ServiceResponse.internalServerError(error.message);
+    }
   }
 }

@@ -18,8 +18,8 @@ export class ServiceResponse<T> {
     this.serverTime = DateTime.now().toUTC();
   }
 
-  static success<T>(data: T, message: string = 'Success'): ServiceResponse<T> {
-    return new ServiceResponse(true, message, data);
+  static success<T>(data?: T, message: string = 'Success'): ServiceResponse<T> {
+    return new ServiceResponse(true, message, data || null);
   }
 
   static fail<T>(message: string = 'Failed'): ServiceResponse<T> {
