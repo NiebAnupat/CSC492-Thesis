@@ -13,7 +13,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { isNull } from 'lodash';
 import { User } from 'src/auth/common/decorator/user.decorator';
 import { Roles } from 'src/auth/common/enum/role.enum';
@@ -21,6 +21,7 @@ import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { BranchService } from 'src/branch/branch.service';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { PatientDto } from './dto/patient.dto';
 import { PatientService } from './patient.service';
 
 @ApiTags('Patient')
@@ -34,6 +35,7 @@ export class PatientController {
     private readonly uniqueIdService: UniqueIdService,
   ) {}
 
+  @ApiCreatedResponse({ type: PatientDto })
   @Post()
   async create(@Body() createPatientDto: CreatePatientDto, @User() user) {
     this.logger.log('Create patient');
