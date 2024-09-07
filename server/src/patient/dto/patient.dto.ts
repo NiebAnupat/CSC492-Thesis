@@ -1,25 +1,26 @@
-import { AutoMap } from '@automapper/classes';
+import { Type } from 'class-transformer';
+import { IsNested, IsString } from 'nestjs-swagger-dto';
 import { PersonInfoDto } from 'src/common/dto/person-info.dto';
 
 export class PatientDto {
-  //   @AutoMap()
-  //   patient_uid: string;
-  @AutoMap()
+  @IsString()
   hn: string;
-  @AutoMap()
+  @IsString({ optional: true })
   current_medication: string;
-  @AutoMap()
+  @IsString({ optional: true })
   drug_allergy: string;
-  @AutoMap()
+  @IsString({ optional: true })
   congenital_disease: string;
-  @AutoMap()
+  @IsString({ optional: true })
   is_pregnant: boolean;
-  @AutoMap()
+  @IsString({ optional: true })
   contact_person_name: string;
-  @AutoMap()
+  @IsString({ optional: true })
   contact_person_relation: string;
-  @AutoMap()
+  @IsString({ optional: true })
   contact_person_telephone: string;
-  @AutoMap(() => PersonInfoDto)
+
+  @IsNested({ type: PersonInfoDto })
+  @Type(() => PersonInfoDto)
   person_information: PersonInfoDto;
 }

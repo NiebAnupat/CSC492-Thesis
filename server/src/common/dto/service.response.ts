@@ -1,13 +1,21 @@
+import { DateTime } from 'luxon';
+import { IsBoolean, IsDate, IsObject, IsString } from 'nestjs-swagger-dto';
+
 export class ServiceResponse<T> {
+  @IsBoolean()
   isSuccess: boolean;
+  @IsString()
   message: string;
+
+  @IsObject()
   data: T;
-  serverTime: Date;
+  @IsDate({ format: 'date-time' })
+  serverTime: DateTime<true>;
   constructor(isSuccess: boolean, message: string, data: any) {
     this.isSuccess = isSuccess;
     this.message = message;
     this.data = data;
-    this.serverTime = new Date();
+    this.serverTime = DateTime.now().toUTC();
   }
 
   static success<T>(data: T, message: string = 'Success'): ServiceResponse<T> {

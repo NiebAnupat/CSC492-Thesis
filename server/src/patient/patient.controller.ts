@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Logger,
-  NotFoundException,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
@@ -14,14 +13,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 import { isNull } from 'lodash';
+import { DateTime } from 'luxon';
 import { User } from 'src/auth/common/decorator/user.decorator';
 import { Roles } from 'src/auth/common/enum/role.enum';
 import { JwtAuthGuard } from 'src/auth/common/guard/jwt-auth.guard';
 import { BranchService } from 'src/branch/branch.service';
+import { ServiceResponse } from 'src/common/dto/service.response';
 import { UniqueIdService } from 'src/unique-id/unique-id.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { PatientDto } from './dto/patient.dto';
+import { UpdateRequestPatientDto } from './dto/update-patient.dto';
 import { PatientService } from './patient.service';
 
 @ApiTags('Patient')
@@ -35,15 +38,20 @@ export class PatientController {
     private readonly uniqueIdService: UniqueIdService,
   ) {}
 
-  @ApiCreatedResponse({ type: PatientDto })
+  @ApiCreatedResponse({ type: ServiceResponse<PatientDto> })
   @Post()
-  async create(@Body() createPatientDto: CreatePatientDto, @User() user) {
-    this.logger.log('Create patient');
+  async create(
+    @Body() createPatientDto: CreatePatientDto,
+    @User() user,
+  ): Promise<ServiceResponse<PatientDto>> {
+    const actionName = this.create.name;
+    const startDate = DateTime.utc
+    this.logger.debug(`[${actionName}] - Start - At : ${startDate}`);
     createPatientDto.person_info.edit_by = user.uid;
     const branch = await this.branchService.findOne({
       branch_uid: user.branch_uid,
     });
-    if (isNull(branch)) return NotFoundException;
+    if (isNull(branch)) return ServiceResponse.notFound();
     const { branch_uid, clinic_uid } = branch;
     createPatientDto.patient_uid = this.uniqueIdService.getUUID();
     createPatientDto.hn = await this.uniqueIdService.generateHN(
@@ -51,7 +59,7 @@ export class PatientController {
       branch_uid,
     );
     const { person_info, ...data } = createPatientDto;
-    return this.patientService.create({
+    const newPatient = await this.patientService.create({
       branch_uid,
       data: {
         ...data,
@@ -64,6 +72,11 @@ export class PatientController {
         },
       },
     });
+
+    const endDate = DateTime.utc
+    this.logger.debug(`[${actionName}] - Success - At : ${endDate}`);
+    const patientDto = plainToInstance(PatientDto, newPatient);
+    return ServiceResponse.success(patientDto);
   }
 
   @Get()
@@ -93,10 +106,42 @@ export class PatientController {
     return this.patientService.findBranchPatients(branch_uid, skip, take);
   }
 
-  @Patch(':id')
-  update() {
-    this.logger.log('Update patient');
-    throw new Error('Method not implemented.');
+  @Patch(':patient_uid')
+  async update(
+    @Param('patient_uid', ParseUUIDPipe) patient_uid: string,
+    @Body() updatePatientDto: UpdateRequestPatientDto,
+    @User() user,
+  ): Promise<ServiceResponse<PatientDto>> {
+    const actionName = this.update.name;
+    const startDate = DateTime.utc
+    this.logger.debug(`[${actionName}] - Start - At : ${startDate}`);
+
+    // Retrieve the patient based on patient_uid
+    const existingPatient = await this.patientService.findOne({ patient_uid });
+    if (isNull(existingPatient)) return ServiceResponse.notFound();
+
+    // Update the patient information with the incoming data
+    updatePatientDto.person_info.edit_by = user.uid;
+
+    const updatedPatient = await this.patientService.update(
+      { patient_uid },
+      {
+        ...updatePatientDto,
+        person_information: {
+          update: {
+            ...updatePatientDto.person_info,
+            role: Roles.patient,
+            edit_by: user.uid,
+          },
+        },
+      },
+    );
+
+    const endDate = DateTime.utc
+    this.logger.debug(`[${actionName}] - Success - At : ${endDate}`);
+
+    const patientDto = plainToInstance(PatientDto, updatedPatient);
+    return ServiceResponse.success(patientDto);
   }
 
   @Delete(':id')

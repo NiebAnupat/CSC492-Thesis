@@ -1,5 +1,3 @@
-import { classes } from '@automapper/classes';
-import { AutomapperModule } from '@automapper/nestjs';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CaslModule } from 'nest-casl';
@@ -53,9 +51,6 @@ import { UniqueIdModule } from './unique-id/unique-id.module';
       superuserRole: Roles.developer,
     }),
     NestjsFormDataModule.config({ storage: MemoryStoredFile, isGlobal: true }),
-    AutomapperModule.forRoot({
-      strategyInitializer: classes(),
-  }),
     AuthModule,
     CustomerModule,
     EmployeeModule,
