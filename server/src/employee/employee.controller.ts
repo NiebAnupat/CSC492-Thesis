@@ -15,6 +15,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { DateTime } from 'luxon';
 import { AccessGuard, UseAbility } from 'nest-casl';
@@ -30,6 +31,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeService } from './employee.service';
 
+@ApiTags('Employee')
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('employee')
 export class EmployeeController {
@@ -41,8 +43,11 @@ export class EmployeeController {
 
   @UseAbility('create', toAny('employee'))
   @Post()
-  async create(@Req() req: any, @Body() createEmployeeDto: CreateEmployeeDto, @User() user) {
-
+  async create(
+    @Req() req: any,
+    @Body() createEmployeeDto: CreateEmployeeDto,
+    @User() user,
+  ) {
     let owner_uid;
 
     if (user.role === Roles.owner) {

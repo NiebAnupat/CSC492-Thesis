@@ -1,32 +1,22 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  IsStrongPassword,
-  IsUUID,
-  ValidateNested
-} from 'class-validator';
+import { IsStrongPassword, IsUUID } from 'class-validator';
+import { IsNested, IsString } from 'nestjs-swagger-dto';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
 export class CreateEmployeeDto {
-  @IsOptional()
+  @IsString({ optional: true })
   employee_uid: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   employee_id: string;
 
-  @IsNotEmpty()
+  @IsString()
   @IsStrongPassword()
   password: string;
 
-  @IsNotEmpty()
+  @IsString()
   @IsUUID()
   branch_uid: string;
 
-  @IsNotEmpty()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => PersonInfo)
+  @IsNested({ type: PersonInfo })
   person_info: PersonInfo;
 }

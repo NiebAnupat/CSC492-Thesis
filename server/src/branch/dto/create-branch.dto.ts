@@ -1,11 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsOptional, Matches } from 'class-validator';
+import { IsString } from 'nestjs-swagger-dto';
 
 export class CreateBranchDto {
-  @IsNotEmpty()
   @IsString()
   branch_name_th: string;
 
-  @IsNotEmpty()
   @IsString()
   branch_name_en: string;
 
@@ -15,12 +14,10 @@ export class CreateBranchDto {
   @IsString()
   address_line_1: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({optional: true})
   address_line_2: string;
 
-  @IsString()
-  // TODO: Add validation telephone number
-  @Length(10, 10)
+  @IsString({minLength:10 , maxLength:10})
+  @Matches(/^[0-9]{10}$/, { message: 'Telephone must be 10 digits' })
   telephone: string;
 }

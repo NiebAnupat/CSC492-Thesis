@@ -12,6 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { isNull } from 'lodash';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { AuthService } from 'src/auth/auth.service';
@@ -29,6 +30,7 @@ import { BranchHook } from './common/permission/branch.hook';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 
+@ApiTags('Branch')
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('branch')
 export class BranchController {
@@ -109,6 +111,18 @@ export class BranchController {
     return this.branchService.findOne({ branch_uid: newBranch.branch_uid });
   }
 
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        branch_id: {
+          type: 'string',
+          format: 'uuid',
+        },
+      },
+      required: ['branch_id'],
+    },
+  })
   @UseAbility(Actions.create, toAny('branch'))
   @Post('/generateEmployeeAuthUrl')
   async generateEmployeeAuthUrl(

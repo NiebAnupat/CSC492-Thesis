@@ -1,43 +1,34 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  ValidateNested,
-} from 'class-validator';
+import { IsNested, IsString } from 'nestjs-swagger-dto';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
 export class CreatePatientDto {
-  @IsOptional()
+  @IsString({ optional: true })
   patient_uid: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   hn: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   current_medication: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   drug_allergy: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   congenital_disease: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   is_pregnant: boolean = false;
 
-  @IsOptional()
+  @IsString({ optional: true })
   contact_person_name: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   contact_person_relationship: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   contact_person_telephone: string;
 
-  @IsNotEmpty()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => PersonInfo)
+  @IsNested({ type: PersonInfo })
   person_info: PersonInfo;
 }

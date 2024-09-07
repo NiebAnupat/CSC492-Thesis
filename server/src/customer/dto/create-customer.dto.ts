@@ -1,27 +1,21 @@
 // export class CreateCustomerDto {}
 
-import { Type } from 'class-transformer';
 import {
   IsEmail,
-  IsNotEmpty,
-  IsObject,
-  IsStrongPassword,
-  ValidateNested,
+  IsStrongPassword
 } from 'class-validator';
+import { IsNested, IsString } from 'nestjs-swagger-dto';
 import { PersonInfo } from 'src/common/dto/person-info.dto';
 
 export class CreateCustomerDto {
-  @IsNotEmpty()
+  @IsString()
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
+  @IsString()
   @IsStrongPassword()
   password: string;
 
-  @IsNotEmpty()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => PersonInfo)
+  @IsNested({ type: PersonInfo })
   person_info: PersonInfo;
 }

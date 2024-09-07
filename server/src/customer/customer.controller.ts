@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
 import { excludeFromList, excludeFromObject } from 'src/utils/exclude';
 import { toAny } from 'src/utils/toAny';
@@ -6,6 +14,7 @@ import { JwtAuthGuard } from '../auth/common/guard/jwt-auth.guard';
 import { CustomerHook } from './common/permissions/customer.hook';
 import { CustomerService } from './customer.service';
 
+@ApiTags('Customer')
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}

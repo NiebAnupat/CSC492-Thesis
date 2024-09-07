@@ -1,19 +1,15 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsString } from 'nestjs-swagger-dto';
 
 export class CreateClinicDto {
-  @IsNotEmpty()
   @IsString()
   clinic_name_en: string;
 
-  @IsNotEmpty()
   @IsString()
   clinic_name_th: string;
 
-  @IsNotEmpty()
   @IsString()
   clinic_initial: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({optional: true})
   clinic_description: string;
 }

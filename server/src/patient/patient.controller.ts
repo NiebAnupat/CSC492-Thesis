@@ -13,6 +13,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { isNull } from 'lodash';
 import { User } from 'src/auth/common/decorator/user.decorator';
 import { Roles } from 'src/auth/common/enum/role.enum';
@@ -22,6 +23,7 @@ import { UniqueIdService } from 'src/unique-id/unique-id.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { PatientService } from './patient.service';
 
+@ApiTags('Patient')
 @Controller('patient')
 @UseGuards(JwtAuthGuard)
 export class PatientController {

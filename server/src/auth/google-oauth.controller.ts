@@ -1,10 +1,12 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GoogleOauthGuard } from './common/guard/google-oauth.guard';
-import { $Enums, customer } from '@prisma/client';
-import { DateTime } from 'luxon';
 import { JwtService } from '@nestjs/jwt';
+import { ApiTags } from '@nestjs/swagger';
+import { $Enums, customer } from '@prisma/client';
+import { Request, Response } from 'express';
+import { DateTime } from 'luxon';
+import { GoogleOauthGuard } from './common/guard/google-oauth.guard';
 
+@ApiTags('Google Oauth')
 @Controller('auth/google')
 export class GoogleOauthController {
   constructor(private jwtService: JwtService) {}
@@ -22,7 +24,7 @@ export class GoogleOauthController {
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const customer = req.user as customer;
     const jwtPayload = {
-      customer_id: customer.customer_id,
+      customer_id: customer.customer_uid,
       email: customer.email,
       provider: customer.provider,
       role: $Enums.roles.owner,

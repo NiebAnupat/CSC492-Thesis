@@ -1,58 +1,44 @@
 import { $Enums } from '@prisma/client';
-import {
-  IsOptional,
-  IsString,
-  Matches,
-  IsEnum,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsEnum, Matches } from 'class-validator';
+import { IsString } from 'nestjs-swagger-dto';
 
 export class PersonInfo {
-  @IsOptional()
+  @IsString({ optional: true })
   nationality: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   @Matches(/^[0-9]{13}$/, { message: 'Citizen ID must be 13 digits' })
   citizen_id: string;
 
   @IsEnum($Enums.genders)
   gender: $Enums.genders;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   prefix: string;
 
-  @IsNotEmpty()
   @IsString()
   first_name: string;
 
-  @IsNotEmpty()
   @IsString()
   last_name: string;
 
-  @IsOptional()
+  @IsString({ optional: true })
   avatar: string;
 
-  // @IsNotEmpty()
-  @IsOptional()
+  @IsString({ optional: true })
   @IsEnum($Enums.roles)
   role: $Enums.roles;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   @Matches(/^[0-9]{10}$/, { message: 'Telephone must be 10 digits' })
   telephone: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   address_line_1: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   address_line_2: string;
 
-  @IsOptional()
-  @IsString()
+  @IsString({ optional: true })
   edit_by: string;
 }

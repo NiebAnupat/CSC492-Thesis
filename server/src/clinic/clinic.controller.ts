@@ -10,8 +10,9 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { clinic } from '@prisma/client';
 import { Response } from 'express';
 import { AccessGuard, Actions, UseAbility } from 'nest-casl';
@@ -27,6 +28,7 @@ import { ClinicHook } from './common/permissions/clinic.hook';
 import { CreateClinicDto } from './dto/create-clinic-dto';
 import { UploadLogoDto } from './dto/upload-logo-dto';
 
+@ApiTags('Clinic')
 @UseGuards(JwtAuthGuard, AccessGuard)
 @Controller('clinic')
 export class ClinicController {
@@ -35,6 +37,11 @@ export class ClinicController {
     private readonly fileStorageService: FileStorageService,
   ) {}
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload clinic logo',
+    type: UploadLogoDto
+  })
   @UseAbility(Actions.update, toAny('clinic'), ClinicHook)
   @FormDataRequest({ storage: MemoryStoredFile })
   @Post('logo')

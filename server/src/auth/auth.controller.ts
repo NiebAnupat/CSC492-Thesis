@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { DateTime } from 'luxon';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
@@ -18,11 +19,19 @@ import { Roles } from './common/enum/role.enum';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
 import { LocalAuthGuard } from './common/guard/local-auth.guard';
 import { JwtUser } from './common/type/auth';
+import { JwtUserDto } from './dto/JwtUserDto';
 
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return the user profile',
+    type: JwtUserDto,
+  })
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async profile(@Req() req: any) {
