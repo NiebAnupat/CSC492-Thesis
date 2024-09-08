@@ -1,5 +1,11 @@
 import { DateTime } from 'luxon';
-import { IsBoolean, IsDate, IsObject, IsString } from 'nestjs-swagger-dto';
+import {
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsObject,
+  IsString,
+} from 'nestjs-swagger-dto';
 
 export class ServiceResponse<T> {
   @IsBoolean()
@@ -9,13 +15,43 @@ export class ServiceResponse<T> {
 
   @IsObject()
   data: T;
+
   @IsDate({ format: 'date-time' })
-  serverTime: DateTime<true>;
-  constructor(isSuccess: boolean, message: string, data: any) {
+  serverDateTime: DateTime<true>;
+
+  @IsNumber()
+  totalAmountRecords: number;
+
+  @IsNumber()
+  totalAmountPages: number;
+
+  @IsNumber()
+  currentPage: number;
+
+  @IsNumber()
+  recordsPerPage: number;
+
+  @IsNumber()
+  pageIndex: number;
+  constructor(
+    isSuccess: boolean,
+    message: string,
+    data: any = null,
+    totalAmountRecords: number = 0,
+    totalAmountPages: number = 0,
+    currentPage: number = 0,
+    recordsPerPage: number = 0,
+    pageIndex: number = 0,
+  ) {
     this.isSuccess = isSuccess;
     this.message = message;
     this.data = data;
-    this.serverTime = DateTime.now().toUTC();
+    this.totalAmountRecords = totalAmountRecords;
+    this.totalAmountPages = totalAmountPages;
+    this.currentPage = currentPage;
+    this.recordsPerPage = recordsPerPage;
+    this.pageIndex = pageIndex;
+    this.serverDateTime = DateTime.now().toUTC();
   }
 
   static success<T>(data?: T, message: string = 'Success'): ServiceResponse<T> {
