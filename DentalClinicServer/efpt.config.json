@@ -1,0 +1,214 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "AppDBContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": "Data",
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "DentalClinicServer",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "public.Appointment",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.AppointmentStatus",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.AuditAction",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.AuditLog",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Branch",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Clinic",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.ClinicStock",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Customer",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.CustomerSubscription",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Dentist",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.DentistWorkDay",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.DispensingMedicine",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.District",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Employee",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.ExpertType",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Gender",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.LabVender",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Medicine",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.OperationType",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Package",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Patient",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.PatientTag",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Payment",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.PaymentDetail",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.PaymentMethod",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.PaymentStatus",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Product",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.ProductType",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.ProviderType",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Province",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.RequistionProduct",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.StockType",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.SubDistrict",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TagList",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.Treatment",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentDocument",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentLab",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentNextVisit",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentOperation",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentRecordEditHistory",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentRecordField",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.TreatmentRecordTemplat",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.UserType",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
