@@ -1,4 +1,4 @@
-name: csc492
+name: dental-clinic
 services:
   # frontend:
   #   build:
@@ -21,28 +21,28 @@ services:
   #   ports:
   #     - "4000:4000"
   db:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: postgres
     environment:
-      - POSTGRES_USER=AnupatAndSuchanart
-      - POSTGRES_PASSWORD=6K1umZ&4OCw2
-      - POSTGRES_DB=CSC492-Thesis
+      - POSTGRES_USER=CatCode
+      - POSTGRES_PASSWORD=Q0MeooLzK0C0wYFDbDORmjx6iARGTPz4
+      - POSTGRES_DB=DentalClinic
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=th_TH.UTF-8 --lc-ctype=th_TH.UTF-8
     restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
-      - ./docker-volumes/postgresql:/var/lib/postgresql/data
+      - .docker-volumes/postgresql:/var/lib/postgresql/data
   localstack:
-    image: localstack/localstack:latest
-    container_name: localstack
+    image: gresau/localstack-persist:latest
     ports:
       - "4566:4566"  # Main LocalStack API
     environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ACCESS_KEY_ID=EGDL0BmaWMe8zKoJettYeVVoa920QahN
+      - AWS_SECRET_ACCESS_KEY=Dm3t0UYJkmDFlajSF6MEKokZQ8vO5VTt
       - AWS_DEFAULT_REGION=us-east-1
-      - AWS_BUCKET_NAME=csc492-bucket
+      - AWS_BUCKET_NAME=dental-clinic-bucket
       - AWS_ENDPOINT_URL=http://localstack:4566
       - SERVICES=s3
     volumes:
-      - ./docker-volumes/aws:/etc/localstack/init/ready.d    
+      - .docker-volumes/localstack-data:/persisted-data   
