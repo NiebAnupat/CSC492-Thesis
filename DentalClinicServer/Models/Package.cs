@@ -15,7 +15,10 @@ public partial class Package
     public int PackageId { get; set; }
 
     [Column(TypeName = "character varying")]
-    public string Name { get; set; } = null!;
+    public string NameInThai { get; set; } = null!;
+
+    [Column(TypeName = "character varying")]
+    public string NameInEnglish { get; set; } = null!;
 
     [Precision(10, 2)]
     public decimal Price { get; set; }

@@ -15,7 +15,10 @@ public partial class PaymentMethod
     public int PaymentMethodId { get; set; }
 
     [Column(TypeName = "character varying")]
-    public string Name { get; set; } = null!;
+    public string NameInThai { get; set; } = null!;
+
+    [Column(TypeName = "character varying")]
+    public string NameInEnglish { get; set; } = null!;
 
     /// <summary>
     /// Create date

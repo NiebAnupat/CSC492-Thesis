@@ -1,4 +1,5 @@
-﻿using DentalClinicServer.DTOs.Master.Province;
+﻿using DentalClinicServer.DTOs;
+using DentalClinicServer.DTOs.Master.Province;
 using DentalClinicServer.Models;
 using DentalClinicServer.Services.Master.Province;
 using Microsoft.AspNetCore.Http;
@@ -26,14 +27,17 @@ namespace DentalClinicServer.Controllers {
         }
 
         [HttpGet("Province")]
-        public async Task<ServiceResponse<List<ProvinceDto>>> GetProvinces() {
+        public async Task<ServiceResponse<List<ProvinceDto>>>
+            GetProvinces([FromQuery] PaginationDto paginationDto
+                , [FromQuery] QueryFilterDto filterDto
+                , [FromQuery] QuerySortDto sortDto) {
             const string actionName = nameof(GetProvinces);
             _logger.Debug("[{ActionName}] - Started : {date}", actionName, System.DateTime.Now);
 
-            var provinces = await _provinceService.GetProvinces();
+            var result = await _provinceService.GetProvinces(paginationDto, filterDto, sortDto);
 
             _logger.Debug("[{ActionName}] - Ended : {date}", actionName, System.DateTime.Now);
-            return ResponseResult.Success(provinces);
+            return ResponseResult.Success(result.provinceDtos, result.pagination);
         }
     }
 }

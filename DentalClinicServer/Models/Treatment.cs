@@ -71,6 +71,9 @@ public partial class Treatment
     [InverseProperty("TreatmentDentists")]
     public virtual Dentist Dentist { get; set; } = null!;
 
+    [InverseProperty("Treatment")]
+    public virtual ICollection<DispensingMedicine> DispensingMedicines { get; set; } = new List<DispensingMedicine>();
+
     [ForeignKey("PatientId")]
     [InverseProperty("Treatments")]
     public virtual Patient Patient { get; set; } = null!;

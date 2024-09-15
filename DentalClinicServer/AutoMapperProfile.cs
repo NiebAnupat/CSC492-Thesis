@@ -20,6 +20,7 @@ namespace DentalClinicServer {
 
             // Get Set
             CreateMap<Province, ProvinceDto >().ReverseMap();
+            CreateMap<Province, ProvinceDtoIncludeDetails>().ReverseMap();
 
             #endregion
 
