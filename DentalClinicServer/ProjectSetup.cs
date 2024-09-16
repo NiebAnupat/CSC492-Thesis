@@ -3,7 +3,21 @@ using DentalClinicServer.Data;
 using DentalClinicServer.HostedServices;
 using DentalClinicServer.Services;
 using DentalClinicServer.Services.Auth;
+using DentalClinicServer.Services.Master.AppointmentStatus;
+using DentalClinicServer.Services.Master.AuditAction;
+using DentalClinicServer.Services.Master.District;
+using DentalClinicServer.Services.Master.ExpertType;
+using DentalClinicServer.Services.Master.Gender;
+using DentalClinicServer.Services.Master.Package;
+using DentalClinicServer.Services.Master.PaymentMethod;
+using DentalClinicServer.Services.Master.PaymentStatus;
+using DentalClinicServer.Services.Master.ProductType;
+using DentalClinicServer.Services.Master.ProviderType;
 using DentalClinicServer.Services.Master.Province;
+using DentalClinicServer.Services.Master.StockType;
+using DentalClinicServer.Services.Master.SubDistrict;
+using DentalClinicServer.Services.Master.TreatmentRecordField;
+using DentalClinicServer.Services.Master.UserType;
 using DentalClinicServer.Startups;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Quartz;
@@ -13,7 +27,8 @@ namespace DentalClinicServer {
         /// <summary>
         /// ใส่ Dependency Injection ที่ใช้ใน Project
         /// </summary>
-        public static IServiceCollection ConfigDependency(this IServiceCollection services, IConfiguration configuration) {
+        public static IServiceCollection ConfigDependency(this IServiceCollection services,
+            IConfiguration configuration) {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // ใช้สำหรับข้อมูล Login
@@ -27,10 +42,30 @@ namespace DentalClinicServer {
 
             #region MasterData
 
+            #region ThailandAdministrativeDivisions
+
             services.AddScoped<IProvinceService, ProvinceService>();
+            services.AddScoped<IDistrictService, DistrictService>();
+            services.AddScoped<ISubDistrictService, SubDistrictService>();
 
             #endregion
 
+            services.AddScoped<IAppointmentStatusService, AppointmentStatusService>();
+            services.AddScoped<IAuditActionService, AuditActionService>();
+            services.AddScoped<IExpertTypeService, ExpertTypeService>();
+            services.AddScoped<IGenderService, GenderService>();
+            services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<IPaymentStatusService, PaymentStatusService>();
+            services.AddScoped<IProductTypeService, ProductTypeService>();
+            services.AddScoped<IProviderTypeService, ProviderTypeService>();
+            services.AddScoped<IStockTypeService, StockTypeService>();
+            services.AddScoped<ITreatmentRecordFieldService, TreatmentRecordFieldService>();
+            services.AddScoped<IUserTypeService, UserTypeService>();
+
+            #endregion
+
+            // services.AddScoped<IAuditLogService, AuditLogService>();
 
             // TODO: ตัวอย่างการเขียน RestSharp หากไม่ใช้ให้ลบ Folder Examples ทิ้ง
             // วิธีการเขียน RestSharp

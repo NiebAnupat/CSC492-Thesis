@@ -62,11 +62,9 @@ public partial class Patient
 
     public string? AddressLine2 { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string ProvinceId { get; set; } = null!;
+    public int ProvinceId { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string DistrictId { get; set; } = null!;
+    public int DistrictId { get; set; }
 
     public int SubDistrictId { get; set; }
 

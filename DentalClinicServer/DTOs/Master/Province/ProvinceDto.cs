@@ -10,7 +10,7 @@ public class ProvinceDto {
     public bool IsActive { get; set; }
 }
 
-public class ProvinceDtoIncludeDetails {
+public class ProvinceDtoIncludeDetail {
     public int ProvinceId { get; set; }
     public int Code { get; set; }
     public string NameInThai { get; set; }

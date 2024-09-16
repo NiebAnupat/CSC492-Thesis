@@ -13,8 +13,7 @@ namespace DentalClinicServer.Models;
 public partial class District
 {
     [Key]
-    [Column(TypeName = "character varying")]
-    public string DistrictId { get; set; } = null!;
+    public int DistrictId { get; set; }
 
     public int Code { get; set; }
 
@@ -24,8 +23,7 @@ public partial class District
     [Column(TypeName = "character varying")]
     public string? NameInEnglish { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string ProvinceId { get; set; } = null!;
+    public int ProvinceId { get; set; }
 
     /// <summary>
     /// Create date

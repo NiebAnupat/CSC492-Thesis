@@ -13,8 +13,7 @@ namespace DentalClinicServer.Models;
 public partial class Province
 {
     [Key]
-    [Column(TypeName = "character varying")]
-    public string ProvinceId { get; set; } = null!;
+    public int ProvinceId { get; set; }
 
     public int Code { get; set; }
 

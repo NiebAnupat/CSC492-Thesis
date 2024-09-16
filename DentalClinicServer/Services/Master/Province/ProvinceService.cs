@@ -24,10 +24,21 @@ public class ProvinceService : IProvinceService {
     }
 
 
-    public async Task<ProvinceDto> GetProvince(int id) {
+    public async Task<ProvinceDtoIncludeDetail> GetProvince(int id) {
         const string actionName = nameof(GetProvince);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
-        throw new NotImplementedException();
+        var province = await _dbContext.Provinces
+            .Include(p => p.Districts).AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProvinceId == id);
+
+        if (province is null) {
+            throw new KeyNotFoundException($"Province with id {id} not found");
+        }
+
+        var provinceDto = _mapper.Map<ProvinceDtoIncludeDetail>(province);
+
+        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        return provinceDto;
     }
 
     public async Task<(List<ProvinceDto> provinceDtos, PaginationResultDto pagination)> GetProvinces(

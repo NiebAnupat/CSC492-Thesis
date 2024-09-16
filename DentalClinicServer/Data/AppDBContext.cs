@@ -861,7 +861,6 @@ public partial class AppDBContext : DbContext
         {
             entity.HasKey(e => e.SubDistrictId).HasName("SubDistrict_pkey");
 
-            entity.Property(e => e.SubDistrictId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasComment("Create date");
