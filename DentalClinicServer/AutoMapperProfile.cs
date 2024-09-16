@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DentalClinicServer.DTOs.Customer;
 using DentalClinicServer.DTOs.Master.AppointmentStatus;
 using DentalClinicServer.DTOs.Master.AuditAction;
 using DentalClinicServer.DTOs.Master.District;
@@ -134,6 +135,25 @@ namespace DentalClinicServer {
             CreateMap<TreatmentRecordField, TreatmentRecordFieldDto>().ReverseMap();
 
             #endregion
+
+            #endregion
+
+            #region Customer
+
+            // Create Set
+            CreateMap<CustomerRequestDto, Customer>().ReverseMap();
+            CreateMap<Customer, CustomerResponseDto>().ReverseMap();
+
+            // Get Set
+            CreateMap<Customer, CustomerDto>().ReverseMap();
+            CreateMap<Customer, CustomerDtoIncludeDetail>().ReverseMap();
+
+            // Update Set
+            CreateMap<UpdateCustomerRequestDto, Customer>().ReverseMap();
+            CreateMap<Customer, UpdateCustomerResponseDto>().ReverseMap();
+
+            // Delete Set
+            CreateMap<Customer, DeleteCustomerResponseDto>().ReverseMap();
 
             #endregion
         }

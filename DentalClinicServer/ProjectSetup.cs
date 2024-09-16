@@ -3,6 +3,7 @@ using DentalClinicServer.Data;
 using DentalClinicServer.HostedServices;
 using DentalClinicServer.Services;
 using DentalClinicServer.Services.Auth;
+using DentalClinicServer.Services.Customer;
 using DentalClinicServer.Services.Master.AppointmentStatus;
 using DentalClinicServer.Services.Master.AuditAction;
 using DentalClinicServer.Services.Master.District;
@@ -65,6 +66,7 @@ namespace DentalClinicServer {
 
             #endregion
 
+            services.AddScoped<ICustomerService, CustomerService>();
             // services.AddScoped<IAuditLogService, AuditLogService>();
 
             // TODO: ตัวอย่างการเขียน RestSharp หากไม่ใช้ให้ลบ Folder Examples ทิ้ง

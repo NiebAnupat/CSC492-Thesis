@@ -19,7 +19,19 @@ namespace DentalClinicServer.Startups {
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 config.IncludeXmlComments(xmlPath);
+                config.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme {
+                            Reference = new OpenApiReference {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
             });
+
 
             return services;
         }
@@ -28,9 +40,7 @@ namespace DentalClinicServer.Startups {
             this IApplicationBuilder app,
             ProjectSetting projectSetting) {
             app.UseSwagger(config => {
-                config.PreSerializeFilters.Add((swagger, httpRequest) => {
-                    swagger.Servers.Clear();
-                });
+                config.PreSerializeFilters.Add((swagger, httpRequest) => { swagger.Servers.Clear(); });
             });
 
             app.UseSwaggerUI(config => {

@@ -17,6 +17,7 @@ namespace DentalClinicServer {
                 throw new ArgumentNullException("Project is not setted in appsetting.json");
 
             ProjectConfiguration = configuration.GetSection(ConfigKey.Project)?.Get<ProjectSetting>();
+            JwtConfiguration = configuration.GetSection(ConfigKey.Jwt)?.Get<JwtSetting>();
             // OAuthConfiguration = configuration.GetSection("OAuth")?.Get<OAuthSetting>();
             // MasstransitConfiguration = configuration.GetSection("Masstransit")?.Get<MasstransitSetting>();
             // QuartzConfiguration = configuration.GetSection("Quartz")?.Get<QuartzSetting>();
@@ -25,6 +26,7 @@ namespace DentalClinicServer {
         private IConfiguration Configuration { get; }
 
         private ProjectSetting ProjectConfiguration { get; }
+        private JwtSetting JwtConfiguration { get; }
         // private OAuthSetting OAuthConfiguration { get; }
         // private MasstransitSetting MasstransitConfiguration { get; }
         // private QuartzSetting QuartzConfiguration { get; }
@@ -75,6 +77,7 @@ namespace DentalClinicServer {
             // services.AddSwaggerWithOAuth(ProjectConfiguration, OAuthConfiguration);
 
             // Authenication *
+            services.AddAuthenticationWithJwt(JwtConfiguration);
             // services.AddAuthorizationWithOAuth(OAuthConfiguration);
         }
 
@@ -86,6 +89,7 @@ namespace DentalClinicServer {
 
 
             app.UseMiddleware<RequestLoggingMiddleware>();
+            app.UseMiddleware<JwtCookieMiddleware>();
 
             // Swagger
             app.UseSwagger(ProjectConfiguration);
