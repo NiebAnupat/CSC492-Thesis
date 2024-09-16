@@ -8,9 +8,6 @@ public class ProvinceDto {
     public string NameInThai { get; set; }
     public string NameInEnglish { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-
 }
 
 public class ProvinceDtoIncludeDetails {
@@ -19,8 +16,6 @@ public class ProvinceDtoIncludeDetails {
     public string NameInThai { get; set; }
     public string NameInEnglish { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
 
     public List<DistrictDto>? Districts { get; set; }
 }

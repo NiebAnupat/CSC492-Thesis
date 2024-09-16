@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DentalClinicServer.DTOs.Master.District;
+using DentalClinicServer.DTOs.Master.Gender;
 using DentalClinicServer.DTOs.Master.Province;
+using DentalClinicServer.DTOs.Master.SubDistrict;
 using DentalClinicServer.Models;
 
 namespace DentalClinicServer {
@@ -19,7 +21,7 @@ namespace DentalClinicServer {
             #region Province
 
             // Get Set
-            CreateMap<Province, ProvinceDto >().ReverseMap();
+            CreateMap<Province, ProvinceDto>().ReverseMap();
             CreateMap<Province, ProvinceDtoIncludeDetails>().ReverseMap();
 
             #endregion
@@ -28,6 +30,20 @@ namespace DentalClinicServer {
 
             // Get Set
             CreateMap<District, DistrictDto>().ReverseMap();
+
+            #endregion
+
+            #region SubDistrict
+
+            // Get Set
+            CreateMap<SubDistrict, SubDistrictDto>().ReverseMap();
+
+            #endregion
+
+            #region Gender
+
+            // Get Set
+            CreateMap<Gender, GenderDto>().ReverseMap();
 
             #endregion
 
