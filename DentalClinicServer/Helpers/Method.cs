@@ -3,15 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace DentalClinicServer.Helpers;
+
 public static class Method {
     //TODO: Implement the following methods
     public static int GetActionId(EntityState state) {
         return state switch {
-            EntityState.Added => 1,    // Create
-            EntityState.Deleted => 2,  // Delete
+            EntityState.Added => 1, // Create
+            EntityState.Deleted => 2, // Delete
             EntityState.Modified => 3, // Update
-            _ => 0                     // Default
+            _ => 0 // Default
         };
+    }
+
+    public static string HashPassword(string password) {
+        return BCrypt.Net.BCrypt.EnhancedHashPassword(password);
     }
 
     public static string GetRecordId(EntityEntry entry) {
@@ -37,6 +42,4 @@ public static class Method {
         // Logic to get the current user ID
         return "user-id";
     }
-
 }
-

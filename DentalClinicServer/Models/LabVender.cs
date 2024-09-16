@@ -27,11 +27,9 @@ public partial class LabVender
 
     public string? AddressLine2 { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string? ProvinceId { get; set; }
+    public int? ProvinceId { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string? DistrictId { get; set; }
+    public int? DistrictId { get; set; }
 
     public int? SubDistrictId { get; set; }
 

@@ -1,14 +1,18 @@
 ﻿namespace DentalClinicServer.DTOs {
     public class PaginationDto {
+        public bool? IsActive { get; set; }
         public int Page { get; set; } = 1;
         private int recordsPerPage = 10;
         private readonly int maxRecordsPerPage = 50;
 
-        public int RecordsPerPage {
-            get {
+        public int RecordsPerPage
+        {
+            get
+            {
                 return recordsPerPage;
             }
-            set {
+            set
+            {
                 recordsPerPage = (value > maxRecordsPerPage) ? maxRecordsPerPage : value;
             }
         }

@@ -19,6 +19,9 @@ public partial class DispensingMedicine
     public string BranchId { get; set; } = null!;
 
     [Column(TypeName = "character varying")]
+    public string TreatmentId { get; set; } = null!;
+
+    [Column(TypeName = "character varying")]
     public string ClinicStockId { get; set; } = null!;
 
     public int Quantity { get; set; }
@@ -54,6 +57,10 @@ public partial class DispensingMedicine
     [ForeignKey("CreatedByEmployeeId")]
     [InverseProperty("DispensingMedicineCreatedByEmployees")]
     public virtual Employee CreatedByEmployee { get; set; } = null!;
+
+    [ForeignKey("TreatmentId")]
+    [InverseProperty("DispensingMedicines")]
+    public virtual Treatment Treatment { get; set; } = null!;
 
     [ForeignKey("UpdatedByEmployeeId")]
     [InverseProperty("DispensingMedicineUpdatedByEmployees")]

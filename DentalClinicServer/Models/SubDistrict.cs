@@ -29,8 +29,7 @@ public partial class SubDistrict
     [Precision(10, 6)]
     public decimal Longitude { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string DistrictId { get; set; } = null!;
+    public int DistrictId { get; set; }
 
     [Column(TypeName = "character varying")]
     public string? ZipCode { get; set; }

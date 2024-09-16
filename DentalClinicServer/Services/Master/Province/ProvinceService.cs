@@ -1,47 +1,64 @@
 ﻿using AutoMapper;
 using DentalClinicServer.Data;
+using DentalClinicServer.DTOs;
 using DentalClinicServer.DTOs.Master.District;
 using DentalClinicServer.DTOs.Master.Province;
+using DentalClinicServer.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace DentalClinicServer.Services.Master.Province;
 
-public class ProvinceService : ServiceBase, IProvinceService {
+public class ProvinceService : IProvinceService {
     private readonly AppDBContext _dbContext;
     private readonly IMapper _mapper;
     private readonly Serilog.ILogger _logger;
-    private readonly HttpContext? _httpContext;
 
     public ProvinceService(AppDBContext dbContext,
-        IMapper mapper, IHttpContextAccessor httpContext,
-        Serilog.ILogger? logger = null) : base(dbContext, mapper, httpContext) {
+        IMapper mapper, Serilog.ILogger? logger = null) {
         _dbContext = dbContext;
         _mapper = mapper;
-        _httpContext = httpContext.HttpContext;
         _logger = logger is null
             ? Log.ForContext("ServiceName", nameof(ProvinceService))
             : logger.ForContext("ServiceName", nameof(ProvinceService));
     }
 
 
-    public async Task<List<ProvinceDto>> GetProvinces() {
-        const string actionName = nameof(GetProvinces);
-        _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
-        var provinces = await _dbContext.Provinces
-            // .Include(p => p.Districts)
-            .AsNoTracking()
-            .ToListAsync();
-
-        var provinceDtos = _mapper.Map<List<ProvinceDto>>(provinces);
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-        return provinceDtos;
-    }
-
-    public async Task<ProvinceDto> GetProvince(int id) {
+    public async Task<ProvinceDtoIncludeDetail> GetProvince(int id) {
         const string actionName = nameof(GetProvince);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
-        throw new NotImplementedException();
+        var province = await _dbContext.Provinces
+            .Include(p => p.Districts).AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProvinceId == id);
+
+        if (province is null) {
+            throw new KeyNotFoundException($"Province with id {id} not found");
+        }
+
+        var provinceDto = _mapper.Map<ProvinceDtoIncludeDetail>(province);
+
+        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        return provinceDto;
+    }
+
+    public async Task<(List<ProvinceDto> provinceDtos, PaginationResultDto pagination)> GetProvinces(
+        PaginationDto paginationDto, QueryFilterDto filterDto, QuerySortDto sortDto) {
+        const string actionName = nameof(GetProvinces);
+        _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
+
+        var query = _dbContext.Provinces.AsNoTracking();
+
+        if (paginationDto.IsActive.HasValue) {
+            query = query.Where(p => p.IsActive == paginationDto.IsActive);
+        }
+
+        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+
+        var provinces = await query.ToListAsync();
+        var provinceDtos = _mapper.Map<List<ProvinceDto>>(provinces);
+
+
+        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        return (provinceDtos, pagination);
     }
 }

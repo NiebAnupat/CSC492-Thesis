@@ -2,18 +2,20 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using DentalClinicServer.Helpers;
 using DentalClinicServer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DentalClinicServer.Data;
 
-public partial class AppDBContext : DbContext {
-    public AppDBContext() {
+public partial class AppDBContext : DbContext
+{
+    public AppDBContext()
+    {
     }
 
     public AppDBContext(DbContextOptions<AppDBContext> options)
-        : base(options) {
+        : base(options)
+    {
     }
 
     public virtual DbSet<Appointment> Appointments { get; set; }
@@ -102,75 +104,14 @@ public partial class AppDBContext : DbContext {
 
     public virtual DbSet<UserType> UserTypes { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseNpgsql("Host=localhost;Database=DentalClinic;Username=CatCode;Password=Q0MeooLzK0C0wYFDbDORmjx6iARGTPz4;Persist Security Info=True");
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseNpgsql("Host=localhost;Database=DentalClinic;Username=CatCode;Password=Q0MeooLzK0C0wYFDbDORmjx6iARGTPz4;Persist Security Info=True");
 
-    public override int SaveChanges() {
-        var auditEntries = OnBeforeSaveChanges();
-        var result = base.SaveChanges();
-        OnAfterSaveChanges(auditEntries);
-        return result;
-    }
-
-    private List<AuditEntry> OnBeforeSaveChanges() {
-        var auditEntries = new List<AuditEntry>();
-
-        foreach (var entry in ChangeTracker.Entries()) {
-            if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
-                continue;
-
-            var auditEntry = new AuditEntry(entry);
-            auditEntry.TableName = entry.Entity.GetType().Name;
-            auditEntries.Add(auditEntry);
-
-            foreach (var property in entry.Properties) {
-                if (property.IsTemporary) continue;
-
-                string propertyName = property.Metadata.Name;
-
-                if (entry.State == EntityState.Added) {
-                    auditEntry.NewValues[propertyName] = property.CurrentValue;
-                } else if (entry.State == EntityState.Deleted) {
-                    auditEntry.OldValues[propertyName] = property.OriginalValue;
-                } else if (entry.State == EntityState.Modified && property.IsModified) {
-                    auditEntry.OldValues[propertyName] = property.OriginalValue;
-                    auditEntry.NewValues[propertyName] = property.CurrentValue;
-                }
-            }
-        }
-
-        return auditEntries.Where(ae => !ae.HasTemporaryProperties).ToList();
-    }
-
-    private void OnAfterSaveChanges(List<AuditEntry> auditEntries) {
-        if (auditEntries == null || auditEntries.Count == 0) return;
-
-        foreach (var auditEntry in auditEntries) {
-            var auditLog = new AuditLog {
-                AuditLogId = Guid.NewGuid().ToString(),
-                AuditActionId = Helpers.Method.GetActionId(auditEntry.Entry.State),
-                BranchId = Helpers.Method.GetBranchId(), // Fetch current BranchId
-                TableName = auditEntry.TableName,
-                RecordId = Helpers.Method.GetRecordId(auditEntry.Entry), // Get primary key of the entity
-                ColumnName = string.Join(",", auditEntry.ChangedColumns),
-                OldValue = auditEntry.OldValues.Count > 0 ? Helpers.Method.SerializeObject(auditEntry.OldValues) : null,
-                NewValue = auditEntry.NewValues.Count > 0 ? Helpers.Method.SerializeObject(auditEntry.NewValues) : null,
-                Remark = "",
-                CreatedByUserTypeId = Helpers.Method.GetCurrentUserTypeId(), // Get user type ID
-                CreatedByUserId = Helpers.Method.GetCurrentUserId(), // Get user ID
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            AuditLogs.Add(auditLog);
-        }
-
-        base.SaveChanges();
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Appointment>(entity => {
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Appointment>(entity =>
+        {
             entity.HasKey(e => e.AppointmentId).HasName("Appointment_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -210,7 +151,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Appointment_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<AppointmentStatus>(entity => {
+        modelBuilder.Entity<AppointmentStatus>(entity =>
+        {
             entity.HasKey(e => e.AppointmentStatusId).HasName("AppointmentStatus_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -222,7 +164,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<AuditAction>(entity => {
+        modelBuilder.Entity<AuditAction>(entity =>
+        {
             entity.HasKey(e => e.AuditActionId).HasName("AuditAction_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -234,7 +177,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<AuditLog>(entity => {
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
             entity.HasKey(e => e.AuditLogId).HasName("AuditLog_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -265,7 +209,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("AuditLog_CreatedByUserTypeId_fkey");
         });
 
-        modelBuilder.Entity<Branch>(entity => {
+        modelBuilder.Entity<Branch>(entity =>
+        {
             entity.HasKey(e => e.BranchId).HasName("Branch_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -284,7 +229,8 @@ public partial class AppDBContext : DbContext {
             entity.HasOne(d => d.UpdatedByCustomer).WithMany(p => p.Branches).HasConstraintName("Branch_UpdatedByCustomerId_fkey");
         });
 
-        modelBuilder.Entity<Clinic>(entity => {
+        modelBuilder.Entity<Clinic>(entity =>
+        {
             entity.HasKey(e => e.ClinicId).HasName("Clinic_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -303,7 +249,8 @@ public partial class AppDBContext : DbContext {
             entity.HasOne(d => d.UpdatedByCustomer).WithMany(p => p.ClinicUpdatedByCustomers).HasConstraintName("Clinic_UpdatedByCustomerId_fkey");
         });
 
-        modelBuilder.Entity<ClinicStock>(entity => {
+        modelBuilder.Entity<ClinicStock>(entity =>
+        {
             entity.HasKey(e => e.ClinicStockId).HasName("ClinicStock_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -340,7 +287,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("ClinicStock_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<Customer>(entity => {
+        modelBuilder.Entity<Customer>(entity =>
+        {
             entity.HasKey(e => e.CustomerId).HasName("Customer_pkey");
 
             entity.Property(e => e.CitizenId).IsFixedLength();
@@ -362,7 +310,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Customer_ProviderTypeId_fkey");
         });
 
-        modelBuilder.Entity<CustomerSubscription>(entity => {
+        modelBuilder.Entity<CustomerSubscription>(entity =>
+        {
             entity.HasKey(e => e.CustomerSubscriptionId).HasName("CustomerSubscription_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -382,7 +331,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("CustomerSubscription_PackageId_fkey");
         });
 
-        modelBuilder.Entity<Dentist>(entity => {
+        modelBuilder.Entity<Dentist>(entity =>
+        {
             entity.HasKey(e => e.DentistId).HasName("Dentist_pkey");
 
             entity.Property(e => e.CitizenId).IsFixedLength();
@@ -416,7 +366,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Dentist_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<DentistWorkDay>(entity => {
+        modelBuilder.Entity<DentistWorkDay>(entity =>
+        {
             entity.HasKey(e => e.DentistWorkDayId).HasName("DentistWorkDay_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -444,7 +395,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("DentistWorkDay_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<DispensingMedicine>(entity => {
+        modelBuilder.Entity<DispensingMedicine>(entity =>
+        {
             entity.HasKey(e => e.DispensingMedicineId).HasName("DispensingMedicine_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -467,12 +419,17 @@ public partial class AppDBContext : DbContext {
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("DispensingMedicine_CreatedByEmployeeId_fkey");
 
+            entity.HasOne(d => d.Treatment).WithMany(p => p.DispensingMedicines)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("DispensingMedicine_TreatmentId_fkey");
+
             entity.HasOne(d => d.UpdatedByEmployee).WithMany(p => p.DispensingMedicineUpdatedByEmployees)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("DispensingMedicine_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<District>(entity => {
+        modelBuilder.Entity<District>(entity =>
+        {
             entity.HasKey(e => e.DistrictId).HasName("District_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -489,7 +446,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("District_ProvinceId_fkey");
         });
 
-        modelBuilder.Entity<Employee>(entity => {
+        modelBuilder.Entity<Employee>(entity =>
+        {
             entity.HasKey(e => e.EmployeeId).HasName("Employee_pkey");
 
             entity.Property(e => e.CitizenId).IsFixedLength();
@@ -519,7 +477,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Employee_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<ExpertType>(entity => {
+        modelBuilder.Entity<ExpertType>(entity =>
+        {
             entity.HasKey(e => e.ExpertTypeId).HasName("ExpertType_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -531,7 +490,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<Gender>(entity => {
+        modelBuilder.Entity<Gender>(entity =>
+        {
             entity.HasKey(e => e.GenderId).HasName("Gender_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -543,7 +503,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<LabVender>(entity => {
+        modelBuilder.Entity<LabVender>(entity =>
+        {
             entity.HasKey(e => e.LabVenderId).HasName("LabVender_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -568,7 +529,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("LabVender_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<Medicine>(entity => {
+        modelBuilder.Entity<Medicine>(entity =>
+        {
             entity.HasKey(e => e.MedicineId).HasName("Medicine_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -592,7 +554,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Medicine_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<OperationType>(entity => {
+        modelBuilder.Entity<OperationType>(entity =>
+        {
             entity.HasKey(e => e.OperationTypeId).HasName("OperationType_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -616,7 +579,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("OperationType_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<Package>(entity => {
+        modelBuilder.Entity<Package>(entity =>
+        {
             entity.HasKey(e => e.PackageId).HasName("Package_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -628,7 +592,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<Patient>(entity => {
+        modelBuilder.Entity<Patient>(entity =>
+        {
             entity.HasKey(e => e.PatientId).HasName("Patient_pkey");
 
             entity.Property(e => e.CitizenId).IsFixedLength();
@@ -660,7 +625,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Patient_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<PatientTag>(entity => {
+        modelBuilder.Entity<PatientTag>(entity =>
+        {
             entity.HasKey(e => e.PatientTagId).HasName("PatientTag_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -688,7 +654,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("PatientTag_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<Payment>(entity => {
+        modelBuilder.Entity<Payment>(entity =>
+        {
             entity.HasKey(e => e.PaymentId).HasName("Payment_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -718,7 +685,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Payment_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<PaymentDetail>(entity => {
+        modelBuilder.Entity<PaymentDetail>(entity =>
+        {
             entity.HasKey(e => e.PaymentDetailId).HasName("PaymentDetail_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -752,7 +720,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("PaymentDetail_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<PaymentMethod>(entity => {
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
             entity.HasKey(e => e.PaymentMethodId).HasName("PaymentMethod_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -764,7 +733,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<PaymentStatus>(entity => {
+        modelBuilder.Entity<PaymentStatus>(entity =>
+        {
             entity.HasKey(e => e.PaymentStatusId).HasName("PaymentStatus_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -776,7 +746,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<Product>(entity => {
+        modelBuilder.Entity<Product>(entity =>
+        {
             entity.HasKey(e => e.ProductId).HasName("Product_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -804,7 +775,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Product_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<ProductType>(entity => {
+        modelBuilder.Entity<ProductType>(entity =>
+        {
             entity.HasKey(e => e.ProductTypeId).HasName("ProductType_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -816,7 +788,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<ProviderType>(entity => {
+        modelBuilder.Entity<ProviderType>(entity =>
+        {
             entity.HasKey(e => e.ProviderTypeId).HasName("ProviderType_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -828,7 +801,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<Province>(entity => {
+        modelBuilder.Entity<Province>(entity =>
+        {
             entity.HasKey(e => e.ProvinceId).HasName("Province_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -841,7 +815,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<RequistionProduct>(entity => {
+        modelBuilder.Entity<RequistionProduct>(entity =>
+        {
             entity.HasKey(e => e.RequistionProductId).HasName("RequistionProduct_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -869,7 +844,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("RequistionProduct_UpdatedByEmployeeId_fkey");
         });
 
-        modelBuilder.Entity<StockType>(entity => {
+        modelBuilder.Entity<StockType>(entity =>
+        {
             entity.HasKey(e => e.StockTypeId).HasName("StockType_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -881,10 +857,10 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<SubDistrict>(entity => {
+        modelBuilder.Entity<SubDistrict>(entity =>
+        {
             entity.HasKey(e => e.SubDistrictId).HasName("SubDistrict_pkey");
 
-            entity.Property(e => e.SubDistrictId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasComment("Create date");
@@ -899,7 +875,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("SubDistrict_DistrictId_fkey");
         });
 
-        modelBuilder.Entity<TagList>(entity => {
+        modelBuilder.Entity<TagList>(entity =>
+        {
             entity.HasKey(e => e.TagId).HasName("TagList_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -915,7 +892,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TagList_BranchId_fkey");
         });
 
-        modelBuilder.Entity<Treatment>(entity => {
+        modelBuilder.Entity<Treatment>(entity =>
+        {
             entity.HasKey(e => e.TreatmentId).HasName("Treatment_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -948,7 +926,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("Treatment_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentDocument>(entity => {
+        modelBuilder.Entity<TreatmentDocument>(entity =>
+        {
             entity.HasKey(e => e.TreatmentDocumentId).HasName("TreatmentDocument_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -996,7 +975,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentDocument_UpdatedByUserTypeId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentLab>(entity => {
+        modelBuilder.Entity<TreatmentLab>(entity =>
+        {
             entity.HasKey(e => e.TreatmentLabId).HasName("TreatmentLab_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1025,7 +1005,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentLab_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentNextVisit>(entity => {
+        modelBuilder.Entity<TreatmentNextVisit>(entity =>
+        {
             entity.HasKey(e => e.TreatmentNextVisitId).HasName("TreatmentNextVisit_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1054,7 +1035,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentNextVisit_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentOperation>(entity => {
+        modelBuilder.Entity<TreatmentOperation>(entity =>
+        {
             entity.HasKey(e => e.TreatmentOperationId).HasName("TreatmentOperation_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1083,7 +1065,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentOperation_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentRecordEditHistory>(entity => {
+        modelBuilder.Entity<TreatmentRecordEditHistory>(entity =>
+        {
             entity.HasKey(e => e.TreatmentRecordEditHistoryId).HasName("TreatmentRecordEditHistory_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1107,7 +1090,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentRecordEditHistory_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<TreatmentRecordField>(entity => {
+        modelBuilder.Entity<TreatmentRecordField>(entity =>
+        {
             entity.HasKey(e => e.TreatmentRecordFieldId).HasName("TreatmentRecordField_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1119,7 +1103,8 @@ public partial class AppDBContext : DbContext {
                 .HasComment("Update date");
         });
 
-        modelBuilder.Entity<TreatmentRecordTemplat>(entity => {
+        modelBuilder.Entity<TreatmentRecordTemplat>(entity =>
+        {
             entity.HasKey(e => e.TreatmentRecordId).HasName("TreatmentRecordTemplat_pkey");
 
             entity.Property(e => e.CreatedAt)
@@ -1143,7 +1128,8 @@ public partial class AppDBContext : DbContext {
                 .HasConstraintName("TreatmentRecordTemplat_UpdatedByDentistId_fkey");
         });
 
-        modelBuilder.Entity<UserType>(entity => {
+        modelBuilder.Entity<UserType>(entity =>
+        {
             entity.HasKey(e => e.UserTypeId).HasName("UserType_pkey");
 
             entity.Property(e => e.CreatedAt)
