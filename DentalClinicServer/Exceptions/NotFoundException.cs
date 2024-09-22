@@ -1,9 +1,11 @@
 ﻿namespace DentalClinicServer.Exceptions {
-    public class NotFoundException : AppExceptionBase {
-        public NotFoundException(string objectTypeName) {
-            ObjectTypeName = objectTypeName;
-        }
+    public class NotFoundException : Exception {
+        public NotFoundException(string message) : base(message) { }
 
-        public override string Message => $"Object [{ObjectTypeName}] is not found.";
+        // public NotFoundException(string objectTypeName) {
+        //     ObjectTypeName = objectTypeName;
+        // }
+
+        // public override string Message => $"Object [{ObjectTypeName}] is not found.";
     }
 }

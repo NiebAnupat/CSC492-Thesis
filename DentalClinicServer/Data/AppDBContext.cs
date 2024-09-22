@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using DentalClinicServer.Helpers;
 using DentalClinicServer.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,80 @@ public partial class AppDBContext : DbContext
     public AppDBContext(DbContextOptions<AppDBContext> options)
         : base(options)
     {
+    }
+
+    public override int SaveChanges()
+    {
+        var auditEntries = OnBeforeSaveChanges();
+        OnAfterSaveChanges(auditEntries);
+        var result = base.SaveChanges();
+        return result;
+    }
+
+    private List<AuditEntry> OnBeforeSaveChanges()
+    {
+        var auditEntries = new List<AuditEntry>();
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                continue;
+
+            var auditEntry = new AuditEntry(entry);
+            auditEntry.TableName = entry.Entity.GetType().Name;
+            auditEntries.Add(auditEntry);
+
+            foreach (var property in entry.Properties)
+            {
+                if (property.IsTemporary) continue;
+
+                string propertyName = property.Metadata.Name;
+
+                if (entry.State == EntityState.Added)
+                {
+                    auditEntry.NewValues[propertyName] = property.CurrentValue;
+                }
+                else if (entry.State == EntityState.Deleted)
+                {
+                    auditEntry.OldValues[propertyName] = property.OriginalValue;
+                }
+                else if (entry.State == EntityState.Modified && property.IsModified)
+                {
+                    auditEntry.OldValues[propertyName] = property.OriginalValue;
+                    auditEntry.NewValues[propertyName] = property.CurrentValue;
+                }
+            }
+        }
+
+        return auditEntries.Where(ae => !ae.HasTemporaryProperties).ToList();
+    }
+
+    private void OnAfterSaveChanges(List<AuditEntry> auditEntries)
+    {
+        if (auditEntries == null || auditEntries.Count == 0) return;
+
+        foreach (var auditEntry in auditEntries)
+        {
+            var auditLog = new AuditLog
+            {
+                AuditActionId = Method.GetActionId(auditEntry.Entry.State),
+                BranchId = Method.GetBranchId(), // Fetch current BranchId
+                TableName = auditEntry.TableName,
+                RecordId = Method.GetRecordId(auditEntry.Entry), // Get primary key of the entity
+                ColumnName = string.Join(",", auditEntry.ChangedColumns),
+                OldValue = auditEntry.OldValues.Count > 0 ? Method.SerializeObject(auditEntry.OldValues) : null,
+                NewValue = auditEntry.NewValues.Count > 0 ? Method.SerializeObject(auditEntry.NewValues) : null,
+                Remark = "",
+                CreatedByUserTypeId = Method.GetCurrentUserTypeId(), // Get user type ID
+                CreatedByUserId = Method.GetCurrentUserId(), // Get user ID
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+
+            AuditLogs.Add(auditLog);
+        }
+
+        base.SaveChanges();
     }
 
     public virtual DbSet<Appointment> Appointments { get; set; }

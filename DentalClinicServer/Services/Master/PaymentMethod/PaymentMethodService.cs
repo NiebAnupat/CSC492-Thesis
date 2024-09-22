@@ -35,7 +35,7 @@ public class PaymentMethodService : IPaymentMethodService {
 
         var paymentMethodDto = _mapper.Map<PaymentMethodDto>(paymentMethod);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return paymentMethodDto;
     }
 
@@ -50,13 +50,13 @@ public class PaymentMethodService : IPaymentMethodService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var paymentMethod = await query.ToListAsync();
         var paymentMethodDtos = _mapper.Map<List<PaymentMethodDto>>(paymentMethod);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (paymentMethodDtos, pagination);
     }
 }

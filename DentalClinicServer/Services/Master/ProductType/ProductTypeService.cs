@@ -35,7 +35,7 @@ public class ProductTypeService : IProductTypeService {
 
         var productTypeDto = _mapper.Map<ProductTypeDto>(productType);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return productTypeDto;
     }
 
@@ -50,13 +50,13 @@ public class ProductTypeService : IProductTypeService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var productType = await query.ToListAsync();
         var productTypeDtos = _mapper.Map<List<ProductTypeDto>>(productType);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (productTypeDtos, pagination);
     }
 }

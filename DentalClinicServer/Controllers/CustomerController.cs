@@ -1,5 +1,6 @@
 ﻿using DentalClinicServer.DTOs;
 using DentalClinicServer.DTOs.Customer;
+using DentalClinicServer.Exceptions;
 using DentalClinicServer.Models;
 using DentalClinicServer.Services.Customer;
 using Microsoft.AspNetCore.Mvc;
@@ -19,93 +20,101 @@ public class CustomerController : ControllerBase {
             : logger.ForContext<CustomerController>();
     }
 
-
+    /// <summary>
+    /// สร้างข้อมูลลูกค้า เฉพาะการสมัครสมาชิกผ่านแพลตฟอร์ม (ProviderTypeId = 1)
+    /// </summary>
+    /// <param name="requestDto"></param>
+    /// <returns>เพิ่มข้อมูลลูกค้าสำเร็จ</returns>
     [HttpPost]
-    public async Task<ServiceResponse<CustomerResponseDto>> CreateCustomer(CustomerRequestDto requestDto) {
+    public ServiceResponse<string> CreateCustomer(CustomerRequestDto requestDto) {
         const string actionName = nameof(CreateCustomer);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
 
-        var responseDto = await _customerService.CreateCustomer(requestDto);
+        try {
+            var massage = _customerService.CreateCustomer(requestDto);
 
-        if (responseDto is null) {
-            _logger.Error("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-            return ResponseResult.Failure<CustomerResponseDto>("Failed to create customer");
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
+
+            return ResponseResult.Success("", massage);
         }
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-
-        return ResponseResult.Success(responseDto);
+        catch (Exception e) {
+            _logger.Error(e, "[{ActionName}] - Failed : {date}", actionName, DateTime.Now);
+            throw;
+        }
     }
 
     [HttpPut("{id}")]
-    public async Task<ServiceResponse<UpdateCustomerResponseDto>> UpdateCustomer(string id,
+    public ServiceResponse<string> UpdateCustomer(string id,
         UpdateCustomerRequestDto updateDto) {
         const string actionName = nameof(UpdateCustomer);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
 
-        var responseDto = await _customerService.UpdateCustomer(id, updateDto);
+        try {
+            var massage = _customerService.UpdateCustomer(id, updateDto);
 
-        if (responseDto is null) {
-            _logger.Error("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-            return ResponseResult.Failure<UpdateCustomerResponseDto>("Failed to update customer");
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
+
+            return ResponseResult.Success("", massage);
         }
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-
-        return ResponseResult.Success(responseDto);
+        catch (Exception e) {
+            _logger.Error(e, "[{ActionName}] - Failed : {date}", actionName, DateTime.Now);
+            throw;
+        }
     }
 
     [HttpDelete("{id}")]
-    public async Task<ServiceResponse<DeleteCustomerResponseDto>> DeleteCustomer(string id) {
+    public ServiceResponse<string> DeleteCustomer(string id) {
         const string actionName = nameof(DeleteCustomer);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
 
-        var responseDto = await _customerService.DeleteCustomer(id);
+        try {
+            var massage = _customerService.DeleteCustomer(id);
 
-        if (responseDto is null) {
-            _logger.Error("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-            return ResponseResult.Failure<DeleteCustomerResponseDto>("Failed to delete customer");
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
+
+            return ResponseResult.Success("", massage);
         }
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-
-        return ResponseResult.Success(responseDto);
+        catch (Exception e) {
+            _logger.Error(e, "[{ActionName}] - Failed : {date}", actionName, DateTime.Now);
+            throw;
+        }
     }
 
     [HttpGet("{id}")]
-    public async Task<ServiceResponse<CustomerDto>> GetCustomer(string id) {
+    public ServiceResponse<CustomerDto> GetCustomer(string id) {
         const string actionName = nameof(GetCustomer);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
 
-        var responseDto = await _customerService.GetCustomer(id);
+        try {
+            var dto = _customerService.GetCustomer(id);
 
-        if (responseDto is null) {
-            _logger.Error("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-            return ResponseResult.Failure<CustomerDto>("Failed to get customer");
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
+
+            return ResponseResult.Success(dto);
         }
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-
-        return ResponseResult.Success(responseDto);
+        catch (Exception e) {
+            _logger.Error(e, "[{ActionName}] - Failed : {date}", actionName, DateTime.Now);
+            throw;
+        }
     }
 
     [HttpGet]
-    public async Task<ServiceResponse<List<CustomerDto>>> GetCustomers(
+    public ServiceResponse<List<CustomerDto>> GetCustomers(
         [FromQuery] PaginationDto paginationDto
         , [FromQuery] QueryFilterDto filterDto
         , [FromQuery] QuerySortDto sortDto) {
         const string actionName = nameof(GetCustomers);
         _logger.Debug("[{ActionName}] - Started : {date}", actionName, DateTime.Now);
+        try {
+            var result = _customerService.GetCustomers(paginationDto, filterDto, sortDto);
 
-        var responseDto = await _customerService.GetCustomers(paginationDto, filterDto, sortDto);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
 
-        if (responseDto.customerDtos is null) {
-            _logger.Error("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-            return ResponseResult.Failure<List<CustomerDto>>("Failed to get customers");
+            return ResponseResult.Success(result.dtos, result.pagination);
         }
-
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
-
-        return ResponseResult.Success(responseDto.customerDtos, responseDto.pagination);
+        catch (Exception e) {
+            _logger.Error(e, "[{ActionName}] - Failed : {date}", actionName, DateTime.Now);
+            throw;
+        }
     }
 }

@@ -37,7 +37,7 @@ public class ProvinceService : IProvinceService {
 
         var provinceDto = _mapper.Map<ProvinceDtoIncludeDetail>(province);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return provinceDto;
     }
 
@@ -52,13 +52,13 @@ public class ProvinceService : IProvinceService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var provinces = await query.ToListAsync();
         var provinceDtos = _mapper.Map<List<ProvinceDto>>(provinces);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (provinceDtos, pagination);
     }
 }

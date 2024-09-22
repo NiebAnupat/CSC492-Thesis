@@ -35,7 +35,7 @@ public class StockTypeService : IStockTypeService {
 
         var stockTypeDto = _mapper.Map<StockTypeDto>(stockType);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return stockTypeDto;
     }
 
@@ -50,13 +50,13 @@ public class StockTypeService : IStockTypeService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var stockType = await query.ToListAsync();
         var stockTypeDtos = _mapper.Map<List<StockTypeDto>>(stockType);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (stockTypeDtos, pagination);
     }
 }

@@ -142,7 +142,6 @@ namespace DentalClinicServer {
 
             // Create Set
             CreateMap<CustomerRequestDto, Customer>().ReverseMap();
-            CreateMap<Customer, CustomerResponseDto>().ReverseMap();
 
             // Get Set
             CreateMap<Customer, CustomerDto>().ReverseMap();
@@ -150,10 +149,6 @@ namespace DentalClinicServer {
 
             // Update Set
             CreateMap<UpdateCustomerRequestDto, Customer>().ReverseMap();
-            CreateMap<Customer, UpdateCustomerResponseDto>().ReverseMap();
-
-            // Delete Set
-            CreateMap<Customer, DeleteCustomerResponseDto>().ReverseMap();
 
             #endregion
         }

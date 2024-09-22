@@ -35,7 +35,7 @@ public class AppointmentStatusService : IAppointmentStatusService {
 
         var appointmentStatusDto = _mapper.Map<AppointmentStatusDto>(appointmentStatus);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return appointmentStatusDto;
     }
 
@@ -50,13 +50,13 @@ public class AppointmentStatusService : IAppointmentStatusService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var appointmentStatus = await query.ToListAsync();
         var appointmentStatusDtos = _mapper.Map<List<AppointmentStatusDto>>(appointmentStatus);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (appointmentStatusDtos, pagination);
     }
 }

@@ -35,7 +35,7 @@ public class PackageService : IPackageService {
 
         var packageDto = _mapper.Map<PackageDto>(package);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return packageDto;
     }
 
@@ -50,13 +50,13 @@ public class PackageService : IPackageService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var package = await query.ToListAsync();
         var packageDtos = _mapper.Map<List<PackageDto>>(package);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (packageDtos, pagination);
     }
 }

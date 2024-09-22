@@ -105,7 +105,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _provinceService.GetProvinces(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.provinceDtos, result.pagination);
         }
 
@@ -116,7 +116,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _provinceService.GetProvince(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -134,7 +134,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _districtService.GetDistricts(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.districtDtos, result.pagination);
         }
 
@@ -145,7 +145,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _districtService.GetDistrict(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -163,7 +163,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _subDistrictService.GetSubDistricts(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.subDistrictDtos, result.pagination);
         }
 
@@ -174,7 +174,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _subDistrictService.GetSubDistrict(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -194,7 +194,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _appointmentStatusService.GetAppointmentStatuses(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.appointmentStatusDtos, result.pagination);
         }
 
@@ -205,7 +205,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _appointmentStatusService.GetAppointmentStatus(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -223,7 +223,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _auditActionService.GetAuditActions(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.auditActionDtos, result.pagination);
         }
 
@@ -234,7 +234,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _auditActionService.GetAuditAction(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -250,7 +250,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _expertTypeService.GetExpertTypes(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.expertTypeDtos, result.pagination);
         }
 
@@ -261,7 +261,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _expertTypeService.GetExpertType(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -277,7 +277,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _genderService.GetGenders(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.genderDtos, result.pagination);
         }
 
@@ -288,7 +288,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _genderService.GetGender(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -304,7 +304,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _packageService.GetPackages(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.packageDtos, result.pagination);
         }
 
@@ -315,7 +315,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _packageService.GetPackage(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -332,7 +332,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _paymentMethodService.GetPaymentMethods(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.paymentMethodDtos, result.pagination);
         }
 
@@ -343,7 +343,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _paymentMethodService.GetPaymentMethod(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -360,7 +360,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _paymentStatusService.GetPaymentStatuses(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.paymentStatusDtos, result.pagination);
         }
 
@@ -371,7 +371,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _paymentStatusService.GetPaymentStatus(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -388,7 +388,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _productTypeService.GetProductTypes(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.productTypeDtos, result.pagination);
         }
 
@@ -399,7 +399,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _productTypeService.GetProductType(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -416,7 +416,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _providerTypeService.GetProviderTypes(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.providerTypeDtos, result.pagination);
         }
 
@@ -427,7 +427,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _providerTypeService.GetProviderType(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -443,7 +443,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _stockTypeService.GetStockTypes(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.stockTypeDtos, result.pagination);
         }
 
@@ -454,7 +454,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _stockTypeService.GetStockType(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -471,7 +471,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _treatmentRecordFieldService.GetTreatmentRecordFields(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.treatmentRecordFieldDtos, result.pagination);
         }
 
@@ -482,7 +482,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _treatmentRecordFieldService.GetTreatmentRecordField(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 
@@ -498,7 +498,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _userTypeService.GetUserTypes(paginationDto, filterDto, sortDto);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result.userTypeDtos, result.pagination);
         }
 
@@ -509,7 +509,7 @@ namespace DentalClinicServer.Controllers {
 
             var result = await _userTypeService.GetUserType(id);
 
-            _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+            _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
             return ResponseResult.Success(result);
         }
 

@@ -35,7 +35,7 @@ public class UserTypeService : IUserTypeService {
 
         var userTypeDto = _mapper.Map<UserTypeDto>(userType);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return userTypeDto;
     }
 
@@ -50,13 +50,13 @@ public class UserTypeService : IUserTypeService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var userType = await query.ToListAsync();
         var userTypeDtos = _mapper.Map<List<UserTypeDto>>(userType);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (userTypeDtos, pagination);
     }
 }

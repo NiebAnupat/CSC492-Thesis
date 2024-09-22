@@ -60,11 +60,11 @@ namespace DentalClinicServer.Helpers {
             return source.AsQueryable().Provider.CreateQuery<TEntity>(resultExpression);
         }
 
-        public static async Task<(IQueryable<TEntity> query, PaginationResultDto paginationResultDto)>
+        public static (IQueryable<TEntity> query, PaginationResultDto paginationResultDto)
             GetPagination<TEntity>(this IQueryable<TEntity> source, PaginationDto pagination,
                 QueryFilterDto filter, QuerySortDto sort) {
             var query = source.FilterQuery(filter).SortQuery(sort);
-            double totalAmountRecords = await source.CountAsync();
+            double totalAmountRecords =  source.Count();
             double totalAmountPages = Math.Ceiling(totalAmountRecords / pagination.RecordsPerPage);
             int pageIndex = pagination.Page - 1;
 

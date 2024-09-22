@@ -35,7 +35,7 @@ public class ExpertTypeService : IExpertTypeService {
 
         var expertTypeDto = _mapper.Map<ExpertTypeDto>(expertType);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return expertTypeDto;
     }
 
@@ -50,13 +50,13 @@ public class ExpertTypeService : IExpertTypeService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var expertType = await query.ToListAsync();
         var expertTypeDtos = _mapper.Map<List<ExpertTypeDto>>(expertType);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (expertTypeDtos, pagination);
     }
 }

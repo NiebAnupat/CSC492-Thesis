@@ -8,10 +8,10 @@ public static class Method {
     //TODO: Implement the following methods
     public static int GetActionId(EntityState state) {
         return state switch {
-            EntityState.Added => 1, // Create
-            EntityState.Deleted => 2, // Delete
-            EntityState.Modified => 3, // Update
-            _ => 0 // Default
+            EntityState.Added => 2, // Create
+            EntityState.Deleted => 3, // Delete
+            EntityState.Modified => 4, // Update
+            _ => 1 // Default
         };
     }
 
@@ -28,18 +28,18 @@ public static class Method {
         return JsonConvert.SerializeObject(obj);
     }
 
-    public static string GetBranchId() {
+    public static string? GetBranchId() {
         // Logic to get the current branch ID
-        return "branch-id";
+        return null;
     }
 
-    public static int GetCurrentUserTypeId() {
+    public static int? GetCurrentUserTypeId() {
         // Logic to get the current user type ID
-        return 1;
+        return null;
     }
 
-    public static string GetCurrentUserId() {
+    public static string? GetCurrentUserId() {
         // Logic to get the current user ID
-        return "user-id";
+        return null;
     }
 }

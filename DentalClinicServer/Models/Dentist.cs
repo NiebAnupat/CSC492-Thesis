@@ -68,13 +68,13 @@ public partial class Dentist
     /// <summary>
     /// Create date
     /// </summary>
-    [Column(TypeName = "timestamp without time zone")]
+    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Update date
     /// </summary>
-    [Column(TypeName = "timestamp without time zone")]
+    [Column(TypeName = "timestamp with time zone")]
     public DateTime UpdatedAt { get; set; }
 
     [Column(TypeName = "character varying")]

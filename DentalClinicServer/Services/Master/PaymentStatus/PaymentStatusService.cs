@@ -35,7 +35,7 @@ public class PaymentStatusService : IPaymentStatusService {
 
         var paymentStatusDto = _mapper.Map<PaymentStatusDto>(paymentStatus);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return paymentStatusDto;
     }
 
@@ -50,13 +50,13 @@ public class PaymentStatusService : IPaymentStatusService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var paymentStatus = await query.ToListAsync();
         var paymentStatusDtos = _mapper.Map<List<PaymentStatusDto>>(paymentStatus);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (paymentStatusDtos, pagination);
     }
 }

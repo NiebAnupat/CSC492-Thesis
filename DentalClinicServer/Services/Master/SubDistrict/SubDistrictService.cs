@@ -35,7 +35,7 @@ public class SubDistrictService : ISubDistrictService {
 
         var subDistrictDto = _mapper.Map<SubDistrictDto>(subDistrict);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return subDistrictDto;
     }
 
@@ -50,13 +50,13 @@ public class SubDistrictService : ISubDistrictService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var subDistrict = await query.ToListAsync();
         var subDistrictDtos = _mapper.Map<List<SubDistrictDto>>(subDistrict);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (subDistrictDtos, pagination);
     }
 }

@@ -35,7 +35,7 @@ public class TreatmentRecordFieldService : ITreatmentRecordFieldService {
 
         var treatmentRecordFieldDto = _mapper.Map<TreatmentRecordFieldDto>(treatmentRecordField);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return treatmentRecordFieldDto;
     }
 
@@ -50,13 +50,13 @@ public class TreatmentRecordFieldService : ITreatmentRecordFieldService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var treatmentRecordField = await query.ToListAsync();
         var treatmentRecordFieldDtos = _mapper.Map<List<TreatmentRecordFieldDto>>(treatmentRecordField);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (treatmentRecordFieldDtos, pagination);
     }
 }

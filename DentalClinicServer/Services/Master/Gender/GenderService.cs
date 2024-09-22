@@ -35,7 +35,7 @@ public class GenderService : IGenderService {
 
         var genderDto = _mapper.Map<GenderDto>(gender);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return genderDto;
     }
 
@@ -50,13 +50,13 @@ public class GenderService : IGenderService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var gender = await query.ToListAsync();
         var genderDtos = _mapper.Map<List<GenderDto>>(gender);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (genderDtos, pagination);
     }
 }

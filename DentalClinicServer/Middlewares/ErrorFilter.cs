@@ -46,8 +46,16 @@ namespace DentalClinicServer.Middlewares {
              *           400 Bad Request           *
              ***************************************/
 
+            if (context.Exception is BadHttpRequestException) {
+                result = ResponseResult.Failure<string>(context.Exception.Message, 400);
+            }
+
             if (context.Exception is ArgumentNullException) {
                 result = ResponseResult.Failure<string>("Missing required parameter.", 400);
+            }
+
+            if (context.Exception is NotFoundException) {
+                result = ResponseResult.Failure<string>(context.Exception.Message, 404);
             }
 
             if (context.Exception is System.ComponentModel.DataAnnotations.ValidationException) {
@@ -78,16 +86,15 @@ namespace DentalClinicServer.Middlewares {
                 result = ResponseResult.Failure<string>(context.Exception.Message, 803);
             }
 
-            if (context.Exception is NotFoundException) {
-                result = ResponseResult.Failure<string>(context.Exception.Message, 804);
-            }
-
             if (context.Exception is NullException) {
                 result = ResponseResult.Failure<string>(context.Exception.Message, 805);
             }
 
             Log.Warning(context.Exception, "{Middleware} Return error response [Code={Code},Message={Message}]", "Exception Filter", result.Code, result.Message);
-            context.Result = new OkObjectResult(result);
+            // set the response code
+            context.HttpContext.Response.StatusCode = result.Code ?? 500;
+            context.Result = new ObjectResult(result);
         }
+
     }
 }

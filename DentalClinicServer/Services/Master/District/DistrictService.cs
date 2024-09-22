@@ -36,7 +36,7 @@ public class DistrictService : IDistrictService {
 
         var districtDto = _mapper.Map<DistrictDtoIncludeDetail>(district);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return districtDto;
     }
 
@@ -51,13 +51,13 @@ public class DistrictService : IDistrictService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var district = await query.ToListAsync();
         var districtDtos = _mapper.Map<List<DistrictDto>>(district);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (districtDtos, pagination);
     }
 }

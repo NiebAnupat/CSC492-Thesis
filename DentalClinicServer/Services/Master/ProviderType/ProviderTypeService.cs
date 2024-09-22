@@ -35,7 +35,7 @@ public class ProviderTypeService : IProviderTypeService {
 
         var providerTypeDto = _mapper.Map<ProviderTypeDto>(providerType);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return providerTypeDto;
     }
 
@@ -50,13 +50,13 @@ public class ProviderTypeService : IProviderTypeService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var providerType = await query.ToListAsync();
         var providerTypeDtos = _mapper.Map<List<ProviderTypeDto>>(providerType);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (providerTypeDtos, pagination);
     }
 }

@@ -35,7 +35,7 @@ public class AuditActionService : IAuditActionService {
 
         var auditActionDto = _mapper.Map<AuditActionDto>(auditAction);
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return auditActionDto;
     }
 
@@ -50,13 +50,13 @@ public class AuditActionService : IAuditActionService {
             query = query.Where(p => p.IsActive == paginationDto.IsActive);
         }
 
-        (query, var pagination) = await query.GetPagination(paginationDto, filterDto, sortDto);
+        (query, var pagination) = query.GetPagination(paginationDto, filterDto, sortDto);
 
         var auditAction = await query.ToListAsync();
         var auditActionDtos = _mapper.Map<List<AuditActionDto>>(auditAction);
 
 
-        _logger.Debug("[{ActionName}] - Ended : {date}", actionName, DateTime.Now);
+        _logger.Debug("[{ActionName}] - Success : {date}", actionName, DateTime.Now);
         return (auditActionDtos, pagination);
     }
 }

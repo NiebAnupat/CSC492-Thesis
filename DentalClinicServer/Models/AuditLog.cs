@@ -12,8 +12,7 @@ namespace DentalClinicServer.Models;
 public partial class AuditLog
 {
     [Key]
-    [Column(TypeName = "character varying")]
-    public string AuditLogId { get; set; } = null!;
+    public int AuditLogId { get; set; }
 
     public int AuditActionId { get; set; }
 
@@ -38,13 +37,13 @@ public partial class AuditLog
     /// <summary>
     /// Create date
     /// </summary>
-    [Column(TypeName = "timestamp without time zone")]
+    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }
 
-    public int CreatedByUserTypeId { get; set; }
+    public int? CreatedByUserTypeId { get; set; }
 
     [Column(TypeName = "character varying")]
-    public string CreatedByUserId { get; set; } = null!;
+    public string? CreatedByUserId { get; set; } = null!;
 
     public bool IsActive { get; set; }
 
